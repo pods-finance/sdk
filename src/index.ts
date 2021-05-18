@@ -39,14 +39,14 @@ async function main() {
   const options: IOption[] = [];
 
   mock.forEach((item) => {
-    const option = OptionBuilder.fromSubgraphData(
-      item,
-      networks.kovan.networkId
-    );
-    const pool = PoolBuilder.fromSubgraphData(
-      item.pool,
-      networks.kovan.networkId
-    );
+    const option = OptionBuilder.fromSubgraphData({
+      source: item,
+      networkId: networks.kovan.networkId,
+    });
+    const pool = PoolBuilder.fromSubgraphData({
+      source: item.pool,
+      networkId: networks.kovan.networkId,
+    });
 
     option.pool = pool;
     options.push(option);

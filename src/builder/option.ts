@@ -5,26 +5,23 @@ import { Option } from "../entities";
 export default class OptionBuilder implements IOptionBuilder {
   private constructor() {}
 
-  public static fromSubgraphData(
-    source: { [key: string]: any },
-    networkId: number
-  ): IOption {
-    const params = { ...source };
-    params.address = _.get(source, "id");
-    params.networkId = networkId;
-    params.type = _.get(source, "type");
+  public static fromSubgraphData(params: {
+    source: { [key: string]: any };
+    networkId: number;
+  }): IOption {
+    const body = { ...params.source };
+    body.address = _.get(body, "id");
+    body.networkId = params.networkId;
+    body.type = _.get(body, "type");
 
-    params.expiration = _.get(source, "expiration");
-    params.exerciseStart = _.get(source, "exerciseStart");
-    params.exerciseWindowSize = _.get(source, "exerciseWindowSize");
+    body.expiration = _.get(body, "expiration");
+    body.exerciseStart = _.get(body, "exerciseStart");
+    body.exerciseWindowSize = _.get(body, "exerciseWindowSize");
 
-    params.poolAddress = _.get(source, "pool.id");
-    params.factoryAddress = _.get(source, "factory.id");
+    body.poolAddress = _.get(body, "pool.id");
+    body.factoryAddress = _.get(body, "factory.id");
 
-    // params.pool.address = _.get(source, "pool.id");
-    // params.pool.factoryAddress = _.get(source, "pool.factory.id");
-
-    const option = new Option(params as IOptionBuilderParams);
+    const option = new Option(body as IOptionBuilderParams);
 
     return option;
   }
