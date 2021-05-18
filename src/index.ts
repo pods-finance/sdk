@@ -53,13 +53,19 @@ async function main() {
   });
 
   options.forEach(async (option) => {
+    const parameters = await option.pool?.getParameters({
+      web3: web3Instance,
+    });
+
     console.log(
-      "Underlying Balance",
-      option.address,
-      await option.underlying.getBalance({
-        web3: web3Instance,
-        owner: "0xAFA20A683A4ff46991Cb065Ae507Bf3b0110d47D",
-      })
+      parameters,
+      parameters?.impliedVolatility?.humanized.toString(),
+      parameters?.totalBalanceA?.humanized.toString(),
+      parameters?.totalBalanceB?.humanized.toString(),
+      parameters?.deamortizedBalanceA?.humanized.toString(),
+      parameters?.deamortizedBalanceB?.humanized.toString(),
+      parameters?.feeAmountPoolA?.humanized.toString(),
+      parameters?.feeAmountPoolB?.humanized.toString()
     );
   });
 }

@@ -10,7 +10,6 @@ export interface IPoolIndicators {
   totalBalanceB?: IValue;
   deamortizedBalanceA?: IValue;
   deamortizedBalanceB?: IValue;
-  fImp?: IValue;
   feeAmountPoolA?: IValue;
   feeAmountPoolB?: IValue;
 }

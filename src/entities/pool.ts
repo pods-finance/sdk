@@ -46,12 +46,12 @@ export default class Pool implements IPool {
     });
   }
   async getIV(params: { web3: Web3 }): Promise<IValue> {
-    const contract = contracts.instances.erc20(params.web3, this.address);
+    const contract = contracts.instances.pool(params.web3, this.address);
     const properties = await contract.methods.priceProperties().call();
 
     const IV: IValue = {
-      raw: _.get(properties, "currentSigma"),
-      humanized: _.get(properties, "currentSigma").dividedBy(
+      raw: new BigNumber(_.get(properties, "currentSigma")),
+      humanized: new BigNumber(_.get(properties, "currentSigma")).dividedBy(
         new BigNumber(10).pow(18)
       ),
     };
@@ -69,7 +69,7 @@ export default class Pool implements IPool {
           _.isNumber(padding) ? padding : this.tokenA.decimals
         )
       );
-      const contract = contracts.instances.erc20(params.web3, this.address);
+      const contract = contracts.instances.pool(params.web3, this.address);
 
       const {
         0: result,
@@ -101,7 +101,7 @@ export default class Pool implements IPool {
           _.isNumber(padding) ? padding : this.tokenA.decimals
         )
       );
-      const contract = contracts.instances.erc20(params.web3, this.address);
+      const contract = contracts.instances.pool(params.web3, this.address);
 
       const {
         0: result,
@@ -133,7 +133,7 @@ export default class Pool implements IPool {
           _.isNumber(padding) ? padding : this.tokenB.decimals
         )
       );
-      const contract = contracts.instances.erc20(params.web3, this.address);
+      const contract = contracts.instances.pool(params.web3, this.address);
 
       const {
         0: result,
@@ -159,7 +159,7 @@ export default class Pool implements IPool {
     web3: Web3;
     amount: BigNumber;
   }): Promise<IValue[]> {
-    const contract = contracts.instances.erc20(params.web3, this.address);
+    const contract = contracts.instances.pool(params.web3, this.address);
     const resultDBA = await contract.methods.deamortizedTokenABalance().call();
     const resultDBB = await contract.methods.deamortizedTokenBBalance().call();
 
@@ -176,11 +176,8 @@ export default class Pool implements IPool {
     return [DBA, DBB];
   }
 
-  async getFeeBalances(params: {
-    web3: Web3;
-    amount: BigNumber;
-  }): Promise<IValue[]> {
-    const contract = contracts.instances.erc20(params.web3, this.address);
+  async getFeeBalances(params: { web3: Web3 }): Promise<IValue[]> {
+    const contract = contracts.instances.pool(params.web3, this.address);
 
     const feePoolAAddress = await contract.methods.feePoolA().call();
     const feePoolBAddress = await contract.methods.feePoolB().call();
@@ -211,7 +208,7 @@ export default class Pool implements IPool {
   }
 
   async getTotalBalances(params: { web3: Web3 }): Promise<IValue[]> {
-    const contract = contracts.instances.erc20(params.web3, this.address);
+    const contract = contracts.instances.pool(params.web3, this.address);
     const result = await contract.methods.getPoolBalances().call();
     const TBA: IValue = {
       raw: new BigNumber(result[0]),
@@ -231,19 +228,26 @@ export default class Pool implements IPool {
   async getParameters(params: { web3: Web3 }): Promise<IPoolIndicators> {
     const result: IPoolIndicators = {};
     const { web3 } = params;
-    const queryIV = await _.attemptAsync(() => this.getIV({ web3 }));
+    const queryIV = await _.attemptAsync(async () => this.getIV({ web3 }));
     result.impliedVolatility = _.isError(queryIV) ? null : queryIV;
 
-    console.log({ result });
+    const totalBalances = await _.attemptAsync(async () =>
+      this.getTotalBalances({ web3 })
+    );
+    result.totalBalanceA = totalBalances[0];
+    result.totalBalanceB = totalBalances[1];
 
-    // impliedVolatility: Value;
-    // totalBalanceA: Value;
-    // totalBalanceB: Value;
-    // deamortizedBalanceA: Value;
-    // deamortizedBalanceB: Value;
-    // fImp: Value;
-    // feeAmountPoolA: Value;
-    // feeAmountPoolB: Value;
+    const deamortizedBalances = await _.attemptAsync(async () =>
+      this.getTotalBalances({ web3 })
+    );
+    result.deamortizedBalanceA = deamortizedBalances[0];
+    result.deamortizedBalanceB = deamortizedBalances[1];
+
+    const feeBalances = await _.attemptAsync(async () =>
+      this.getFeeBalances({ web3 })
+    );
+    result.feeAmountPoolA = feeBalances[0];
+    result.feeAmountPoolB = feeBalances[1];
 
     return result;
   }
