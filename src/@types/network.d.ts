@@ -1,4 +1,4 @@
-interface Network {
+export interface INetwork {
   chainId: number;
   networkId: number;
   name: string;

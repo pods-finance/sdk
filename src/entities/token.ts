@@ -1,18 +1,9 @@
 import _ from "lodash";
 import BigNumber from "bignumber.js";
 import Web3 from "web3";
+import { INetwork, IToken } from "@types";
 import networks from "../constants/networks";
 import contracts from "../contracts";
-
-interface IToken {
-  readonly address: string;
-  readonly decimals: BigNumber;
-  readonly symbol: string;
-  readonly name: string;
-  readonly networkId: number;
-
-  balanceOf(params: { web3: Web3; spender: string }): Promise<BigNumber>;
-}
 
 export default class Token implements IToken {
   public readonly address: string;
@@ -37,17 +28,31 @@ export default class Token implements IToken {
   }
 
   isUtility() {
-    const network: Network = networks[this.networkId];
+    const network: INetwork = networks[this.networkId];
     return network.token.utility.includes(this.address);
   }
 
   isUtilityWrapped() {
-    const network: Network = networks[this.networkId];
+    const network: INetwork = networks[this.networkId];
     return network.token.wrapped.includes(this.address);
   }
 
-  async balanceOf(params: { web3: Web3; spender: string }): Promise<BigNumber> {
+  async getBalance(params: { web3: Web3; owner: string }): Promise<BigNumber> {
+    if (this.isUtility()) {
+      const value = await params.web3.eth.getBalance(params.owner);
+      return new BigNumber(value);
+    }
     const contract = contracts.instances.erc20(params.web3, this.address);
-    return contract.methods.balanceOf(params.spender).call();
+    return contract.methods.balanceOf(params.owner).call();
+  }
+
+  async getAllowance(params: {
+    web3: Web3;
+    owner: string;
+    spender?: string;
+  }): Promise<BigNumber> {
+    if (this.isUtility()) return new BigNumber(Infinity);
+    const contract = contracts.instances.erc20(params.web3, this.address);
+    return contract.methods.balanceOf(params.spender || params.owner).call();
   }
 }

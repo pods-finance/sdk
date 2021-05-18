@@ -1,9 +1,11 @@
+import { INetwork } from "@types";
+
 const chains = {
   polygon: "Polygon",
   ethereum: "Ethereum",
 };
 
-const _networks: { [key: number]: Network } = {
+const _networks: { [key: number]: INetwork } = {
   1: {
     chainId: 1,
     networkId: 1,
@@ -76,7 +78,7 @@ const _networks: { [key: number]: Network } = {
   },
 };
 
-const networks: { [key: string]: Network } = {
+const networks: { [key: string]: INetwork } = {
   ..._networks,
   mainnet: _networks[1],
   kovan: _networks[42],

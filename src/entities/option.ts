@@ -4,65 +4,50 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import duration from "dayjs/plugin/duration";
 
+import { IPool, IOption, IOptionBuilderParams, IToken } from "@types";
+import { OptionType } from "../constants/globals";
 import Token from "./token";
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
 
-enum OptionType {
-  Put = 0,
-  Call = 1,
-}
-
-interface IOption {
-  readonly address: string;
-  readonly networkId: number;
-
-  readonly underlying: Token;
-  readonly strike: Token;
-  readonly type: OptionType;
-  readonly strikePrice: BigNumber;
-  readonly expiration: number;
-  readonly exercise: number;
-  readonly window: number;
-
-  readonly factoryAddress: string;
-
-  durations(): { [key: string]: number | string | boolean | null };
-}
-
 export default class Option implements IOption {
+  /**
+   * ---------- VARIABLES ----------
+   */
+
   public readonly address: string;
   public readonly networkId: number;
 
-  public readonly underlying: Token;
-  public readonly strike: Token;
+  public readonly underlying: IToken;
+  public readonly strike: IToken;
   public readonly type: OptionType = OptionType.Put;
   public readonly strikePrice: BigNumber;
   public readonly expiration: number;
-  public readonly exercise: number;
-  public readonly window: number;
+  public readonly exerciseStart: number;
+  public readonly exerciseWindowSize: number;
 
   public readonly factoryAddress: string;
+  public readonly poolAddress: string;
 
-  constructor(params: {
-    address: string;
-    networkId: number;
-    type: number;
+  private _pool?: IPool | undefined;
 
-    underlyingAsset: string;
-    underlyingAssetDecimals: BigNumber;
-    underlyingAssetSymbol: string;
-    strikeAsset: string;
-    strikeAssetDecimals: BigNumber;
-    strikeAssetSymbol: string;
-    strikePrice: BigNumber;
-    expiration: number;
-    exercise: number;
-    window: number;
+  /**
+   * ---------- SETTERS & GETTERS ----------
+   */
 
-    factoryAddress: string;
-  }) {
+  public get pool(): IPool | undefined {
+    return this._pool;
+  }
+  public set pool(value: IPool | undefined) {
+    this._pool = value;
+  }
+
+  /**
+   * ---------- CONSTRUCTOR & METHODS ----------
+   */
+
+  constructor(params: IOptionBuilderParams) {
     this.address = params.address.toLowerCase();
     this.networkId = params.networkId;
 
@@ -83,28 +68,31 @@ export default class Option implements IOption {
 
     this.strikePrice = params.strikePrice;
     this.expiration = params.expiration;
-    this.exercise = params.exercise;
-    this.window = params.window;
+    this.exerciseStart = params.exerciseStart;
+    this.exerciseWindowSize = params.exerciseWindowSize;
 
-    this.factoryAddress = params.factoryAddress;
+    this.factoryAddress = _.toString(params.factoryAddress).toLowerCase();
+    this.poolAddress = _.toString(params.poolAddress).toLowerCase();
   }
 
-  durations(): { [key: string]: number | string | boolean | null } {
+  getDurations(): { [key: string]: number | string | boolean | null } {
     const expirationFormatted = dayjs(
       new BigNumber(this.expiration).multipliedBy(1000).toNumber()
     ).format("MMM Do, YYYY");
 
     const exerciseFormatted = dayjs(
-      new BigNumber(this.exercise).multipliedBy(1000).toNumber()
+      new BigNumber(this.exerciseStart).multipliedBy(1000).toNumber()
     ).format("MMM Do, YYYY");
 
-    const windowFormatted = dayjs.duration(this.window * 1000).humanize();
+    const windowFormatted = dayjs
+      .duration(this.exerciseWindowSize * 1000)
+      .humanize();
 
     const expirationToToday = new BigNumber(this.expiration)
       .minus(dayjs().valueOf() / 1000)
       .toNumber();
 
-    const exerciseToToday = expirationToToday - this.window;
+    const exerciseToToday = expirationToToday - this.exerciseWindowSize;
     const expirationFromNow = dayjs(this.expiration * 1000).fromNow();
     const exerciseToTodayFormatted = dayjs
       .duration(exerciseToToday)
