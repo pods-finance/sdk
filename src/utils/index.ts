@@ -40,8 +40,24 @@ export const zero: IValue = {
   humanized: new BigNumber(0),
 };
 
+export function expect(
+  value: any,
+  identifier: string = "unknown",
+  strongType?: string
+) {
+  if (value === undefined || _.isNil(value))
+    throw new Error(`Missing parameter: ${identifier}`);
+  if (!_.isNilOrEmptyString(strongType) && typeof value !== strongType)
+    throw new Error(
+      `Unexpected type for parameter: ${identifier}, ${strongType}`
+    );
+}
+
 const utils = {
   config,
   isNilOrEmptyString,
+  attemptAsync,
+  zero,
+  expect,
 };
 export default utils;

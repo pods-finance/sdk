@@ -2,8 +2,8 @@ import BigNumber from "bignumber.js";
 import { IOption } from "./option";
 
 export interface IOptionBuilderParams {
-  address: string;
-  networkId: number;
+  address?: string;
+  networkId?: number;
   type: number;
 
   underlyingAsset: string;

@@ -11,4 +11,8 @@ export interface INetwork {
     symbol: string;
     decimals: number;
   };
+  subgraph?: {
+    prod: string;
+    dev: string;
+  };
 }

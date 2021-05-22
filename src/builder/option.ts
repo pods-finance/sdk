@@ -5,7 +5,7 @@ import { Option } from "../entities";
 export default class OptionBuilder implements IOptionBuilder {
   private constructor() {}
 
-  public static fromSubgraphData(params: {
+  public static fromData(params: {
     source: { [key: string]: any };
     networkId: number;
   }): IOption {
@@ -21,7 +21,10 @@ export default class OptionBuilder implements IOptionBuilder {
     body.poolAddress = _.get(body, "pool.id");
     body.factoryAddress = _.get(body, "factory.id");
 
-    const option = new Option(body as IOptionBuilderParams);
+    const option = new Option({
+      address: body.address,
+      networkId: body.networkId,
+    }).init(body as IOptionBuilderParams);
 
     return option;
   }

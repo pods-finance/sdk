@@ -19,6 +19,10 @@ const _networks: { [key: number]: INetwork } = {
       symbol: "ETH",
       decimals: 18,
     },
+    subgraph: {
+      prod: "https://api.thegraph.com/subgraphs/name/pods-finance/pods",
+      dev: "https://api.thegraph.com/subgraphs/name/pods-finance/pods-dev",
+    },
   },
   42: {
     chainId: 42,
@@ -32,6 +36,11 @@ const _networks: { [key: number]: INetwork } = {
       name: "Ether",
       symbol: "ETH",
       decimals: 18,
+    },
+    subgraph: {
+      prod: "https://api.thegraph.com/subgraphs/name/pods-finance/pods-kovan",
+      dev:
+        "https://api.thegraph.com/subgraphs/name/pods-finance/pods-kovan-dev",
     },
   },
   137: {
@@ -47,6 +56,11 @@ const _networks: { [key: number]: INetwork } = {
       symbol: "MATIC",
       decimals: 18,
     },
+    subgraph: {
+      prod: "https://api.thegraph.com/subgraphs/name/pods-finance/pods-matic",
+      dev:
+        "https://api.thegraph.com/subgraphs/name/pods-finance/pods-matic-dev",
+    },
   },
   80001: {
     chainId: 80001,
@@ -60,6 +74,11 @@ const _networks: { [key: number]: INetwork } = {
       name: "Matic",
       symbol: "MATIC",
       decimals: 18,
+    },
+    subgraph: {
+      prod: "https://api.thegraph.com/subgraphs/name/pods-finance/pods-mumbai",
+      dev:
+        "https://api.thegraph.com/subgraphs/name/pods-finance/pods-mumbai-dev",
     },
   },
   1337: {

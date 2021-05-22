@@ -1,8 +1,8 @@
 import BigNumber from "bignumber.js";
 
 export interface IPoolBuilderParams {
-  address: string;
-  networkId: number;
+  address?: string;
+  networkId?: number;
 
   factoryAddress: string;
   optionAddress: string;

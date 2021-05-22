@@ -6,8 +6,8 @@ function getInfuraInstance(): Web3 {
   );
 }
 
-const web3Source = {
+const web3 = {
   getInfuraInstance,
 };
 
-export default web3Source;
+export default web3;

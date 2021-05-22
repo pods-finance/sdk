@@ -5,9 +5,12 @@ import { Pool } from "../entities";
 export default class PoolBuilder implements IPoolBuilder {
   private constructor() {}
 
-  public static fromSubgraph() {}
+  public static fromSubgraph() {
+    /** Query the subgraph subgraph.findOptionById */
+    /** Use fromSubgraphData on the result if non-null */
+  }
 
-  public static fromSubgraphData(params: {
+  public static fromData(params: {
     source: { [key: string]: any };
     networkId: number;
   }): IPool {
@@ -17,7 +20,10 @@ export default class PoolBuilder implements IPoolBuilder {
     body.factoryAddress = _.get(body, "factory.id");
     body.optionAddress = _.get(body, "option.id");
 
-    const pool = new Pool(body as IPoolBuilderParams);
+    const pool = new Pool({
+      address: body.address,
+      networkId: body.networkId,
+    }).init(body as IPoolBuilderParams);
 
     return pool;
   }
