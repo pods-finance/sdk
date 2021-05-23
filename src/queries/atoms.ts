@@ -56,9 +56,9 @@ export const ActionFragmentLight = gql`
     }
     option {
       id
-    }
-    pool {
-      id
+      pool {
+        id
+      }
     }
   }
 `;
@@ -109,6 +109,9 @@ export const PositionFragment = gql`
     }
     option {
       id
+      pool {
+        id
+      }
     }
     premiumPaid
     premiumReceived

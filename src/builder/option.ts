@@ -1,6 +1,7 @@
 import _ from "lodash";
 import { IOption, IOptionBuilder, IOptionBuilderParams } from "@types";
 import { Option } from "../entities";
+import PoolBuilder from "./pool";
 
 export default class OptionBuilder implements IOptionBuilder {
   private constructor() {}
@@ -10,14 +11,9 @@ export default class OptionBuilder implements IOptionBuilder {
     networkId: number;
   }): IOption {
     const body = { ...params.source };
-    body.address = _.get(body, "id");
+
     body.networkId = params.networkId;
-    body.type = _.get(body, "type");
-
-    body.expiration = _.get(body, "expiration");
-    body.exerciseStart = _.get(body, "exerciseStart");
-    body.exerciseWindowSize = _.get(body, "exerciseWindowSize");
-
+    body.address = _.get(body, "id");
     body.poolAddress = _.get(body, "pool.id");
     body.factoryAddress = _.get(body, "factory.id");
 
@@ -25,6 +21,15 @@ export default class OptionBuilder implements IOptionBuilder {
       address: body.address,
       networkId: body.networkId,
     }).init(body as IOptionBuilderParams);
+
+    if (_.has(body, "pool") && _.has(body, "pool.id")) {
+      const pool = PoolBuilder.fromData({
+        source: _.get(body, "pool"),
+        networkId: body.networkId,
+      });
+
+      option.pool = pool;
+    }
 
     return option;
   }

@@ -9,9 +9,9 @@ import queries from "./queries";
 import clients from "./clients";
 import networks from "./constants/networks";
 
-import { IOption } from "@types";
+import { IAction, IOption } from "@types";
 import mock from "./constants/mock";
-import { OptionBuilder, PoolBuilder } from "./builder";
+import { ActionBuilder, OptionBuilder, PoolBuilder } from "./builder";
 
 import "cross-fetch/polyfill";
 
@@ -117,7 +117,6 @@ async function flowMock(): Promise<void> {
 }
 
 async function flowLive(): Promise<void> {
-  const options: IOption[] = [];
   const web3Instance = clients.web3.getInfuraInstance();
   const subgraphInstance = clients.subgraph.apollo.getClientInstance(
     networks.kovan,
@@ -135,21 +134,12 @@ async function flowLive(): Promise<void> {
 
   const list = _.get(query, "data.options");
 
-  console.log({ list });
-
-  list.forEach((item: any) => {
-    const option = OptionBuilder.fromData({
+  const options: IOption[] = list.map((item: any) =>
+    OptionBuilder.fromData({
       source: item,
       networkId: networks.kovan.networkId,
-    });
-    const pool = PoolBuilder.fromData({
-      source: item.pool,
-      networkId: networks.kovan.networkId,
-    });
-
-    option.pool = pool;
-    options.push(option);
-  });
+    })
+  );
 
   options.forEach(async (option) => {
     const parameters = await option.pool?.getParameters({
@@ -163,19 +153,49 @@ async function flowLive(): Promise<void> {
   });
 }
 
+async function flowActions(): Promise<void> {
+  const subgraphInstance = clients.subgraph.apollo.getClientInstance(
+    networks.kovan,
+    true
+  );
+
+  const query = await subgraphInstance.query({
+    query: queries.action.getListHeavy,
+    variables: {
+      first: 2,
+      skip: 0,
+    },
+    fetchPolicy: "no-cache",
+  });
+
+  const list = _.get(query, "data.actions");
+
+  const actions: IAction[] = list.map((item: any) =>
+    ActionBuilder.fromData({
+      source: item,
+      networkId: networks.kovan.networkId,
+    })
+  );
+
+  actions.forEach((action) => {
+    console.log(
+      "Action",
+      action.getNextDynamicBuyingPriceValue().humanized.toString()
+    );
+  });
+}
+
 const tests = {
   tokens,
   subgraphActions,
   subgraphOptions,
   flowMock,
   flowLive,
+  flowActions,
 };
 
-console.log({ tests });
-
 async function main() {
-  console.log("hello");
-  await tests.flowLive();
+  await tests.flowActions();
 }
 
 main();

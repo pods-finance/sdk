@@ -35,7 +35,6 @@ export interface IPool {
   init(params: IPoolBuilderParams): IPool;
 
   getParameters(params: { web3: Web3 }): Promise<IPoolIndicators>;
-  getMetrics(params: { web3: Web3 }): Promise<IPoolMetrics>;
 
   getIV(params: { web3: Web3 }): Promise<IValue>;
   getABPrice(params: { web3: Web3 }): Promise<IValue>;
@@ -57,4 +56,7 @@ export interface IPool {
     amount: BigNumber;
   }): Promise<IValue[]>;
   getFeeBalances(params: { web3: Web3; amount: BigNumber }): Promise<IValue[]>;
+
+  getCap(params: { web3: Web3; manager: string }): Promise<IValue>;
+  getUserPosition(params: { web3: Web3; user: string }): Promise<IValue[]>;
 }

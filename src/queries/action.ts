@@ -13,8 +13,8 @@ import {
  */
 
 export const ActionFragmentLightWithDependencies = gql`
-  fragment ActionFragmentHeavyWithDependencies on Action {
-    ...ActionFragmentHeavy
+  fragment ActionFragmentLightWithDependencies on Action {
+    ...ActionFragmentLight
     option {
       ...OptionFragment
       pool {
@@ -22,7 +22,7 @@ export const ActionFragmentLightWithDependencies = gql`
       }
     }
   }
-  ${ActionFragmentHeavy}
+  ${ActionFragmentLight}
   ${OptionFragment}
   ${PoolFragment}
 `;
@@ -51,37 +51,37 @@ export const ActionFragmentHeavyWithDependencies = gql`
 export const getByAddressLight = gql`
   query action($id: Bytes!) {
     action(id: $address) {
-      ...ActionFragmentLight
+      ...ActionFragmentLightWithDependencies
     }
   }
-  ${ActionFragmentLight}
+  ${ActionFragmentLightWithDependencies}
 `;
 
 export const getByAddressHeavy = gql`
   query action($id: Bytes!) {
     action(id: $address) {
-      ...ActionFragmentHeavy
+      ...ActionFragmentHeavyWithDependencies
     }
   }
-  ${ActionFragmentHeavy}
+  ${ActionFragmentHeavyWithDependencies}
 `;
 
 export const getByAddressesLight = gql`
   query actions($ids: [Bytes!]!) {
     actions(where: { id_in: $ids }) {
-      ...ActionFragmentLight
+      ...ActionFragmentLightWithDependencies
     }
   }
-  ${ActionFragmentLight}
+  ${ActionFragmentLightWithDependencies}
 `;
 
 export const getByAddressesHeavy = gql`
   query actions($ids: [Bytes!]!) {
     actions(where: { id_in: $ids }) {
-      ...ActionFragmentHeavy
+      ...ActionFragmentHeavyWithDependencies
     }
   }
-  ${ActionFragmentHeavy}
+  ${ActionFragmentHeavyWithDependencies}
 `;
 
 export const getListLight = gql`
@@ -92,10 +92,10 @@ export const getListLight = gql`
       orderBy: timestamp
       orderDirection: desc
     ) {
-      ...ActionFragmentLight
+      ...ActionFragmentLightWithDependencies
     }
   }
-  ${ActionFragmentLight}
+  ${ActionFragmentLightWithDependencies}
 `;
 
 export const getListHeavy = gql`
@@ -106,10 +106,10 @@ export const getListHeavy = gql`
       orderBy: timestamp
       orderDirection: desc
     ) {
-      ...ActionFragmentHeavy
+      ...ActionFragmentHeavyWithDependencies
     }
   }
-  ${ActionFragmentHeavy}
+  ${ActionFragmentHeavyWithDependencies}
 `;
 
 export const getListLightTimestampPaginated = gql`
@@ -120,10 +120,10 @@ export const getListLightTimestampPaginated = gql`
       orderBy: timestamp
       orderDirection: desc
     ) {
-      ...ActionFragmentLight
+      ...ActionFragmentLightWithDependencies
     }
   }
-  ${ActionFragmentLight}
+  ${ActionFragmentLightWithDependencies}
 `;
 
 export const getListHeavyTimestampPaginated = gql`
@@ -134,10 +134,10 @@ export const getListHeavyTimestampPaginated = gql`
       orderBy: timestamp
       orderDirection: desc
     ) {
-      ...ActionFragmentHeavy
+      ...ActionFragmentHeavyWithDependencies
     }
   }
-  ${ActionFragmentHeavy}
+  ${ActionFragmentHeavyWithDependencies}
 `;
 
 export const getListByUserLight = gql`
@@ -149,10 +149,10 @@ export const getListByUserLight = gql`
       orderDirection: desc
       where: { user: $user }
     ) {
-      ...ActionFragmentLight
+      ...ActionFragmentLightWithDependencies
     }
   }
-  ${ActionFragmentLight}
+  ${ActionFragmentLightWithDependencies}
 `;
 
 export const getListByUserHeavy = gql`
@@ -164,10 +164,10 @@ export const getListByUserHeavy = gql`
       orderDirection: desc
       where: { user: $user }
     ) {
-      ...ActionFragmentHeavy
+      ...ActionFragmentHeavyWithDependencies
     }
   }
-  ${ActionFragmentHeavy}
+  ${ActionFragmentHeavyWithDependencies}
 `;
 
 export const getListByUserLightTimestampPaginated = gql`
@@ -178,10 +178,10 @@ export const getListByUserLightTimestampPaginated = gql`
       orderDirection: desc
       where: { user: $user, timestamp_lt: $timestamp }
     ) {
-      ...ActionFragmentLight
+      ...ActionFragmentLightWithDependencies
     }
   }
-  ${ActionFragmentLight}
+  ${ActionFragmentLightWithDependencies}
 `;
 
 export const getListByUserHeavyTimestampPaginated = gql`
@@ -192,10 +192,10 @@ export const getListByUserHeavyTimestampPaginated = gql`
       orderDirection: desc
       where: { user: $user, timestamp_lt: $timestamp }
     ) {
-      ...ActionFragmentHeavy
+      ...ActionFragmentHeavyWithDependencies
     }
   }
-  ${ActionFragmentHeavy}
+  ${ActionFragmentHeavyWithDependencies}
 `;
 
 export const getListByUserAndOptionLightTimestampPaginated = gql`
@@ -211,10 +211,10 @@ export const getListByUserAndOptionLightTimestampPaginated = gql`
       orderDirection: desc
       where: { user: $user, option: $option, timestamp_lt: $timestamp }
     ) {
-      ...ActionFragmentLight
+      ...ActionFragmentLightWithDependencies
     }
   }
-  ${ActionFragmentLight}
+  ${ActionFragmentLightWithDependencies}
 `;
 
 export const getListByUserAndOptionHeavyTimestampPaginated = gql`
@@ -230,10 +230,10 @@ export const getListByUserAndOptionHeavyTimestampPaginated = gql`
       orderDirection: desc
       where: { user: $user, option: $option, timestamp_lt: $timestamp }
     ) {
-      ...ActionFragmentHeavy
+      ...ActionFragmentHeavyWithDependencies
     }
   }
-  ${ActionFragmentHeavy}
+  ${ActionFragmentHeavyWithDependencies}
 `;
 
 export const getListByUserAndPoolLightTimestampPaginated = gql`
@@ -244,10 +244,10 @@ export const getListByUserAndPoolLightTimestampPaginated = gql`
       orderDirection: desc
       where: { user: $user, pool: $pool, timestamp_lt: $timestamp }
     ) {
-      ...ActionFragmentLight
+      ...ActionFragmentLightWithDependencies
     }
   }
-  ${ActionFragmentLight}
+  ${ActionFragmentLightWithDependencies}
 `;
 
 export const getListByUserAndPoolHeavyTimestampPaginated = gql`
@@ -258,8 +258,10 @@ export const getListByUserAndPoolHeavyTimestampPaginated = gql`
       orderDirection: desc
       where: { user: $user, pool: $pool, timestamp_lt: $timestamp }
     ) {
-      ...ActionFragmentHeavy
+      ...ActionFragmentHeavyWithDependencies
     }
   }
-  ${ActionFragmentHeavy}
+  ${ActionFragmentHeavyWithDependencies}
 `;
+
+export const getList = getListLight;

@@ -5,11 +5,6 @@ import { Pool } from "../entities";
 export default class PoolBuilder implements IPoolBuilder {
   private constructor() {}
 
-  public static fromSubgraph() {
-    /** Query the subgraph subgraph.findOptionById */
-    /** Use fromSubgraphData on the result if non-null */
-  }
-
   public static fromData(params: {
     source: { [key: string]: any };
     networkId: number;

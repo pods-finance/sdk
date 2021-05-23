@@ -1,12 +1,21 @@
 import _ from "lodash";
 import BigNumber from "bignumber.js";
 import dayjs from "dayjs";
+import Web3 from "web3";
 import relativeTime from "dayjs/plugin/relativeTime";
 import duration from "dayjs/plugin/duration";
 
-import { IPool, IOption, IOptionBuilderParams, IToken, Optional } from "@types";
+import {
+  IPool,
+  IOption,
+  IOptionBuilderParams,
+  IToken,
+  Optional,
+  IValue,
+} from "@types";
 import { OptionType } from "../constants/globals";
-import { expect } from "../utils";
+import { expect, zero } from "../utils";
+import contracts from "../contracts";
 import Token from "./token";
 
 dayjs.extend(relativeTime);
@@ -20,6 +29,8 @@ export default class Option implements IOption {
   public readonly address: string;
   public readonly networkId: number;
 
+  private _symbol?: string;
+  private _decimals?: BigNumber;
   private _underlying?: IToken;
   private _strike?: IToken;
   private _type: OptionType = OptionType.Put;
@@ -34,6 +45,20 @@ export default class Option implements IOption {
   /**
    * ---------- SETTERS & GETTERS ----------
    */
+
+  public get symbol(): Optional<string> {
+    return this._symbol;
+  }
+  public set symbol(value: Optional<string>) {
+    this._symbol = value;
+  }
+
+  public get decimals(): Optional<BigNumber> {
+    return this._decimals;
+  }
+  public set decimals(value: Optional<BigNumber>) {
+    this._decimals = value;
+  }
 
   public get pool(): Optional<IPool> {
     return this._pool;
@@ -116,6 +141,8 @@ export default class Option implements IOption {
 
   init(params: IOptionBuilderParams): IOption {
     this.type = params.type ? OptionType.Call : OptionType.Put;
+    this.symbol = params.symbol;
+    this.decimals = params.decimals || 18;
 
     this.underlying = new Token({
       address: params.underlyingAsset,
@@ -138,7 +165,7 @@ export default class Option implements IOption {
     this.factoryAddress = _.toString(params.factoryAddress).toLowerCase();
     this.poolAddress = _.toString(params.poolAddress).toLowerCase();
 
-    return this;
+    return this as IOption;
   }
 
   getDurations(): { [key: string]: number | string | boolean | null } {
@@ -184,5 +211,132 @@ export default class Option implements IOption {
       isExercisable,
       isExercising,
     };
+  }
+
+  async getTotalSupply(params: { web3: Web3 }): Promise<IValue> {
+    expect(this.strike, "strike");
+
+    try {
+      const contract = contracts.instances.option(params.web3, this.address);
+      const result = await contract.methods.totalSupply().call();
+
+      const supply: IValue = {
+        raw: result,
+        humanized: result.dividedBy(
+          new BigNumber(10).pow(this.strike!.decimals)
+        ),
+      };
+
+      return supply;
+    } catch (error) {
+      console.error("Pods SDK", error);
+    }
+    return zero;
+  }
+
+  async getCap(params: { web3: Web3; manager: string }): Promise<IValue> {
+    const { web3, manager } = params;
+
+    expect(this.strike, "strike");
+    expect(manager, "manager (address)");
+
+    try {
+      const managerContract = contracts.instances.configurationManager(
+        web3,
+        manager
+      );
+      const providerAddress = await managerContract.methods
+        .getCapProvider()
+        .call();
+      const providerContract = contracts.instances.capProvider(
+        web3,
+        providerAddress
+      );
+
+      const result = await providerContract.methods.getCap(this.address).call();
+
+      const size: IValue = {
+        raw: new BigNumber(result),
+        humanized: new BigNumber(result).dividedBy(
+          new BigNumber(10).pow(this.strike!.decimals)
+        ),
+      };
+
+      return size;
+    } catch (error) {
+      console.error("Pods SDK", error);
+    }
+    return zero;
+  }
+
+  async getUserMintedOptions(params: {
+    web3: Web3;
+    user: string;
+  }): Promise<IValue> {
+    const { web3, user } = params;
+
+    expect(this.decimals, "decimals");
+    expect(user, "user (address)");
+
+    try {
+      const contract = contracts.instances.option(web3, this.address);
+      const result = await contract.methods.mintedOptions().call();
+
+      const size: IValue = {
+        raw: new BigNumber(result),
+        humanized: new BigNumber(result).dividedBy(
+          new BigNumber(10).pow(this.decimals!)
+        ),
+      };
+
+      return size;
+    } catch (error) {
+      console.error("Pods SDK", error);
+    }
+    return zero;
+  }
+
+  /**
+   *
+   * @param {object} params
+   * @param {Web3} params.web3 Web3 instance
+   * @param {string} params.user User wallet address
+   * @returns {Promise<IValue[]>} [UnderylyingBalance, StrikeBalance]
+   */
+  async getUserWithdrawBalances(params: {
+    web3: Web3;
+    user: string;
+  }): Promise<IValue[]> {
+    const { web3, user } = params;
+
+    expect(this.underlying, "underlying");
+    expect(this.strike, "strike");
+    expect(user, "user (address)");
+
+    try {
+      const contract = contracts.instances.option(web3, this.address);
+      const result = await contract.methods
+        .getSellerWithdrawAmounts(user)
+        .call();
+
+      const SB: IValue = {
+        raw: new BigNumber(result[0]),
+        humanized: new BigNumber(result[0]).dividedBy(
+          new BigNumber(10).pow(this.strike!.decimals)
+        ),
+      };
+
+      const UB: IValue = {
+        raw: new BigNumber(result[1]),
+        humanized: new BigNumber(result[1]).dividedBy(
+          new BigNumber(10).pow(this.underlying!.decimals)
+        ),
+      };
+
+      return [UB, SB];
+    } catch (error) {
+      console.error("Pods SDK", error);
+    }
+    return [zero, zero];
   }
 }

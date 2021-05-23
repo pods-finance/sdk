@@ -1,11 +1,13 @@
 import BigNumber from "bignumber.js";
-import { IOption } from "./option";
+import { IPoolBuilderParams } from "./poolBuilder";
 
 export interface IOptionBuilderParams {
   address?: string;
   networkId?: number;
   type: number;
 
+  symbol: string;
+  decimals: BigNumber;
   underlyingAsset: string;
   underlyingAssetDecimals: BigNumber;
   underlyingAssetSymbol: string;
@@ -19,6 +21,8 @@ export interface IOptionBuilderParams {
 
   factoryAddress: string;
   poolAddress: string;
+
+  pool?: IPoolBuilderParams;
 }
 
 export interface IOptionBuilder {}

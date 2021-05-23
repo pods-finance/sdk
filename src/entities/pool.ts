@@ -10,7 +10,6 @@ import {
   IPool,
   IPoolBuilderParams,
   IPoolIndicators,
-  IPoolMetrics,
   Optional,
 } from "@types";
 import { expect } from "../utils";
@@ -365,9 +364,79 @@ export default class Pool implements IPool {
     return result;
   }
 
-  async getMetrics(params: { web3: Web3 }): Promise<IPoolMetrics> {
-    const result: IPoolMetrics = {};
-    console.log(params);
-    return result;
+  async getCap(params: { web3: Web3; manager: string }): Promise<IValue> {
+    const { web3, manager } = params;
+
+    expect(this.tokenB, "tokenB");
+    expect(manager, "manager (address)");
+
+    try {
+      const managerContract = contracts.instances.configurationManager(
+        web3,
+        manager
+      );
+      const providerAddress = await managerContract.methods
+        .getCapProvider()
+        .call();
+      const providerContract = contracts.instances.capProvider(
+        web3,
+        providerAddress
+      );
+      const result = await providerContract.methods.getCap(this.address).call();
+
+      const size: IValue = {
+        raw: new BigNumber(result),
+        humanized: new BigNumber(result).dividedBy(
+          new BigNumber(10).pow(this.tokenB!.decimals)
+        ),
+      };
+
+      return size;
+    } catch (error) {
+      console.error("Pods SDK", error);
+    }
+
+    return zero;
+  }
+
+  async getUserPosition(params: {
+    web3: Web3;
+    user: string;
+  }): Promise<IValue[]> {
+    const { web3, user } = params;
+
+    expect(this.tokenB, "tokenA");
+    expect(this.tokenB, "tokenB");
+    expect(user, "user (address)");
+
+    try {
+      const contract = contracts.instances.pool(web3, this.address);
+      const result = await contract.methods
+        .getRemoveLiquidityAmounts(
+          new BigNumber(100).toString(),
+          new BigNumber(100).toString(),
+          user
+        )
+        .call();
+
+      const UBA: IValue = {
+        raw: new BigNumber(result[0]),
+        humanized: new BigNumber(result[0]).dividedBy(
+          new BigNumber(10).pow(this.tokenA!.decimals)
+        ),
+      };
+      const UBB: IValue = {
+        raw: new BigNumber(result[1]),
+        humanized: new BigNumber(result[1]).dividedBy(
+          new BigNumber(10).pow(this.tokenB!.decimals)
+        ),
+      };
+
+      return [UBA, UBB];
+    } catch (error) {
+      console.error("Pods SDK", error);
+    }
+
+    return [zero, zero];
   }
 }
