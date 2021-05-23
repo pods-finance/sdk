@@ -103,18 +103,16 @@ export default class Pool implements IPool {
     return IV;
   }
 
-  async getBuyingPrice(
-    params: { web3: Web3; amount: BigNumber },
-    padding: number | null = null
-  ): Promise<IValue> {
+  async getBuyingPrice(params: {
+    web3: Web3;
+    amount: BigNumber;
+  }): Promise<IValue> {
     expect(this.tokenA, "tokenA");
     expect(this.tokenB, "tokenB");
 
     try {
       const sanitized = params.amount.multipliedBy(
-        new BigNumber(10).pow(
-          _.isNumber(padding) ? padding : this.tokenA!.decimals
-        )
+        new BigNumber(10).pow(this.tokenA!.decimals)
       );
       const contract = contracts.instances.pool(params.web3, this.address);
 
@@ -138,18 +136,16 @@ export default class Pool implements IPool {
     return zero;
   }
 
-  async getSellingPrice(
-    params: { web3: Web3; amount: BigNumber },
-    padding: number | null = null
-  ): Promise<IValue> {
+  async getSellingPrice(params: {
+    web3: Web3;
+    amount: BigNumber;
+  }): Promise<IValue> {
     expect(this.tokenA, "tokenA");
     expect(this.tokenB, "tokenB");
 
     try {
       const sanitized = params.amount.multipliedBy(
-        new BigNumber(10).pow(
-          _.isNumber(padding) ? padding : this.tokenA!.decimals
-        )
+        new BigNumber(10).pow(this.tokenA!.decimals)
       );
       const contract = contracts.instances.pool(params.web3, this.address);
 
@@ -195,18 +191,16 @@ export default class Pool implements IPool {
     return zero;
   }
 
-  async getBuyingEstimateForPrice(
-    params: { web3: Web3; amount: BigNumber },
-    padding: number | null = null
-  ): Promise<IValue> {
+  async getBuyingEstimateForPrice(params: {
+    web3: Web3;
+    amount: BigNumber;
+  }): Promise<IValue> {
     expect(this.tokenA, "tokenA");
     expect(this.tokenB, "tokenB");
 
     try {
       const sanitized = params.amount.multipliedBy(
-        new BigNumber(10).pow(
-          _.isNumber(padding) ? padding : this.tokenB!.decimals
-        )
+        new BigNumber(10).pow(this.tokenB!.decimals)
       );
       const contract = contracts.instances.pool(params.web3, this.address);
 

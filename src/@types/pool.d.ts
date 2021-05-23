@@ -38,18 +38,12 @@ export interface IPool {
 
   getIV(params: { web3: Web3 }): Promise<IValue>;
   getABPrice(params: { web3: Web3 }): Promise<IValue>;
-  getBuyingPrice(
-    params: { web3: Web3; amount: BigNumber; isPadded: boolean },
-    padding: number | null
-  ): Promise<IValue>;
-  getBuyingEstimateForPrice(
-    params: { web3: Web3; amount: BigNumber; isPadded: boolean },
-    padding: number | null
-  ): Promise<IValue>;
-  getSellingPrice(
-    params: { web3: Web3; amount: BigNumber },
-    padding: number | null
-  ): Promise<IValue>;
+  getBuyingPrice(params: { web3: Web3; amount: BigNumber }): Promise<IValue>;
+  getBuyingEstimateForPrice(params: {
+    web3: Web3;
+    amount: BigNumber;
+  }): Promise<IValue>;
+  getSellingPrice(params: { web3: Web3; amount: BigNumber }): Promise<IValue>;
   getTotalBalances(params: { web3: Web3 }): Promise<IValue[]>;
   getDeamortizedBalances(params: {
     web3: Web3;
