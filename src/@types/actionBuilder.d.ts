@@ -25,7 +25,7 @@ export interface IActionBuilderParams {
   /** HEAVY */
   spotPrice?: BigNumber;
   metadataOptionsMintedAndSold?: BigNumber;
-  nextSigma?: BigNumber;
+  nextIV?: BigNumber;
   nextSellingPrice?: BigNumber;
   nextBuyingPrice?: BigNumber;
   nextDynamicSellingPrice?: BigNumber;

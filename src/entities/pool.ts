@@ -94,8 +94,8 @@ export default class Pool implements IPool {
     const properties = await contract.methods.priceProperties().call();
 
     const IV: IValue = {
-      raw: new BigNumber(_.get(properties, "currentSigma")),
-      humanized: new BigNumber(_.get(properties, "currentSigma")).dividedBy(
+      raw: new BigNumber(_.get(properties, "currentIV")),
+      humanized: new BigNumber(_.get(properties, "currentIV")).dividedBy(
         new BigNumber(10).pow(18)
       ),
     };

@@ -40,7 +40,7 @@ const _networks: { [key: number]: INetwork } = {
     subgraph: {
       prod: "https://api.thegraph.com/subgraphs/name/pods-finance/pods-kovan",
       dev:
-        "https://api.thegraph.com/subgraphs/name/pods-finance/pods-kovan-dev",
+        "https://api.thegraph.com/subgraphs/name/pods-finance/pods-experimental",
     },
   },
   137: {

@@ -72,7 +72,7 @@ export const ActionFragmentHeavy = gql`
     metadata {
       optionsMintedAndSold
     }
-    nextSigma
+    nextIV
     nextSellingPrice
     nextBuyingPrice
     nextDynamicSellingPrice

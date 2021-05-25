@@ -28,7 +28,7 @@ export interface IAction {
 
   spotPrice?: BigNumber;
   metadataOptionsMintedAndSold?: BigNumber;
-  nextSigma?: BigNumber;
+  nextIV?: BigNumber;
   nextSellingPrice?: BigNumber;
   nextBuyingPrice?: BigNumber;
   nextDynamicSellingPrice?: BigNumber;

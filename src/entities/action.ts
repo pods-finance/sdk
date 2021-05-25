@@ -41,7 +41,7 @@ export default class Action implements IAction {
 
   private _spotPrice?: BigNumber;
   private _metadataOptionsMintedAndSold?: BigNumber;
-  private _nextSigma?: BigNumber;
+  private _nextIV?: BigNumber;
   private _nextSellingPrice?: BigNumber;
   private _nextBuyingPrice?: BigNumber;
   private _nextDynamicSellingPrice?: BigNumber;
@@ -86,11 +86,11 @@ export default class Action implements IAction {
     this._metadataOptionsMintedAndSold = value;
   }
 
-  public get nextSigma(): Optional<BigNumber> {
-    return this._nextSigma;
+  public get nextIV(): Optional<BigNumber> {
+    return this._nextIV;
   }
-  public set nextSigma(value: Optional<BigNumber>) {
-    this._nextSigma = value;
+  public set nextIV(value: Optional<BigNumber>) {
+    this._nextIV = value;
   }
 
   public get nextSellingPrice(): Optional<BigNumber> {
@@ -240,7 +240,7 @@ export default class Action implements IAction {
 
     this.spotPrice = params.spotPrice;
     this.metadataOptionsMintedAndSold = params.metadataOptionsMintedAndSold;
-    this.nextSigma = params.nextSigma;
+    this.nextIV = params.nextIV;
     this.nextSellingPrice = params.nextSellingPrice;
     this.nextBuyingPrice = params.nextBuyingPrice;
     this.nextDynamicBuyingPrice = params.nextDynamicBuyingPrice;
