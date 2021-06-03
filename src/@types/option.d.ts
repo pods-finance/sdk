@@ -12,6 +12,7 @@ export interface IOption {
   readonly address: string;
   readonly networkId: number;
 
+  web3?: Web3;
   symbol?: string;
   decimals?: BigNumber;
   underlying?: IToken;
@@ -29,12 +30,9 @@ export interface IOption {
   init(params: IOptionBuilderParams): IOption;
   getDurations(): { [key: string]: number | string | boolean | null };
 
-  getTotalSupply(params: { web3: Web3 }): Promise<IValue>;
-  getCap(params: { web3: Web3; manager: string }): Promise<IValue>;
+  getTotalSupply(): Promise<IValue>;
+  getCap(params: { manager: string }): Promise<IValue>;
 
-  getUserMintedOptions(params: { web3: Web3; user: string }): Promise<IValue>;
-  getUserWithdrawBalances(params: {
-    web3: Web3;
-    user: string;
-  }): Promise<IValue[]>;
+  getUserMintedOptions(params: { user: string }): Promise<IValue>;
+  getUserWithdrawBalances(params: { user: string }): Promise<IValue[]>;
 }

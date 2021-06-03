@@ -29,6 +29,7 @@ export default class Option implements IOption {
   public readonly address: string;
   public readonly networkId: number;
 
+  private _web3?: Web3;
   private _symbol?: string;
   private _decimals?: BigNumber;
   private _underlying?: IToken;
@@ -45,6 +46,13 @@ export default class Option implements IOption {
   /**
    * ---------- SETTERS & GETTERS ----------
    */
+
+  public get web3(): Optional<Web3> {
+    return this._web3;
+  }
+  public set web3(value: Optional<Web3>) {
+    this._web3 = value;
+  }
 
   public get symbol(): Optional<string> {
     return this._symbol;
@@ -143,6 +151,7 @@ export default class Option implements IOption {
     this.type = params.type ? OptionType.Call : OptionType.Put;
     this.symbol = params.symbol;
     this.decimals = params.decimals || 18;
+    this.web3 = params.web3;
 
     this.underlying = new Token({
       address: params.underlyingAsset,
@@ -213,11 +222,12 @@ export default class Option implements IOption {
     };
   }
 
-  async getTotalSupply(params: { web3: Web3 }): Promise<IValue> {
+  async getTotalSupply(): Promise<IValue> {
     expect(this.strike, "strike");
+    expect(this.web3, "web3");
 
     try {
-      const contract = contracts.instances.option(params.web3, this.address);
+      const contract = contracts.instances.option(this.web3!, this.address);
       const result = await contract.methods.totalSupply().call();
 
       const supply: IValue = {
@@ -234,22 +244,23 @@ export default class Option implements IOption {
     return zero;
   }
 
-  async getCap(params: { web3: Web3; manager: string }): Promise<IValue> {
-    const { web3, manager } = params;
+  async getCap(params: { manager: string }): Promise<IValue> {
+    const { manager } = params;
 
     expect(this.strike, "strike");
+    expect(this.web3, "web3");
     expect(manager, "manager (address)");
 
     try {
       const managerContract = contracts.instances.configurationManager(
-        web3,
+        this.web3!,
         manager
       );
       const providerAddress = await managerContract.methods
         .getCapProvider()
         .call();
       const providerContract = contracts.instances.capProvider(
-        web3,
+        this.web3!,
         providerAddress
       );
 
@@ -269,17 +280,15 @@ export default class Option implements IOption {
     return zero;
   }
 
-  async getUserMintedOptions(params: {
-    web3: Web3;
-    user: string;
-  }): Promise<IValue> {
-    const { web3, user } = params;
+  async getUserMintedOptions(params: { user: string }): Promise<IValue> {
+    const { user } = params;
 
     expect(this.decimals, "decimals");
+    expect(this.web3, "web3");
     expect(user, "user (address)");
 
     try {
-      const contract = contracts.instances.option(web3, this.address);
+      const contract = contracts.instances.option(this.web3!, this.address);
       const result = await contract.methods.mintedOptions().call();
 
       const size: IValue = {
@@ -299,22 +308,19 @@ export default class Option implements IOption {
   /**
    *
    * @param {object} params
-   * @param {Web3} params.web3 Web3 instance
    * @param {string} params.user User wallet address
    * @returns {Promise<IValue[]>} [UnderylyingBalance, StrikeBalance]
    */
-  async getUserWithdrawBalances(params: {
-    web3: Web3;
-    user: string;
-  }): Promise<IValue[]> {
-    const { web3, user } = params;
+  async getUserWithdrawBalances(params: { user: string }): Promise<IValue[]> {
+    const { user } = params;
 
     expect(this.underlying, "underlying");
     expect(this.strike, "strike");
+    expect(this.web3, "web3");
     expect(user, "user (address)");
 
     try {
-      const contract = contracts.instances.option(web3, this.address);
+      const contract = contracts.instances.option(this.web3!, this.address);
       const result = await contract.methods
         .getSellerWithdrawAmounts(user)
         .call();

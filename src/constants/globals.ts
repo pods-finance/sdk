@@ -16,3 +16,5 @@ export enum ActionType {
   TransferFrom = "TransferFrom",
   TransferTo = "TransferTo",
 }
+
+export const DEFAULT_TIMEOUT: number = 60 * 20;

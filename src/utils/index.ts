@@ -1,6 +1,8 @@
 import _ from "lodash";
 import BigNumber from "bignumber.js";
+import Web3 from "web3";
 import { IValue } from "@types";
+import { DEFAULT_TIMEOUT } from "../constants/globals";
 declare module "lodash" {
   interface LoDashStatic {
     isNilOrEmptyString(value: any): boolean;
@@ -53,11 +55,29 @@ export function expect(
     );
 }
 
+export async function getDefaultDeadline(web3: Web3): Promise<BigNumber> {
+  expect(web3, "web3");
+  const currentBlock = await web3.eth.getBlock("latest");
+  return new BigNumber(currentBlock.timestamp).plus(
+    new BigNumber(DEFAULT_TIMEOUT)
+  );
+}
+
+export async function getWeb3Owner(web3: Web3): Promise<string> {
+  expect(web3, "web3");
+
+  const accounts = await web3.eth.getAccounts();
+  return _.get(accounts, "[0]");
+}
+
 const utils = {
   config,
   isNilOrEmptyString,
   attemptAsync,
   zero,
   expect,
+
+  getDefaultDeadline,
+  getWeb3Owner,
 };
 export default utils;
