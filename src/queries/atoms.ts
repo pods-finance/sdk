@@ -1,4 +1,4 @@
-import gql from "graphql-tag-ts";
+import gql from "graphql-tag";
 
 /**
  * Declare bodies for entities e.g. Action, Option, Pool, User, Manager

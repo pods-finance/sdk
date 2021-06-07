@@ -37,13 +37,43 @@ export default class Token implements IToken {
     return network.token.wrapped.includes(this.address);
   }
 
-  async getBalance(params: { web3: Web3; owner: string }): Promise<BigNumber> {
-    if (this.isUtility()) {
-      const value = await params.web3.eth.getBalance(params.owner);
+  static async getBalanceFor(params: {
+    web3: Web3;
+    owner: string;
+    address: string;
+    isUtility?: boolean;
+  }): Promise<BigNumber> {
+    const { web3, owner, address, isUtility } = params || {};
+    if (isUtility === true) {
+      const value = await web3.eth.getBalance(owner);
       return new BigNumber(value);
     }
-    const contract = contracts.instances.erc20(params.web3, this.address);
-    return contract.methods.balanceOf(params.owner).call();
+    const contract = contracts.instances.erc20(web3, address);
+    return new BigNumber(await contract.methods.balanceOf(owner).call());
+  }
+
+  async getBalance(params: { web3: Web3; owner: string }): Promise<BigNumber> {
+    return Token.getBalanceFor({
+      ...params,
+      isUtility: this.isUtility(),
+      address: this.address,
+    });
+  }
+
+  static async getAllowanceFor(params: {
+    web3: Web3;
+    owner: string;
+    spender?: string;
+    address: string;
+    isUtility?: boolean;
+  }): Promise<BigNumber> {
+    const { web3, owner, address, spender, isUtility } = params || {};
+
+    if (isUtility === true) return new BigNumber(Infinity);
+    const contract = contracts.instances.erc20(web3, address);
+    return new BigNumber(
+      contract.methods.allowance(owner, spender || owner).call()
+    );
   }
 
   async getAllowance(params: {
@@ -51,8 +81,10 @@ export default class Token implements IToken {
     owner: string;
     spender?: string;
   }): Promise<BigNumber> {
-    if (this.isUtility()) return new BigNumber(Infinity);
-    const contract = contracts.instances.erc20(params.web3, this.address);
-    return contract.methods.balanceOf(params.spender || params.owner).call();
+    return Token.getAllowanceFor({
+      ...params,
+      isUtility: this.isUtility(),
+      address: this.address,
+    });
   }
 }

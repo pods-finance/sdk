@@ -4,6 +4,7 @@ import clients from "./clients";
 import constants from "./constants";
 import contracts from "./contracts";
 import queries from "./queries";
+import utils from "./utils";
 
 import * as builders from "./builders";
 import * as entities from "./entities";
@@ -18,6 +19,16 @@ const SDK: ISDK = {
   queries,
   builders,
   entities,
+  utils,
+  Action,
+  Helper,
+  Option,
+  Pool,
+  Token,
+  ActionBuilder,
+  HelperBuilder,
+  OptionBuilder,
+  PoolBuilder,
 };
 
 export {
@@ -34,10 +45,3 @@ export {
 };
 
 export default SDK;
-
-/**
- * Temporary
- */
-
-import { main } from "./mock";
-main();

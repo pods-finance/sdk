@@ -70,6 +70,16 @@ export async function getWeb3Owner(web3: Web3): Promise<string> {
   return _.get(accounts, "[0]");
 }
 
+/**
+ * Convert raw numbers into humanized values (strip the decimals)
+ * @param raw
+ * @param decimals
+ * @returns {BigNumber} humanized value
+ */
+export function humanize(raw: BigNumber, decimals: number = 18): BigNumber {
+  return raw.dividedBy(new BigNumber(10).pow(decimals));
+}
+
 const utils = {
   config,
   isNilOrEmptyString,
@@ -79,5 +89,6 @@ const utils = {
 
   getDefaultDeadline,
   getWeb3Owner,
+  humanize,
 };
 export default utils;

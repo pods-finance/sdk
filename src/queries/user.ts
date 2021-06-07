@@ -1,4 +1,4 @@
-import gql from "graphql-tag-ts";
+import gql from "graphql-tag";
 import {
   ActionFragmentLight,
   ActionFragmentHeavy,
