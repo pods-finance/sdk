@@ -13,7 +13,7 @@ import {
   Optional,
   IValue,
 } from "@types";
-import { OptionType } from "../constants/globals";
+import { OptionType, MILESTONE_EXPIRATION_SOON } from "../constants/globals";
 import { expect, zero } from "../utils";
 import contracts from "../contracts";
 import Token from "./token";
@@ -35,7 +35,7 @@ export default class Option implements IOption {
   private _underlying?: IToken;
   private _strike?: IToken;
   private _type: OptionType = OptionType.Put;
-  private _strikePrice?: BigNumber;
+  private _strikePrice?: IValue;
   private _expiration?: number;
   private _exerciseStart?: number;
   private _exerciseWindowSize?: number;
@@ -96,10 +96,10 @@ export default class Option implements IOption {
     this._type = value;
   }
 
-  public get strikePrice(): Optional<BigNumber> {
+  public get strikePrice(): Optional<IValue> {
     return this._strikePrice;
   }
-  public set strikePrice(value: Optional<BigNumber>) {
+  public set strikePrice(value: Optional<IValue>) {
     this._strikePrice = value;
   }
 
@@ -166,10 +166,18 @@ export default class Option implements IOption {
       networkId: this.networkId,
     });
 
-    this.strikePrice = params.strikePrice;
-    this.expiration = params.expiration;
-    this.exerciseStart = params.exerciseStart;
-    this.exerciseWindowSize = params.exerciseWindowSize;
+    this.strikePrice = {
+      raw: params.strikePrice,
+      humanized: new BigNumber(params.strikePrice).dividedBy(
+        new BigNumber(10).pow(this.strike!.decimals)
+      ),
+    };
+
+    this.expiration = new BigNumber(params.expiration).toNumber();
+    this.exerciseStart = new BigNumber(params.exerciseStart).toNumber();
+    this.exerciseWindowSize = new BigNumber(
+      params.exerciseWindowSize
+    ).toNumber();
 
     this.factoryAddress = _.toString(params.factoryAddress).toLowerCase();
     this.poolAddress = _.toString(params.poolAddress).toLowerCase();
@@ -177,7 +185,9 @@ export default class Option implements IOption {
     return this as IOption;
   }
 
-  getDurations(): { [key: string]: number | string | boolean | null } {
+  getDurations(): {
+    [key: string]: number | string | boolean | null | undefined;
+  } {
     expect(this.expiration, "expiration", "number");
     expect(this.exerciseStart, "exerciseStart", "number");
     expect(this.exerciseWindowSize, "exerciseWindowSize", "number");
@@ -208,7 +218,15 @@ export default class Option implements IOption {
     const isExercisable = exerciseToToday <= 0;
     const isExercising = isExercisable && !isExpired;
 
+    const isExercisableSoon =
+      new BigNumber(exerciseToToday).isLessThanOrEqualTo(
+        new BigNumber(MILESTONE_EXPIRATION_SOON)
+      ) && !isExpired;
+
     return {
+      expiration: this.expiration,
+      exerciseStart: this.exerciseStart,
+      exerciseWindowSize: this.exerciseWindowSize,
       expirationFormatted,
       exerciseFormatted,
       windowFormatted,
@@ -219,6 +237,7 @@ export default class Option implements IOption {
       isExpired,
       isExercisable,
       isExercising,
+      isExercisableSoon,
     };
   }
 

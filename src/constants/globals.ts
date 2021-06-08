@@ -18,3 +18,5 @@ export enum ActionType {
 }
 
 export const DEFAULT_TIMEOUT: number = 60 * 20;
+
+export const MILESTONE_EXPIRATION_SOON: number = 60 * 60 * 24 * 3;

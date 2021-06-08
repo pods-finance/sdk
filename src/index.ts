@@ -9,6 +9,12 @@ import utils from "./utils";
 import * as builders from "./builders";
 import * as entities from "./entities";
 
+import dotenv from "dotenv";
+import "cross-fetch/polyfill";
+
+dotenv.config();
+utils.config();
+
 const { Action, Helper, Option, Pool, Token } = entities;
 const { ActionBuilder, HelperBuilder, OptionBuilder, PoolBuilder } = builders;
 

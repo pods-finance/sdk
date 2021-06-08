@@ -51,7 +51,7 @@ export function expect(
     throw new Error(`Missing parameter: ${identifier}`);
   if (!_.isNilOrEmptyString(strongType) && typeof value !== strongType)
     throw new Error(
-      `Unexpected type for parameter: ${identifier}, ${strongType}`
+      `Unexpected type for parameter: ${identifier}, ${strongType}, got ${typeof value}`
     );
 }
 

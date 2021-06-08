@@ -18,7 +18,7 @@ export interface IOption {
   underlying?: IToken;
   strike?: IToken;
   type?: OptionType;
-  strikePrice?: BigNumber;
+  strikePrice?: IValue;
   expiration?: number;
   exerciseStart?: number;
   exerciseWindowSize?: number;
@@ -28,7 +28,9 @@ export interface IOption {
   pool?: IPool;
 
   init(params: IOptionBuilderParams): IOption;
-  getDurations(): { [key: string]: number | string | boolean | null };
+  getDurations(): {
+    [key: string]: number | string | boolean | null | undefined;
+  };
 
   getTotalSupply(): Promise<IValue>;
   getCap(params: { manager: string }): Promise<IValue>;
