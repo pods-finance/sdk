@@ -36,18 +36,24 @@ export interface IPool {
 
   init(params: IPoolBuilderParams): IPool;
 
-  getParameters(params: { web3?: Web3 }): Promise<IPoolIndicators>;
+  getParameters(params?: { web3?: Web3 }): Promise<IPoolIndicators>;
 
-  getIV(params: { web3?: Web3 }): Promise<IValue>;
-  getABPrice(params: { web3?: Web3 }): Promise<IValue>;
-  getBuyingPrice(params: { amount: BigNumber; web3?: Web3 }): Promise<IValue>;
+  getIV(params?: { web3?: Web3 }): Promise<IValue>;
+  getABPrice(params?: { web3?: Web3 }): Promise<{ [key: string]: IValue }>;
+  getBuyingPrice(params: {
+    amount: BigNumber;
+    web3?: Web3;
+  }): Promise<{ [key: string]: IValue }>;
   getBuyingEstimateForPrice(params: {
     amount: BigNumber;
     web3?: Web3;
-  }): Promise<IValue>;
-  getSellingPrice(params: { amount: BigNumber; web3?: Web3 }): Promise<IValue>;
-  getTotalBalances(params: { web3?: Web3 }): Promise<IValue[]>;
-  getDeamortizedBalances(params: { web3?: Web3 }): Promise<IValue[]>;
+  }): Promise<{ [key: string]: IValue }>;
+  getSellingPrice(params: {
+    amount: BigNumber;
+    web3?: Web3;
+  }): Promise<{ [key: string]: IValue }>;
+  getTotalBalances(params?: { web3?: Web3 }): Promise<IValue[]>;
+  getDeamortizedBalances(params?: { web3?: Web3 }): Promise<IValue[]>;
   getFeeBalances(params: { amount: BigNumber; web3?: Web3 }): Promise<IValue[]>;
 
   getCap(params: { manager: string; web3?: Web3 }): Promise<IValue>;

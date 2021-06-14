@@ -13,6 +13,7 @@ import {
   IPoolIndicators,
   Optional,
 } from "@types";
+import { ALLOW_LOGS } from "../constants/globals";
 import { expect } from "../utils";
 
 export default class Pool implements IPool {
@@ -123,7 +124,7 @@ export default class Pool implements IPool {
   async getBuyingPrice(params: {
     amount: BigNumber;
     web3?: Web3;
-  }): Promise<IValue> {
+  }): Promise<{ [key: string]: IValue }> {
     expect(this.tokenA, "tokenA");
     expect(this.tokenB, "tokenB");
     expect(this.web3 || params.web3, "web3");
@@ -138,29 +139,45 @@ export default class Pool implements IPool {
       );
 
       const {
-        0: result,
+        amountBIn,
+        feesTokenA,
+        feesTokenB,
       } = await contract.methods
         .getOptionTradeDetailsExactAOutput(sanitized.toFixed(0).toString())
         .call();
 
-      const price: IValue = {
-        raw: new BigNumber(result),
-        humanized: new BigNumber(result).dividedBy(
+      const value: IValue = {
+        raw: new BigNumber(amountBIn),
+        humanized: new BigNumber(amountBIn).dividedBy(
           new BigNumber(10).pow(this.tokenB!.decimals)
         ),
       };
 
-      return price;
+      const feesA: IValue = {
+        raw: new BigNumber(feesTokenA),
+        humanized: new BigNumber(feesTokenA).dividedBy(
+          new BigNumber(10).pow(this.tokenB!.decimals)
+        ),
+      };
+
+      const feesB: IValue = {
+        raw: new BigNumber(feesTokenB),
+        humanized: new BigNumber(feesTokenB).dividedBy(
+          new BigNumber(10).pow(this.tokenB!.decimals)
+        ),
+      };
+
+      return { value, feesA, feesB };
     } catch (error) {
-      console.error("Pods SDK", error);
+      if (ALLOW_LOGS) console.error("Pods SDK", error);
     }
-    return zero;
+    return { value: zero, feesA: zero, feesB: zero };
   }
 
   async getSellingPrice(params: {
     amount: BigNumber;
     web3?: Web3;
-  }): Promise<IValue> {
+  }): Promise<{ [key: string]: IValue }> {
     expect(this.tokenA, "tokenA");
     expect(this.tokenB, "tokenB");
     expect(this.web3 || params.web3, "web3");
@@ -175,26 +192,44 @@ export default class Pool implements IPool {
       );
 
       const {
-        0: result,
+        amountBOut,
+        feesTokenA,
+        feesTokenB,
       } = await contract.methods
         .getOptionTradeDetailsExactAInput(sanitized.toFixed(0).toString())
         .call();
 
-      const price: IValue = {
-        raw: new BigNumber(result),
-        humanized: new BigNumber(result).dividedBy(
+      const value: IValue = {
+        raw: new BigNumber(amountBOut),
+        humanized: new BigNumber(amountBOut).dividedBy(
           new BigNumber(10).pow(this.tokenB!.decimals)
         ),
       };
 
-      return price;
+      const feesA: IValue = {
+        raw: new BigNumber(feesTokenA),
+        humanized: new BigNumber(feesTokenA).dividedBy(
+          new BigNumber(10).pow(this.tokenB!.decimals)
+        ),
+      };
+
+      const feesB: IValue = {
+        raw: new BigNumber(feesTokenB),
+        humanized: new BigNumber(feesTokenB).dividedBy(
+          new BigNumber(10).pow(this.tokenB!.decimals)
+        ),
+      };
+
+      return { value, feesA, feesB };
     } catch (error) {
-      console.error("Pods SDK", error);
+      if (ALLOW_LOGS) console.error("Pods SDK", error);
     }
-    return zero;
+    return { value: zero, feesA: zero, feesB: zero };
   }
 
-  async getABPrice(params: { web3?: Web3 } = {}): Promise<IValue> {
+  async getABPrice(
+    params: { web3?: Web3 } = {}
+  ): Promise<{ [key: string]: IValue }> {
     expect(this.tokenB, "tokenB");
     expect(this.web3 || params.web3, "web3");
 
@@ -206,24 +241,24 @@ export default class Pool implements IPool {
 
       const { 0: result } = await contract.methods.getABPrice().call();
 
-      const price: IValue = {
+      const value: IValue = {
         raw: new BigNumber(result),
         humanized: new BigNumber(result).dividedBy(
           new BigNumber(10).pow(this.tokenB!.decimals)
         ),
       };
 
-      return price;
+      return { value };
     } catch (error) {
-      console.error("Pods SDK", error);
+      if (ALLOW_LOGS) console.error("Pods SDK", error);
     }
-    return zero;
+    return { value: zero };
   }
 
   async getBuyingEstimateForPrice(params: {
     amount: BigNumber;
     web3?: Web3;
-  }): Promise<IValue> {
+  }): Promise<{ [key: string]: IValue }> {
     expect(this.tokenA, "tokenA");
     expect(this.tokenB, "tokenB");
     expect(this.web3 || params.web3, "web3");
@@ -238,23 +273,39 @@ export default class Pool implements IPool {
       );
 
       const {
-        0: result,
+        amountAOut,
+        feesTokenA,
+        feesTokenB,
       } = await contract.methods
         .getOptionTradeDetailsExactBInput(sanitized.toFixed(0).toString())
         .call();
 
-      const price: IValue = {
-        raw: new BigNumber(result),
-        humanized: new BigNumber(result).dividedBy(
+      const value: IValue = {
+        raw: new BigNumber(amountAOut),
+        humanized: new BigNumber(amountAOut).dividedBy(
           new BigNumber(10).pow(this.tokenA!.decimals)
         ),
       };
 
-      return price;
+      const feesA: IValue = {
+        raw: new BigNumber(feesTokenA),
+        humanized: new BigNumber(feesTokenA).dividedBy(
+          new BigNumber(10).pow(this.tokenB!.decimals)
+        ),
+      };
+
+      const feesB: IValue = {
+        raw: new BigNumber(feesTokenB),
+        humanized: new BigNumber(feesTokenB).dividedBy(
+          new BigNumber(10).pow(this.tokenB!.decimals)
+        ),
+      };
+
+      return { value, feesA, feesB };
     } catch (error) {
-      console.error("Pods SDK", error);
+      if (ALLOW_LOGS) console.error("Pods SDK", error);
     }
-    return zero;
+    return { value: zero, feesA: zero, feesB: zero };
   }
 
   async getDeamortizedBalances(
@@ -292,7 +343,7 @@ export default class Pool implements IPool {
 
       return [DBA, DBB];
     } catch (error) {
-      console.error("Pods SDK", error);
+      if (ALLOW_LOGS) console.error("Pods SDK", error);
     }
 
     return [zero, zero];
@@ -335,7 +386,7 @@ export default class Pool implements IPool {
 
       return [FBA, FBB];
     } catch (error) {
-      console.error("Pods SDK", error);
+      if (ALLOW_LOGS) console.error("Pods SDK", error);
     }
 
     return [zero, zero];
@@ -366,7 +417,7 @@ export default class Pool implements IPool {
       };
       return [TBA, TBB];
     } catch (error) {
-      console.error("Pods SDK", error);
+      if (ALLOW_LOGS) console.error("Pods SDK", error);
     }
 
     return [zero, zero];
@@ -433,7 +484,7 @@ export default class Pool implements IPool {
 
       return size;
     } catch (error) {
-      console.error("Pods SDK", error);
+      if (ALLOW_LOGS) console.error("Pods SDK", error);
     }
 
     return zero;
@@ -478,7 +529,7 @@ export default class Pool implements IPool {
 
       return [UBA, UBB];
     } catch (error) {
-      console.error("Pods SDK", error);
+      if (ALLOW_LOGS) console.error("Pods SDK", error);
     }
 
     return [zero, zero];

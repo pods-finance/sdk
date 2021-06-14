@@ -7,20 +7,26 @@ import { Helper } from "../entities";
 export default class HelperBuilder implements IHelperBuilder {
   public static async resolve(params: {
     client: IApolloClient;
-    networkId: number;
     web3: Web3;
   }): Promise<IHelper> {
-    const { client, networkId, web3 } = params;
+    const { client, web3 } = params;
     const address = await this.getLatestAddress({ client });
-    return this.resolveFromAddress({ address, networkId, web3 });
+    return this.resolveFromAddress({ address, web3 });
   }
 
-  public static resolveFromAddress(params: {
+  /**
+   *
+   * @param {object} params
+   * @param {string} params.address Address for the configuration manager
+   * @param {Web3} params.web3 Web3 instance
+   * @returns
+   */
+  public static async resolveFromAddress(params: {
     address: string;
-    networkId: number;
     web3: Web3;
-  }): IHelper {
-    const { address, networkId, web3 } = params;
+  }): Promise<IHelper> {
+    const { address, web3 } = params;
+    const networkId = await await web3.eth.net.getId();
     const entity = new Helper({ address, networkId, web3 });
 
     return entity;

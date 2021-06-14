@@ -32,9 +32,12 @@ export interface IOption {
     [key: string]: number | string | boolean | null | undefined;
   };
 
-  getTotalSupply(): Promise<IValue>;
-  getCap(params: { manager: string }): Promise<IValue>;
+  getTotalSupply(params?: { web3?: Web3 }): Promise<IValue>;
+  getCap(params: { manager: string; web3?: Web3 }): Promise<IValue>;
 
-  getUserMintedOptions(params: { user: string }): Promise<IValue>;
-  getUserWithdrawBalances(params: { user: string }): Promise<IValue[]>;
+  getUserMintedOptions(params: { user: string; web3?: Web3 }): Promise<IValue>;
+  getUserWithdrawBalances(params: {
+    user: string;
+    web3?: Web3;
+  }): Promise<IValue[]>;
 }

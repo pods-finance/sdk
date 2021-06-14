@@ -35,8 +35,8 @@ export default class Helper implements IHelper {
     expect(option.pool?.tokenB, "tokenB (option pool)");
     expect(option.pool?.tokenB?.decimals, "decimals (option pool tokenB)");
     expect(option.decimals, "decimals");
-    expect(optionAmount, "optionAmount", "BigNumber");
-    expect(premiumAmount, "premiumAmount", "BigNumber");
+    expect(optionAmount, "optionAmount", "object");
+    expect(premiumAmount, "premiumAmount", "object");
 
     const input = new BigNumber(premiumAmount).multipliedBy(
       new BigNumber(10).pow(option.pool!.tokenB!.decimals)
@@ -83,8 +83,8 @@ export default class Helper implements IHelper {
     expect(option.pool?.tokenB, "tokenB (option pool)");
     expect(option.pool?.tokenB?.decimals, "decimals (option pool tokenB)");
     expect(option.decimals, "decimals");
-    expect(optionAmount, "optionAmount", "BigNumber");
-    expect(premiumAmount, "premiumAmount", "BigNumber");
+    expect(optionAmount, "optionAmount", "object");
+    expect(premiumAmount, "premiumAmount", "object");
 
     const input = new BigNumber(premiumAmount).multipliedBy(
       new BigNumber(10).pow(option.pool!.tokenB!.decimals)
@@ -95,7 +95,7 @@ export default class Helper implements IHelper {
 
     const owner = await getWeb3Owner(this.web3);
 
-    const IV = await option.pool!.getIV();
+    const IV = await option.pool!.getIV({ web3: this.web3 });
 
     const contract = contracts.instances.optionHelper(this.web3, this.address);
 
@@ -132,8 +132,8 @@ export default class Helper implements IHelper {
     expect(option.pool?.tokenB, "tokenB (option pool)");
     expect(option.pool?.tokenB?.decimals, "decimals (option pool tokenB)");
     expect(option.decimals, "decimals");
-    expect(optionAmount, "optionAmount", "BigNumber");
-    expect(premiumAmount, "premiumAmount", "BigNumber");
+    expect(optionAmount, "optionAmount", "object");
+    expect(premiumAmount, "premiumAmount", "object");
 
     const input = new BigNumber(optionAmount).multipliedBy(
       new BigNumber(10).pow(option.decimals!)
@@ -182,8 +182,8 @@ export default class Helper implements IHelper {
     expect(option.pool?.tokenB, "tokenB (option pool)");
     expect(option.pool?.tokenB?.decimals, "decimals (option pool tokenB)");
     expect(option.decimals, "decimals");
-    expect(optionAmount, "optionAmount", "BigNumber");
-    expect(premiumAmount, "premiumAmount", "BigNumber");
+    expect(optionAmount, "optionAmount", "object");
+    expect(premiumAmount, "premiumAmount", "object");
 
     const input = new BigNumber(optionAmount).multipliedBy(
       new BigNumber(10).pow(option.decimals!)
@@ -240,8 +240,8 @@ export default class Helper implements IHelper {
     expect(option.pool?.tokenB, "tokenB (option pool)");
     expect(option.pool?.tokenB?.decimals, "decimals (option pool tokenB)");
     expect(option.decimals, "decimals");
-    expect(tokenAAmount, "tokenAAmount", "BigNumber");
-    expect(tokenBAmount, "tokenBAmount", "BigNumber");
+    expect(tokenAAmount, "tokenAAmount", "object");
+    expect(tokenBAmount, "tokenBAmount", "object");
 
     const amountA = new BigNumber(tokenAAmount).multipliedBy(
       new BigNumber(10).pow(option.decimals!)
@@ -278,8 +278,8 @@ export default class Helper implements IHelper {
     expect(this.web3, "web3");
     expect(option, "option");
     expect(option.pool, "pool (option)");
-    expect(percentA, "percentA", "BigNumber");
-    expect(percentB, "percentB", "BigNumber");
+    expect(percentA, "percentA", "object");
+    expect(percentB, "percentB", "object");
 
     const owner = await getWeb3Owner(this.web3);
     const contract = contracts.instances.pool(this.web3, option.pool!.address);
@@ -306,7 +306,7 @@ export default class Helper implements IHelper {
     expect(this.web3, "web3");
     expect(option, "option");
     expect(option.decimals, "decimals");
-    expect(optionAmount, "optionAmount", "BigNumber");
+    expect(optionAmount, "optionAmount", "object");
 
     const output = new BigNumber(optionAmount).multipliedBy(
       new BigNumber(10).pow(option.decimals!)
@@ -335,7 +335,7 @@ export default class Helper implements IHelper {
     expect(this.web3, "web3");
     expect(option, "option");
     expect(option.decimals, "decimals");
-    expect(optionAmount, "optionAmount", "BigNumber");
+    expect(optionAmount, "optionAmount", "object");
 
     const owner = await getWeb3Owner(this.web3);
 
@@ -362,7 +362,7 @@ export default class Helper implements IHelper {
     expect(this.web3, "web3");
     expect(option, "option");
     expect(option.decimals, "decimals");
-    expect(optionAmount, "optionAmount", "BigNumber");
+    expect(optionAmount, "optionAmount", "object");
 
     const input = new BigNumber(optionAmount).multipliedBy(
       new BigNumber(10).pow(option.decimals!)
@@ -390,7 +390,7 @@ export default class Helper implements IHelper {
     expect(this.web3, "web3");
     expect(option, "option");
     expect(option.decimals, "decimals");
-    expect(optionAmount, "optionAmount", "BigNumber");
+    expect(optionAmount, "optionAmount", "object");
 
     const input = new BigNumber(optionAmount).multipliedBy(
       new BigNumber(10).pow(option.decimals!)

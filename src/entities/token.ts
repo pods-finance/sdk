@@ -3,6 +3,7 @@ import BigNumber from "bignumber.js";
 import Web3 from "web3";
 import { INetwork, IToken } from "@types";
 import networks from "../constants/networks";
+import * as globals from "../constants/globals";
 import contracts from "../contracts";
 
 export default class Token implements IToken {
@@ -21,7 +22,7 @@ export default class Token implements IToken {
   }) {
     this.address = params.address.toLowerCase();
     this.symbol = params.symbol;
-    this.decimals = params.decimals;
+    this.decimals = new BigNumber(params.decimals);
     this.networkId = params.networkId;
 
     this.name = params.name || params.symbol;
@@ -69,10 +70,10 @@ export default class Token implements IToken {
   }): Promise<BigNumber> {
     const { web3, owner, address, spender, isUtility } = params || {};
 
-    if (isUtility === true) return new BigNumber(Infinity);
+    if (isUtility === true) return new BigNumber(globals.MAX_UINT);
     const contract = contracts.instances.erc20(web3, address);
     return new BigNumber(
-      contract.methods.allowance(owner, spender || owner).call()
+      await contract.methods.allowance(owner, spender || owner).call()
     );
   }
 
