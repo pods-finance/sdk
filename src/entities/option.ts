@@ -203,17 +203,25 @@ export default class Option implements IOption {
       new BigNumber(this.expiration!).multipliedBy(1000).toNumber()
     ).format("MMM Do, YYYY");
 
+    const expirationFormattedWithHour = dayjs(
+      new BigNumber(this.expiration!).multipliedBy(1000).toNumber()
+    ).format("MMM Do, YYYY h A");
+
     const expirationFormattedWithTime = dayjs(
       new BigNumber(this.expiration!).multipliedBy(1000).toNumber()
-    ).format("MMM Do, YYYY hh:mm");
+    ).format("MMM Do, YYYY hh:mm A");
 
-    const exerciseFormatted = dayjs(
+    const exerciseStartFormatted = dayjs(
       new BigNumber(this.exerciseStart!).multipliedBy(1000).toNumber()
     ).format("MMM Do, YYYY");
 
-    const exerciseFormattedWithTime = dayjs(
+    const exerciseStartFormattedWithHour = dayjs(
       new BigNumber(this.exerciseStart!).multipliedBy(1000).toNumber()
-    ).format("MMM Do, YYYY hh:mm");
+    ).format("MMM Do, YYYY h A");
+
+    const exerciseStartFormattedWithTime = dayjs(
+      new BigNumber(this.exerciseStart!).multipliedBy(1000).toNumber()
+    ).format("MMM Do, YYYY hh:mm A");
 
     const windowFormatted = dayjs
       .duration(this.exerciseWindowSize! * 1000)
@@ -223,18 +231,24 @@ export default class Option implements IOption {
       .minus(dayjs().valueOf() / 1000)
       .toNumber();
 
-    const exerciseToToday = expirationToToday - this.exerciseWindowSize!;
+    const exerciseStartToToday = expirationToToday - this.exerciseWindowSize!;
     const expirationFromNow = dayjs(this.expiration! * 1000).fromNow();
-    const exerciseToTodayFormatted = dayjs
-      .duration(exerciseToToday)
+    const exerciseStartFromNow = dayjs(this.exerciseStart! * 1000).fromNow();
+
+    const exerciseStartToTodayFormatted = dayjs
+      .duration(exerciseStartToToday * 1000)
+      .humanize(true);
+
+    const expirationToTodayFormatted = dayjs
+      .duration(expirationToToday * 1000)
       .humanize(true);
 
     const isExpired = expirationToToday <= 0;
-    const isExercisable = exerciseToToday <= 0;
-    const isExercising = isExercisable && !isExpired;
+    const isTrading = exerciseStartToToday > 0;
+    const isExercising = !isTrading && !isExpired;
 
     const isExercisableSoon =
-      new BigNumber(exerciseToToday).isLessThanOrEqualTo(
+      new BigNumber(exerciseStartToToday).isLessThanOrEqualTo(
         new BigNumber(MILESTONE_EXPIRATION_SOON)
       ) && !isExpired;
 
@@ -243,16 +257,20 @@ export default class Option implements IOption {
       exerciseStart: this.exerciseStart,
       exerciseWindowSize: this.exerciseWindowSize,
       expirationFormatted,
-      exerciseFormatted,
+      exerciseStartFormatted,
       expirationFormattedWithTime,
-      exerciseFormattedWithTime,
+      exerciseStartFormattedWithTime,
+      expirationToTodayFormatted,
+      expirationFormattedWithHour,
       windowFormatted,
       expirationToToday,
-      exerciseToToday,
+      exerciseStartToToday,
       expirationFromNow,
-      exerciseToTodayFormatted,
+      exerciseStartFromNow,
+      exerciseStartToTodayFormatted,
+      exerciseStartFormattedWithHour,
       isExpired,
-      isExercisable,
+      isTrading,
       isExercising,
       isExercisableSoon,
     };
@@ -334,7 +352,8 @@ export default class Option implements IOption {
         (this.web3 || web3)!,
         this.address
       );
-      const result = await contract.methods.mintedOptions().call();
+
+      const result = await contract.methods.mintedOptions(user).call();
 
       const size: IValue = {
         raw: new BigNumber(result),

@@ -239,7 +239,7 @@ export default class Pool implements IPool {
         this.address
       );
 
-      const { 0: result } = await contract.methods.getABPrice().call();
+      const result = await contract.methods.getABPrice().call();
 
       const value: IValue = {
         raw: new BigNumber(result),

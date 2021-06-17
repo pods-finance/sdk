@@ -47,7 +47,7 @@ export default class Helper implements IHelper {
 
     const owner = await getWeb3Owner(this.web3);
 
-    const IV = await option.pool!.getIV();
+    const IV = await option.pool!.getIV({ web3: this.web3 });
 
     const contract = contracts.instances.optionHelper(this.web3, this.address);
 
@@ -145,7 +145,7 @@ export default class Helper implements IHelper {
 
     const owner = await getWeb3Owner(this.web3);
 
-    const IV = await option.pool!.getIV();
+    const IV = await option.pool!.getIV({ web3: this.web3 });
 
     const contract = contracts.instances.optionHelper(this.web3, this.address);
 
@@ -195,7 +195,7 @@ export default class Helper implements IHelper {
 
     const owner = await getWeb3Owner(this.web3);
 
-    const IV = await option.pool!.getIV();
+    const IV = await option.pool!.getIV({ web3: this.web3 });
 
     const contract = contracts.instances.optionHelper(this.web3, this.address);
 
