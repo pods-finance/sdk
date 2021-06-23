@@ -1,11 +1,11 @@
 import _ from "lodash";
 import BigNumber from "bignumber.js";
-import Web3 from "web3";
 import Token from "./token";
 import contracts from "../contracts";
 import { zero } from "../utils";
 
 import {
+  IProvider,
   IToken,
   IValue,
   IPool,
@@ -24,7 +24,7 @@ export default class Pool implements IPool {
   public readonly address: string;
   public readonly networkId: number;
 
-  private _web3?: Web3;
+  private _provider?: IProvider;
 
   private _tokenA?: IToken;
   private _tokenB?: IToken;
@@ -36,11 +36,11 @@ export default class Pool implements IPool {
    * ---------- SETTERS & GETTERS ----------
    */
 
-  public get web3(): Optional<Web3> {
-    return this._web3;
+  public get provider(): Optional<IProvider> {
+    return this._provider;
   }
-  public set web3(value: Optional<Web3>) {
-    this._web3 = value;
+  public set provider(value: Optional<IProvider>) {
+    this._provider = value;
   }
 
   public get tokenA(): Optional<IToken> {
@@ -83,7 +83,7 @@ export default class Pool implements IPool {
     this.factoryAddress = _.toString(params.factoryAddress).toLowerCase();
     this.optionAddress = _.toString(params.optionAddress).toLowerCase();
 
-    this.web3 = params.web3;
+    this.provider = params.provider;
 
     this.tokenA = new Token({
       address: params.tokenA,
@@ -102,20 +102,20 @@ export default class Pool implements IPool {
     return this;
   }
 
-  async getIV(params: { web3?: Web3 } = {}): Promise<IValue> {
-    expect(this.web3 || params.web3, "web3");
+  async getIV(params: { provider?: IProvider } = {}): Promise<IValue> {
+    expect(this.provider || params.provider, "provider");
 
     const contract = contracts.instances.pool(
-      (this.web3 || params.web3)!,
+      (this.provider || params.provider)!,
       this.address
     );
-    const properties = await contract.methods.priceProperties().call();
+    const properties = await contract.priceProperties();
 
     const IV: IValue = {
-      raw: new BigNumber(_.get(properties, "currentIV")),
-      humanized: new BigNumber(_.get(properties, "currentIV")).dividedBy(
-        new BigNumber(10).pow(18)
-      ),
+      raw: new BigNumber(_.get(properties, "currentIV").toString()),
+      humanized: new BigNumber(
+        _.get(properties, "currentIV").toString()
+      ).dividedBy(new BigNumber(10).pow(18)),
     };
 
     return IV;
@@ -123,18 +123,18 @@ export default class Pool implements IPool {
 
   async getBuyingPrice(params: {
     amount: BigNumber;
-    web3?: Web3;
+    provider?: IProvider;
   }): Promise<{ [key: string]: IValue }> {
     expect(this.tokenA, "tokenA");
     expect(this.tokenB, "tokenB");
-    expect(this.web3 || params.web3, "web3");
+    expect(this.provider || params.provider, "provider");
 
     try {
       const sanitized = params.amount.multipliedBy(
         new BigNumber(10).pow(this.tokenA!.decimals)
       );
       const contract = contracts.instances.pool(
-        (this.web3 || params.web3)!,
+        (this.provider || params.provider)!,
         this.address
       );
 
@@ -142,27 +142,27 @@ export default class Pool implements IPool {
         amountBIn,
         feesTokenA,
         feesTokenB,
-      } = await contract.methods
-        .getOptionTradeDetailsExactAOutput(sanitized.toFixed(0).toString())
-        .call();
+      } = await contract.getOptionTradeDetailsExactAOutput(
+        sanitized.toFixed(0).toString()
+      );
 
       const value: IValue = {
-        raw: new BigNumber(amountBIn),
-        humanized: new BigNumber(amountBIn).dividedBy(
+        raw: new BigNumber(amountBIn.toString()),
+        humanized: new BigNumber(amountBIn.toString()).dividedBy(
           new BigNumber(10).pow(this.tokenB!.decimals)
         ),
       };
 
       const feesA: IValue = {
-        raw: new BigNumber(feesTokenA),
-        humanized: new BigNumber(feesTokenA).dividedBy(
+        raw: new BigNumber(feesTokenA.toString()),
+        humanized: new BigNumber(feesTokenA.toString()).dividedBy(
           new BigNumber(10).pow(this.tokenB!.decimals)
         ),
       };
 
       const feesB: IValue = {
-        raw: new BigNumber(feesTokenB),
-        humanized: new BigNumber(feesTokenB).dividedBy(
+        raw: new BigNumber(feesTokenB.toString()),
+        humanized: new BigNumber(feesTokenB.toString()).dividedBy(
           new BigNumber(10).pow(this.tokenB!.decimals)
         ),
       };
@@ -176,18 +176,18 @@ export default class Pool implements IPool {
 
   async getSellingPrice(params: {
     amount: BigNumber;
-    web3?: Web3;
+    provider?: IProvider;
   }): Promise<{ [key: string]: IValue }> {
     expect(this.tokenA, "tokenA");
     expect(this.tokenB, "tokenB");
-    expect(this.web3 || params.web3, "web3");
+    expect(this.provider || params.provider, "provider");
 
     try {
       const sanitized = params.amount.multipliedBy(
         new BigNumber(10).pow(this.tokenA!.decimals)
       );
       const contract = contracts.instances.pool(
-        (this.web3 || params.web3)!,
+        (this.provider || params.provider)!,
         this.address
       );
 
@@ -195,27 +195,27 @@ export default class Pool implements IPool {
         amountBOut,
         feesTokenA,
         feesTokenB,
-      } = await contract.methods
-        .getOptionTradeDetailsExactAInput(sanitized.toFixed(0).toString())
-        .call();
+      } = await contract.getOptionTradeDetailsExactAInput(
+        sanitized.toFixed(0).toString()
+      );
 
       const value: IValue = {
-        raw: new BigNumber(amountBOut),
-        humanized: new BigNumber(amountBOut).dividedBy(
+        raw: new BigNumber(amountBOut.toString()),
+        humanized: new BigNumber(amountBOut.toString()).dividedBy(
           new BigNumber(10).pow(this.tokenB!.decimals)
         ),
       };
 
       const feesA: IValue = {
-        raw: new BigNumber(feesTokenA),
-        humanized: new BigNumber(feesTokenA).dividedBy(
+        raw: new BigNumber(feesTokenA.toString()),
+        humanized: new BigNumber(feesTokenA.toString()).dividedBy(
           new BigNumber(10).pow(this.tokenB!.decimals)
         ),
       };
 
       const feesB: IValue = {
-        raw: new BigNumber(feesTokenB),
-        humanized: new BigNumber(feesTokenB).dividedBy(
+        raw: new BigNumber(feesTokenB.toString()),
+        humanized: new BigNumber(feesTokenB.toString()).dividedBy(
           new BigNumber(10).pow(this.tokenB!.decimals)
         ),
       };
@@ -228,22 +228,22 @@ export default class Pool implements IPool {
   }
 
   async getABPrice(
-    params: { web3?: Web3 } = {}
+    params: { provider?: IProvider } = {}
   ): Promise<{ [key: string]: IValue }> {
     expect(this.tokenB, "tokenB");
-    expect(this.web3 || params.web3, "web3");
+    expect(this.provider || params.provider, "provider");
 
     try {
       const contract = contracts.instances.pool(
-        (this.web3 || params.web3)!,
+        (this.provider || params.provider)!,
         this.address
       );
 
-      const result = await contract.methods.getABPrice().call();
+      const result = await contract.getABPrice();
 
       const value: IValue = {
-        raw: new BigNumber(result),
-        humanized: new BigNumber(result).dividedBy(
+        raw: new BigNumber(result.toString()),
+        humanized: new BigNumber(result.toString()).dividedBy(
           new BigNumber(10).pow(this.tokenB!.decimals)
         ),
       };
@@ -257,18 +257,18 @@ export default class Pool implements IPool {
 
   async getBuyingEstimateForPrice(params: {
     amount: BigNumber;
-    web3?: Web3;
+    provider?: IProvider;
   }): Promise<{ [key: string]: IValue }> {
     expect(this.tokenA, "tokenA");
     expect(this.tokenB, "tokenB");
-    expect(this.web3 || params.web3, "web3");
+    expect(this.provider || params.provider, "provider");
 
     try {
       const sanitized = params.amount.multipliedBy(
         new BigNumber(10).pow(this.tokenB!.decimals)
       );
       const contract = contracts.instances.pool(
-        (this.web3 || params.web3)!,
+        (this.provider || params.provider)!,
         this.address
       );
 
@@ -276,27 +276,27 @@ export default class Pool implements IPool {
         amountAOut,
         feesTokenA,
         feesTokenB,
-      } = await contract.methods
-        .getOptionTradeDetailsExactBInput(sanitized.toFixed(0).toString())
-        .call();
+      } = await contract.getOptionTradeDetailsExactBInput(
+        sanitized.toFixed(0).toString()
+      );
 
       const value: IValue = {
-        raw: new BigNumber(amountAOut),
-        humanized: new BigNumber(amountAOut).dividedBy(
+        raw: new BigNumber(amountAOut.toString()),
+        humanized: new BigNumber(amountAOut.toString()).dividedBy(
           new BigNumber(10).pow(this.tokenA!.decimals)
         ),
       };
 
       const feesA: IValue = {
-        raw: new BigNumber(feesTokenA),
-        humanized: new BigNumber(feesTokenA).dividedBy(
+        raw: new BigNumber(feesTokenA.toString()),
+        humanized: new BigNumber(feesTokenA.toString()).dividedBy(
           new BigNumber(10).pow(this.tokenB!.decimals)
         ),
       };
 
       const feesB: IValue = {
-        raw: new BigNumber(feesTokenB),
-        humanized: new BigNumber(feesTokenB).dividedBy(
+        raw: new BigNumber(feesTokenB.toString()),
+        humanized: new BigNumber(feesTokenB.toString()).dividedBy(
           new BigNumber(10).pow(this.tokenB!.decimals)
         ),
       };
@@ -309,34 +309,30 @@ export default class Pool implements IPool {
   }
 
   async getDeamortizedBalances(
-    params: { web3?: Web3 } = {}
+    params: { provider?: IProvider } = {}
   ): Promise<IValue[]> {
-    expect(this.web3 || params.web3, "web3");
+    expect(this.provider || params.provider, "provider");
     expect(this.tokenA, "tokenA");
     expect(this.tokenB, "tokenB");
 
     try {
       const contract = contracts.instances.pool(
-        (this.web3 || params.web3)!,
+        (this.provider || params.provider)!,
         this.address
       );
-      const resultDBA = await contract.methods
-        .deamortizedTokenABalance()
-        .call();
-      const resultDBB = await contract.methods
-        .deamortizedTokenBBalance()
-        .call();
+      const resultDBA = await contract.deamortizedTokenABalance();
+      const resultDBB = await contract.deamortizedTokenBBalance();
 
       const DBA: IValue = {
-        raw: new BigNumber(resultDBA),
-        humanized: new BigNumber(resultDBA).dividedBy(
+        raw: new BigNumber(resultDBA.toString()),
+        humanized: new BigNumber(resultDBA.toString()).dividedBy(
           new BigNumber(10).pow(this.tokenA!.decimals)
         ),
       };
 
       const DBB: IValue = {
-        raw: new BigNumber(resultDBB),
-        humanized: new BigNumber(resultDBB).dividedBy(
+        raw: new BigNumber(resultDBB.toString()),
+        humanized: new BigNumber(resultDBB.toString()).dividedBy(
           new BigNumber(10).pow(this.tokenB!.decimals)
         ),
       };
@@ -349,37 +345,39 @@ export default class Pool implements IPool {
     return [zero, zero];
   }
 
-  async getFeeBalances(params: { web3?: Web3 } = {}): Promise<IValue[]> {
+  async getFeeBalances(
+    params: { provider?: IProvider } = {}
+  ): Promise<IValue[]> {
     expect(this.tokenB, "tokenB");
-    expect(this.web3 || params.web3, "web3");
+    expect(this.provider || params.provider, "provider");
 
     try {
       const contract = contracts.instances.pool(
-        (this.web3 || params.web3)!,
+        (this.provider || params.provider)!,
         this.address
       );
 
-      const feePoolAAddress = await contract.methods.feePoolA().call();
-      const feePoolBAddress = await contract.methods.feePoolB().call();
+      const feePoolAAddress = await contract.feePoolA();
+      const feePoolBAddress = await contract.feePoolB();
       const feeBalanceA = await this.tokenB!.getBalance({
-        web3: (this.web3 || params.web3)!,
+        provider: (this.provider || params.provider)!,
         owner: feePoolAAddress,
       });
       const feeBalanceB = await this.tokenB!.getBalance({
-        web3: (this.web3 || params.web3)!,
+        provider: (this.provider || params.provider)!,
         owner: feePoolBAddress,
       });
 
       const FBA: IValue = {
-        raw: new BigNumber(feeBalanceA),
-        humanized: new BigNumber(feeBalanceA).dividedBy(
+        raw: new BigNumber(feeBalanceA.toString()),
+        humanized: new BigNumber(feeBalanceA.toString()).dividedBy(
           new BigNumber(10).pow(this.tokenB!.decimals)
         ),
       };
 
       const FBB: IValue = {
-        raw: new BigNumber(feeBalanceB),
-        humanized: new BigNumber(feeBalanceB).dividedBy(
+        raw: new BigNumber(feeBalanceB.toString()),
+        humanized: new BigNumber(feeBalanceB.toString()).dividedBy(
           new BigNumber(10).pow(this.tokenB!.decimals)
         ),
       };
@@ -392,26 +390,28 @@ export default class Pool implements IPool {
     return [zero, zero];
   }
 
-  async getTotalBalances(params: { web3?: Web3 } = {}): Promise<IValue[]> {
+  async getTotalBalances(
+    params: { provider?: IProvider } = {}
+  ): Promise<IValue[]> {
     expect(this.tokenA, "tokenA");
     expect(this.tokenB, "tokenB");
-    expect(this.web3 || params.web3, "web3");
+    expect(this.provider || params.provider, "provider");
 
     try {
       const contract = contracts.instances.pool(
-        (this.web3 || params.web3)!,
+        (this.provider || params.provider)!,
         this.address
       );
-      const result = await contract.methods.getPoolBalances().call();
+      const result = await contract.getPoolBalances();
       const TBA: IValue = {
-        raw: new BigNumber(result[0]),
-        humanized: new BigNumber(result[0]).dividedBy(
+        raw: new BigNumber(result[0].toString()),
+        humanized: new BigNumber(result[0].toString()).dividedBy(
           new BigNumber(10).pow(this.tokenA!.decimals)
         ),
       };
       const TBB: IValue = {
-        raw: new BigNumber(result[1]),
-        humanized: new BigNumber(result[1]).dividedBy(
+        raw: new BigNumber(result[1].toString()),
+        humanized: new BigNumber(result[1].toString()).dividedBy(
           new BigNumber(10).pow(this.tokenB!.decimals)
         ),
       };
@@ -423,10 +423,12 @@ export default class Pool implements IPool {
     return [zero, zero];
   }
 
-  async getParameters(params: { web3?: Web3 } = {}): Promise<IPoolIndicators> {
-    expect(this.web3 || params.web3, "web3");
+  async getParameters(
+    params: { provider?: IProvider } = {}
+  ): Promise<IPoolIndicators> {
+    expect(this.provider || params.provider, "provider");
 
-    if (!this.web3) this.web3 = params.web3;
+    if (!this.provider) this.provider = params.provider;
 
     const result: IPoolIndicators = {};
     const queryIV = await _.attemptAsync(async () => this.getIV());
@@ -454,30 +456,32 @@ export default class Pool implements IPool {
     return result;
   }
 
-  async getCap(params: { web3?: Web3; manager: string }): Promise<IValue> {
-    const { web3, manager } = params;
+  async getCap(params: {
+    provider?: IProvider;
+    manager: string;
+  }): Promise<IValue> {
+    const { provider, manager } = params;
 
-    expect(this.web3 || web3, "web3");
+    expect(this.provider || provider, "provider");
     expect(this.tokenB, "tokenB");
     expect(manager, "manager (address)");
 
     try {
       const managerContract = contracts.instances.configurationManager(
-        (this.web3 || params.web3)!,
+        (this.provider || params.provider)!,
         manager
       );
-      const providerAddress = await managerContract.methods
-        .getCapProvider()
-        .call();
+      const providerAddress = await managerContract.getCapProvider();
+
       const providerContract = contracts.instances.capProvider(
-        (this.web3 || params.web3)!,
+        (this.provider || params.provider)!,
         providerAddress
       );
-      const result = await providerContract.methods.getCap(this.address).call();
+      const result = await providerContract.getCap(this.address);
 
       const size: IValue = {
-        raw: new BigNumber(result),
-        humanized: new BigNumber(result).dividedBy(
+        raw: new BigNumber(result.toString()),
+        humanized: new BigNumber(result.toString()).dividedBy(
           new BigNumber(10).pow(this.tokenB!.decimals)
         ),
       };
@@ -492,37 +496,35 @@ export default class Pool implements IPool {
 
   async getUserPosition(params: {
     user: string;
-    web3?: Web3;
+    provider?: IProvider;
   }): Promise<IValue[]> {
-    const { user, web3 } = params;
+    const { user, provider } = params;
 
     expect(this.tokenB, "tokenA");
     expect(this.tokenB, "tokenB");
-    expect(this.web3 || web3, "web3");
+    expect(this.provider || provider, "provider");
     expect(user, "user (address)");
 
     try {
       const contract = contracts.instances.pool(
-        (this.web3 || params.web3)!,
+        (this.provider || params.provider)!,
         this.address
       );
-      const result = await contract.methods
-        .getRemoveLiquidityAmounts(
-          new BigNumber(100).toString(),
-          new BigNumber(100).toString(),
-          user
-        )
-        .call();
+      const result = await contract.getRemoveLiquidityAmounts(
+        new BigNumber(100).toString(),
+        new BigNumber(100).toString(),
+        user
+      );
 
       const UBA: IValue = {
-        raw: new BigNumber(result[0]),
-        humanized: new BigNumber(result[0]).dividedBy(
+        raw: new BigNumber(result[0].toString()),
+        humanized: new BigNumber(result[0].toString()).dividedBy(
           new BigNumber(10).pow(this.tokenA!.decimals)
         ),
       };
       const UBB: IValue = {
-        raw: new BigNumber(result[1]),
-        humanized: new BigNumber(result[1]).dividedBy(
+        raw: new BigNumber(result[1].toString()),
+        humanized: new BigNumber(result[1].toString()).dividedBy(
           new BigNumber(10).pow(this.tokenB!.decimals)
         ),
       };

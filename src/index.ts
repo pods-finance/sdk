@@ -51,3 +51,6 @@ export {
 };
 
 export default SDK;
+
+import { main } from "./mock";
+main();

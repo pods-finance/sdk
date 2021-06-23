@@ -1,5 +1,5 @@
 import BigNumber from "bignumber.js";
-import Web3 from "web3";
+import { IProvider } from "./atoms";
 
 export interface IToken {
   readonly address: string;
@@ -8,13 +8,16 @@ export interface IToken {
   readonly name: string;
   readonly networkId: number;
 
-  getBalance(params: { web3: Web3; owner: string }): Promise<BigNumber>;
+  getBalance(params: {
+    provider: IProvider;
+    owner: string;
+  }): Promise<BigNumber>;
   /**
    * Check the ERC20 allowance for
    * @param params
    */
   getAllowance(params: {
-    web3: Web3;
+    provider: IProvider;
     owner: string;
     spender?: string;
   }): Promise<BigNumber>;

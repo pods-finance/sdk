@@ -1,6 +1,6 @@
 import BigNumber from "bignumber.js";
-import Web3 from "web3";
 
+import { IProvider } from "./atoms";
 import { IOption } from "./option";
 import { IToken } from "./token";
 import { IValue } from "./value";
@@ -24,7 +24,7 @@ export interface IPool {
   readonly address: string;
   readonly networkId: number;
 
-  web3?: Web3;
+  provider?: IProvider;
 
   tokenA?: IToken;
   tokenB?: IToken;
@@ -36,26 +36,34 @@ export interface IPool {
 
   init(params: IPoolBuilderParams): IPool;
 
-  getParameters(params?: { web3?: Web3 }): Promise<IPoolIndicators>;
+  getParameters(params?: { provider?: IProvider }): Promise<IPoolIndicators>;
 
-  getIV(params?: { web3?: Web3 }): Promise<IValue>;
-  getABPrice(params?: { web3?: Web3 }): Promise<{ [key: string]: IValue }>;
+  getIV(params?: { provider?: IProvider }): Promise<IValue>;
+  getABPrice(params?: {
+    provider?: IProvider;
+  }): Promise<{ [key: string]: IValue }>;
   getBuyingPrice(params: {
     amount: BigNumber;
-    web3?: Web3;
+    provider?: IProvider;
   }): Promise<{ [key: string]: IValue }>;
   getBuyingEstimateForPrice(params: {
     amount: BigNumber;
-    web3?: Web3;
+    provider?: IProvider;
   }): Promise<{ [key: string]: IValue }>;
   getSellingPrice(params: {
     amount: BigNumber;
-    web3?: Web3;
+    provider?: IProvider;
   }): Promise<{ [key: string]: IValue }>;
-  getTotalBalances(params?: { web3?: Web3 }): Promise<IValue[]>;
-  getDeamortizedBalances(params?: { web3?: Web3 }): Promise<IValue[]>;
-  getFeeBalances(params: { amount: BigNumber; web3?: Web3 }): Promise<IValue[]>;
+  getTotalBalances(params?: { provider?: IProvider }): Promise<IValue[]>;
+  getDeamortizedBalances(params?: { provider?: IProvider }): Promise<IValue[]>;
+  getFeeBalances(params: {
+    amount: BigNumber;
+    provider?: IProvider;
+  }): Promise<IValue[]>;
 
-  getCap(params: { manager: string; web3?: Web3 }): Promise<IValue>;
-  getUserPosition(params: { user: string; web3?: Web3 }): Promise<IValue[]>;
+  getCap(params: { manager: string; provider?: IProvider }): Promise<IValue>;
+  getUserPosition(params: {
+    user: string;
+    provider?: IProvider;
+  }): Promise<IValue[]>;
 }

@@ -1,7 +1,6 @@
 import _ from "lodash";
 import BigNumber from "bignumber.js";
-import Web3 from "web3";
-import { IValue } from "@types";
+import { IProvider, IValue } from "@types";
 import { DEFAULT_TIMEOUT } from "../constants/globals";
 declare module "lodash" {
   interface LoDashStatic {
@@ -55,19 +54,24 @@ export function expect(
     );
 }
 
-export async function getDefaultDeadline(web3: Web3): Promise<BigNumber> {
-  expect(web3, "web3");
-  const currentBlock = await web3.eth.getBlock("latest");
-  return new BigNumber(currentBlock.timestamp).plus(
-    new BigNumber(DEFAULT_TIMEOUT)
-  );
+export async function getDefaultDeadline(
+  provider: IProvider
+): Promise<BigNumber> {
+  expect(provider, "provider");
+  const index = await provider.getBlockNumber();
+  const block = await provider.getBlock(index);
+
+  return new BigNumber(block.timestamp).plus(new BigNumber(DEFAULT_TIMEOUT));
 }
 
-export async function getWeb3Owner(web3: Web3): Promise<string> {
-  expect(web3, "web3");
+export async function getOwner(provider: IProvider): Promise<string> {
+  expect(provider, "provider");
 
-  const accounts = await web3.eth.getAccounts();
-  return _.get(accounts, "[0]");
+  const signer = provider.getSigner();
+  expect(signer, "signer");
+
+  const account = await signer.getAddress();
+  return account;
 }
 
 /**
@@ -88,7 +92,7 @@ const utils = {
   expect,
 
   getDefaultDeadline,
-  getWeb3Owner,
+  getOwner,
   humanize,
 };
 export default utils;

@@ -1,7 +1,6 @@
 import _ from "lodash";
 import BigNumber from "bignumber.js";
-import Web3 from "web3";
-import { INetwork, IToken } from "@types";
+import { IProvider, INetwork, IToken } from "@types";
 import networks from "../constants/networks";
 import * as globals from "../constants/globals";
 import contracts from "../contracts";
@@ -39,21 +38,25 @@ export default class Token implements IToken {
   }
 
   static async getBalanceFor(params: {
-    web3: Web3;
+    provider: IProvider;
     owner: string;
     address: string;
     isUtility?: boolean;
   }): Promise<BigNumber> {
-    const { web3, owner, address, isUtility } = params || {};
+    const { provider, owner, address, isUtility } = params || {};
     if (isUtility === true) {
-      const value = await web3.eth.getBalance(owner);
-      return new BigNumber(value);
+      const value = await provider.getBalance(owner);
+      return new BigNumber(value.toString());
     }
-    const contract = contracts.instances.erc20(web3, address);
-    return new BigNumber(await contract.methods.balanceOf(owner).call());
+    const contract = contracts.instances.erc20(provider, address);
+    const result = await contract.balanceOf(owner);
+    return new BigNumber(result.toString());
   }
 
-  async getBalance(params: { web3: Web3; owner: string }): Promise<BigNumber> {
+  async getBalance(params: {
+    provider: IProvider;
+    owner: string;
+  }): Promise<BigNumber> {
     return Token.getBalanceFor({
       ...params,
       isUtility: this.isUtility(),
@@ -62,23 +65,22 @@ export default class Token implements IToken {
   }
 
   static async getAllowanceFor(params: {
-    web3: Web3;
+    provider: IProvider;
     owner: string;
     spender?: string;
     address: string;
     isUtility?: boolean;
   }): Promise<BigNumber> {
-    const { web3, owner, address, spender, isUtility } = params || {};
+    const { provider, owner, address, spender, isUtility } = params || {};
 
     if (isUtility === true) return new BigNumber(globals.MAX_UINT);
-    const contract = contracts.instances.erc20(web3, address);
-    return new BigNumber(
-      await contract.methods.allowance(owner, spender || owner).call()
-    );
+    const contract = contracts.instances.erc20(provider, address);
+    const allowance = await contract.allowance(owner, spender || owner);
+    return new BigNumber(allowance.toString());
   }
 
   async getAllowance(params: {
-    web3: Web3;
+    provider: IProvider;
     owner: string;
     spender?: string;
   }): Promise<BigNumber> {

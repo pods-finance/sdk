@@ -1,13 +1,13 @@
 import _ from "lodash";
 import BigNumber from "bignumber.js";
 import dayjs from "dayjs";
-import Web3 from "web3";
 
 import relativeTime from "dayjs/plugin/relativeTime";
 import advancedFormat from "dayjs/plugin/advancedFormat";
 import duration from "dayjs/plugin/duration";
 
 import {
+  IProvider,
   IPool,
   IOption,
   IOptionBuilderParams,
@@ -36,7 +36,7 @@ export default class Option implements IOption {
   public readonly address: string;
   public readonly networkId: number;
 
-  private _web3?: Web3;
+  private _provider?: IProvider;
   private _symbol?: string;
   private _decimals?: BigNumber;
   private _underlying?: IToken;
@@ -54,11 +54,11 @@ export default class Option implements IOption {
    * ---------- SETTERS & GETTERS ----------
    */
 
-  public get web3(): Optional<Web3> {
-    return this._web3;
+  public get provider(): Optional<IProvider> {
+    return this._provider;
   }
-  public set web3(value: Optional<Web3>) {
-    this._web3 = value;
+  public set provider(value: Optional<IProvider>) {
+    this._provider = value;
   }
 
   public get symbol(): Optional<string> {
@@ -158,7 +158,7 @@ export default class Option implements IOption {
     this.type = params.type ? OptionType.Call : OptionType.Put;
     this.symbol = params.symbol;
     this.decimals = params.decimals || 18;
-    this.web3 = params.web3;
+    this.provider = params.provider;
 
     this.underlying = new Token({
       address: params.underlyingAsset,
@@ -276,20 +276,20 @@ export default class Option implements IOption {
     };
   }
 
-  async getTotalSupply(params: { web3?: Web3 } = {}): Promise<IValue> {
+  async getTotalSupply(params: { provider?: IProvider } = {}): Promise<IValue> {
     expect(this.strike, "strike");
-    expect(this.web3 || params.web3, "web3");
+    expect(this.provider || params.provider, "provider");
 
     try {
       const contract = contracts.instances.option(
-        (this.web3 || params.web3)!,
+        (this.provider || params.provider)!,
         this.address
       );
-      const result = await contract.methods.totalSupply().call();
+      const result = await contract.totalSupply();
 
       const supply: IValue = {
-        raw: result,
-        humanized: result.dividedBy(
+        raw: new BigNumber(result.toString()),
+        humanized: new BigNumber(result.toString()).dividedBy(
           new BigNumber(10).pow(this.strike!.decimals)
         ),
       };
@@ -301,31 +301,32 @@ export default class Option implements IOption {
     return zero;
   }
 
-  async getCap(params: { manager: string; web3?: Web3 }): Promise<IValue> {
-    const { manager, web3 } = params;
+  async getCap(params: {
+    manager: string;
+    provider?: IProvider;
+  }): Promise<IValue> {
+    const { manager, provider } = params;
 
     expect(this.strike, "strike");
-    expect(this.web3 || web3, "web3");
+    expect(this.provider || provider, "provider");
     expect(manager, "manager (address)");
 
     try {
       const managerContract = contracts.instances.configurationManager(
-        (this.web3 || web3)!,
+        (this.provider || provider)!,
         manager
       );
-      const providerAddress = await managerContract.methods
-        .getCapProvider()
-        .call();
+      const providerAddress = await managerContract.getCapProvider();
       const providerContract = contracts.instances.capProvider(
-        (this.web3 || web3)!,
+        (this.provider || provider)!,
         providerAddress
       );
 
-      const result = await providerContract.methods.getCap(this.address).call();
+      const result = await providerContract.getCap(this.address);
 
       const size: IValue = {
-        raw: new BigNumber(result),
-        humanized: new BigNumber(result).dividedBy(
+        raw: new BigNumber(result.toString()),
+        humanized: new BigNumber(result.toString()).dividedBy(
           new BigNumber(10).pow(this.strike!.decimals)
         ),
       };
@@ -339,25 +340,25 @@ export default class Option implements IOption {
 
   async getUserMintedOptions(params: {
     user: string;
-    web3?: Web3;
+    provider?: IProvider;
   }): Promise<IValue> {
-    const { user, web3 } = params;
+    const { user, provider } = params;
 
     expect(this.decimals, "decimals");
-    expect(this.web3 || web3, "web3");
+    expect(this.provider || provider, "provider");
     expect(user, "user (address)");
 
     try {
       const contract = contracts.instances.option(
-        (this.web3 || web3)!,
+        (this.provider || provider)!,
         this.address
       );
 
-      const result = await contract.methods.mintedOptions(user).call();
+      const result = await contract.mintedOptions(user);
 
       const size: IValue = {
-        raw: new BigNumber(result),
-        humanized: new BigNumber(result).dividedBy(
+        raw: new BigNumber(result.toString()),
+        humanized: new BigNumber(result.toString()).dividedBy(
           new BigNumber(10).pow(this.decimals!)
         ),
       };
@@ -377,34 +378,32 @@ export default class Option implements IOption {
    */
   async getUserWithdrawBalances(params: {
     user: string;
-    web3?: Web3;
+    provider?: IProvider;
   }): Promise<IValue[]> {
-    const { user, web3 } = params;
+    const { user, provider } = params;
 
     expect(this.underlying, "underlying");
     expect(this.strike, "strike");
-    expect(this.web3 || web3, "web3");
+    expect(this.provider || provider, "provider");
     expect(user, "user (address)");
 
     try {
       const contract = contracts.instances.option(
-        (this.web3 || web3)!,
+        (this.provider || provider)!,
         this.address
       );
-      const result = await contract.methods
-        .getSellerWithdrawAmounts(user)
-        .call();
+      const result = await contract.getSellerWithdrawAmounts(user);
 
       const SB: IValue = {
-        raw: new BigNumber(result[0]),
-        humanized: new BigNumber(result[0]).dividedBy(
+        raw: new BigNumber(result[0].toString()),
+        humanized: new BigNumber(result[0].toString()).dividedBy(
           new BigNumber(10).pow(this.strike!.decimals)
         ),
       };
 
       const UB: IValue = {
-        raw: new BigNumber(result[1]),
-        humanized: new BigNumber(result[1]).dividedBy(
+        raw: new BigNumber(result[1].toString()),
+        humanized: new BigNumber(result[1].toString()).dividedBy(
           new BigNumber(10).pow(this.underlying!.decimals)
         ),
       };

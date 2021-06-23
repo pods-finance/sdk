@@ -1,12 +1,13 @@
 import _ from "lodash";
 import BigNumber from "bignumber.js";
-import Web3 from "web3";
 import { IOption } from "./option";
+import { IProvider, ISigner } from "./atoms";
 
 export interface IHelper {
   readonly address: string;
   readonly networkId: number;
-  readonly web3: Web3;
+  readonly provider: IProvider;
+  readonly signer: ISigner;
 
   /** Buy an exact optionAmount with an estimated premiumAmount. Use humanized values (no decimal padding) */
   doBuyExact(params: {
@@ -53,15 +54,22 @@ export interface IHelper {
     callback?: Function;
   }): Promise<void>;
 
-  /** Add liquidity. Use humanized values (no decimal padding) */
-  doAddLiquidity(params: {
+  /** Add single liquidity. Use humanized values (no decimal padding) */
+  doAddSingleLiquidity(params: {
+    option: IOption;
+    strikeAmount: BigNumber;
+    callback?: Function;
+  }): Promise<void>;
+
+  /** Add dual liquidity. Use humanized values (no decimal padding) */
+  doAddDualLiquidity(params: {
     option: IOption;
     tokenAAmount: BigNumber;
     tokenBAmount: BigNumber;
     callback?: Function;
   }): Promise<void>;
 
-  /** Remove liquidity. Use integer values from 0 to 100 */
+  /** Remove dual liquidity. Use integer values from 0 to 100 */
   doRemoveLiquidity(params: {
     option: IOption;
     percentA: BigNumber;

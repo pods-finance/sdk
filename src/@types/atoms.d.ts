@@ -1,8 +1,14 @@
-import Web3 from "web3";
 import { NormalizedCacheObject } from "apollo-cache-inmemory";
 import { ApolloClient } from "apollo-client";
+import { ethers } from "ethers";
 
 export type IApolloClient = ApolloClient<NormalizedCacheObject>;
-export type IWeb3 = Web3;
+export type IProvider =
+  | ethers.providers.JsonRpcProvider
+  | ethers.providers.Web3Provider;
+
+export type ISigner = ethers.Signer;
+
+export type ISignerOrProvider = IProvider | ISigner;
 
 export type Optional<Base> = Base | undefined;

@@ -1,11 +1,11 @@
 import BigNumber from "bignumber.js";
-import Web3 from "web3";
+import { IProvider } from "./atoms";
 import { IPoolBuilderParams } from "./poolBuilder";
 
 export interface IOptionBuilderParams {
   address?: string;
   networkId?: number;
-  web3?: Web3;
+  provider?: IProvider;
   type: number;
 
   symbol: string;

@@ -1,6 +1,6 @@
 import BigNumber from "bignumber.js";
-import Web3 from "web3";
 
+import { IProvider } from "./atoms";
 import { IValue } from "./value";
 import { IPool } from "./pool";
 import { IToken } from "./token";
@@ -12,7 +12,7 @@ export interface IOption {
   readonly address: string;
   readonly networkId: number;
 
-  web3?: Web3;
+  provider?: IProvider;
   symbol?: string;
   decimals?: BigNumber;
   underlying?: IToken;
@@ -32,12 +32,15 @@ export interface IOption {
     [key: string]: number | string | boolean | null | undefined;
   };
 
-  getTotalSupply(params?: { web3?: Web3 }): Promise<IValue>;
-  getCap(params: { manager: string; web3?: Web3 }): Promise<IValue>;
+  getTotalSupply(params?: { provider?: IProvider }): Promise<IValue>;
+  getCap(params: { manager: string; provider?: IProvider }): Promise<IValue>;
 
-  getUserMintedOptions(params: { user: string; web3?: Web3 }): Promise<IValue>;
+  getUserMintedOptions(params: {
+    user: string;
+    provider?: IProvider;
+  }): Promise<IValue>;
   getUserWithdrawBalances(params: {
     user: string;
-    web3?: Web3;
+    provider?: IProvider;
   }): Promise<IValue[]>;
 }

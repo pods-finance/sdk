@@ -1,23 +1,28 @@
 import _ from "lodash";
 import BigNumber from "bignumber.js";
-import Web3 from "web3";
-import { IHelper, IOption } from "@types";
-import { expect, getDefaultDeadline, getWeb3Owner } from "../utils";
+import { ISigner, IHelper, IOption, IProvider } from "@types";
+import { expect, getDefaultDeadline, getOwner } from "../utils";
 import contracts from "../contracts";
 
 export default class Helper implements IHelper {
   address: string;
   networkId: number;
-  web3: Web3;
+  provider: IProvider;
+  signer: ISigner;
 
   /**
    * ---------- CONSTRUCTOR & METHODS ----------
    */
 
-  constructor(params: { address: string; networkId: number; web3: Web3 }) {
+  constructor(params: {
+    address: string;
+    networkId: number;
+    provider: IProvider;
+  }) {
     this.address = params.address.toLowerCase();
     this.networkId = params.networkId;
-    this.web3 = params.web3;
+    this.provider = params.provider;
+    this.signer = params.provider.getSigner();
   }
 
   async doBuyExact(params: {
@@ -29,7 +34,8 @@ export default class Helper implements IHelper {
   }): Promise<void> {
     const { option, premiumAmount, optionAmount, deadline, callback } = params;
 
-    expect(this.web3, "web3");
+    expect(this.provider, "provider");
+    expect(this.signer, "signer");
     expect(option, "option");
     expect(option.pool, "pool (option)");
     expect(option.pool?.tokenB, "tokenB (option pool)");
@@ -45,28 +51,29 @@ export default class Helper implements IHelper {
       new BigNumber(10).pow(option.decimals!)
     );
 
-    const owner = await getWeb3Owner(this.web3);
+    const IV = await option.pool!.getIV({ provider: this.provider });
 
-    const IV = await option.pool!.getIV({ web3: this.web3 });
+    const contract = contracts.instances.optionHelper(
+      this.signer,
+      this.address
+    );
 
-    const contract = contracts.instances.optionHelper(this.web3, this.address);
+    const transaction = await contract.buyExactOptions(
+      option.address,
+      output.toFixed(0).toString(),
+      input.toFixed(0).toString(),
+      (deadline || (await getDefaultDeadline(this.provider)))
+        .toFixed(0)
+        .toString(),
+      IV.raw.toFixed(0).toString()
+    );
 
-    await contract.methods
-      .buyExactOptions(
-        option.address,
-        output.toFixed(0).toString(),
-        input.toFixed(0).toString(),
-        (deadline || (await getDefaultDeadline(this.web3)))
-          .toFixed(0)
-          .toString(),
-        IV.raw.toFixed(0).toString()
-      )
-      .send(
-        {
-          from: owner,
-        },
-        callback || _.noop
-      );
+    try {
+      const receipt = await transaction.wait();
+      (callback || _.noop)(null, receipt.transactionHash, receipt);
+    } catch (error) {
+      (callback || _.noop)(error, error.transactionHash);
+    }
   }
   async doBuyEstimated(params: {
     option: IOption;
@@ -77,7 +84,7 @@ export default class Helper implements IHelper {
   }): Promise<void> {
     const { option, premiumAmount, optionAmount, deadline, callback } = params;
 
-    expect(this.web3, "web3");
+    expect(this.provider, "provider");
     expect(option, "option");
     expect(option.pool, "pool (option)");
     expect(option.pool?.tokenB, "tokenB (option pool)");
@@ -93,18 +100,21 @@ export default class Helper implements IHelper {
       new BigNumber(10).pow(option.decimals!)
     );
 
-    const owner = await getWeb3Owner(this.web3);
+    const owner = await getOwner(this.provider);
 
-    const IV = await option.pool!.getIV({ web3: this.web3 });
+    const IV = await option.pool!.getIV({ provider: this.provider });
 
-    const contract = contracts.instances.optionHelper(this.web3, this.address);
+    const contract = contracts.instances.optionHelper(
+      this.provider,
+      this.address
+    );
 
     await contract.methods
       .buyOptionsWithExactTokens(
         option.address,
         output.toFixed(0).toString(),
         input.toFixed(0).toString(),
-        (deadline || (await getDefaultDeadline(this.web3)))
+        (deadline || (await getDefaultDeadline(this.provider)))
           .toFixed(0)
           .toString(),
         IV.raw.toFixed(0).toString()
@@ -126,7 +136,7 @@ export default class Helper implements IHelper {
   }): Promise<void> {
     const { option, premiumAmount, optionAmount, deadline, callback } = params;
 
-    expect(this.web3, "web3");
+    expect(this.provider, "provider");
     expect(option, "option");
     expect(option.pool, "pool (option)");
     expect(option.pool?.tokenB, "tokenB (option pool)");
@@ -143,18 +153,21 @@ export default class Helper implements IHelper {
       new BigNumber(10).pow(option.pool!.tokenB!.decimals)
     );
 
-    const owner = await getWeb3Owner(this.web3);
+    const owner = await getOwner(this.provider);
 
-    const IV = await option.pool!.getIV({ web3: this.web3 });
+    const IV = await option.pool!.getIV({ provider: this.provider });
 
-    const contract = contracts.instances.optionHelper(this.web3, this.address);
+    const contract = contracts.instances.optionHelper(
+      this.provider,
+      this.address
+    );
 
     await contract.methods
       .mintAndSellOptions(
         option.address,
         input.toFixed(0).toString(),
         output.toFixed(0).toString(),
-        (deadline || (await getDefaultDeadline(this.web3)))
+        (deadline || (await getDefaultDeadline(this.provider)))
           .toFixed(0)
           .toString(),
         IV.raw.toFixed(0).toString()
@@ -176,7 +189,7 @@ export default class Helper implements IHelper {
   }): Promise<void> {
     const { option, premiumAmount, optionAmount, deadline, callback } = params;
 
-    expect(this.web3, "web3");
+    expect(this.provider, "provider");
     expect(option, "option");
     expect(option.pool, "pool (option)");
     expect(option.pool?.tokenB, "tokenB (option pool)");
@@ -193,18 +206,21 @@ export default class Helper implements IHelper {
       new BigNumber(10).pow(option.pool!.tokenB!.decimals)
     );
 
-    const owner = await getWeb3Owner(this.web3);
+    const owner = await getOwner(this.provider);
 
-    const IV = await option.pool!.getIV({ web3: this.web3 });
+    const IV = await option.pool!.getIV({ provider: this.provider });
 
-    const contract = contracts.instances.optionHelper(this.web3, this.address);
+    const contract = contracts.instances.optionHelper(
+      this.provider,
+      this.address
+    );
 
     await contract.methods
       .sellExactOptions(
         option.address,
         input.toFixed(0).toString(),
         output.toFixed(0).toString(),
-        (deadline || (await getDefaultDeadline(this.web3)))
+        (deadline || (await getDefaultDeadline(this.provider)))
           .toFixed(0)
           .toString(),
         IV.raw.toFixed(0).toString()
@@ -226,7 +242,7 @@ export default class Helper implements IHelper {
     return this.doSellExact(params);
   }
 
-  async doAddLiquidity(params: {
+  async doAddDualLiquidity(params: {
     option: IOption;
     tokenAAmount: BigNumber;
     tokenBAmount: BigNumber;
@@ -234,7 +250,7 @@ export default class Helper implements IHelper {
   }): Promise<void> {
     const { option, tokenAAmount, tokenBAmount, callback } = params;
 
-    expect(this.web3, "web3");
+    expect(this.provider, "provider");
     expect(option, "option");
     expect(option.pool, "pool (option)");
     expect(option.pool?.tokenB, "tokenB (option pool)");
@@ -251,8 +267,11 @@ export default class Helper implements IHelper {
       new BigNumber(10).pow(option.pool!.tokenB!.decimals)
     );
 
-    const owner = await getWeb3Owner(this.web3);
-    const contract = contracts.instances.optionHelper(this.web3, this.address);
+    const owner = await getOwner(this.provider);
+    const contract = contracts.instances.optionHelper(
+      this.provider,
+      this.address
+    );
 
     await contract.methods
       .addLiquidity(
@@ -275,14 +294,17 @@ export default class Helper implements IHelper {
   }): Promise<void> {
     const { option, percentA, percentB, callback } = params;
 
-    expect(this.web3, "web3");
+    expect(this.provider, "provider");
     expect(option, "option");
     expect(option.pool, "pool (option)");
     expect(percentA, "percentA", "object");
     expect(percentB, "percentB", "object");
 
-    const owner = await getWeb3Owner(this.web3);
-    const contract = contracts.instances.pool(this.web3, option.pool!.address);
+    const owner = await getOwner(this.provider);
+    const contract = contracts.instances.pool(
+      this.provider,
+      option.pool!.address
+    );
 
     await contract.methods
       .removeLiquidity(
@@ -296,6 +318,16 @@ export default class Helper implements IHelper {
         callback || _.noop
       );
   }
+
+  async doAddSingleLiquidity(params: {
+    option: IOption;
+    strikeAmount: BigNumber;
+    callback?: Function | undefined;
+  }): Promise<void> {
+    console.info({ params });
+    throw new Error("Method not implemented yet.");
+  }
+
   async doMint(params: {
     option: IOption;
     optionAmount: BigNumber;
@@ -303,7 +335,7 @@ export default class Helper implements IHelper {
   }): Promise<void> {
     const { option, optionAmount, callback } = params;
 
-    expect(this.web3, "web3");
+    expect(this.provider, "provider");
     expect(option, "option");
     expect(option.decimals, "decimals");
     expect(optionAmount, "optionAmount", "object");
@@ -312,9 +344,12 @@ export default class Helper implements IHelper {
       new BigNumber(10).pow(option.decimals!)
     );
 
-    const owner = await getWeb3Owner(this.web3);
+    const owner = await getOwner(this.provider);
 
-    const contract = contracts.instances.optionHelper(this.web3, this.address);
+    const contract = contracts.instances.optionHelper(
+      this.provider,
+      this.address
+    );
 
     await contract.methods
       .mint(option.address, output.toFixed(0).toString())
@@ -332,14 +367,14 @@ export default class Helper implements IHelper {
   }): Promise<void> {
     const { option, optionAmount, callback } = params;
 
-    expect(this.web3, "web3");
+    expect(this.provider, "provider");
     expect(option, "option");
     expect(option.decimals, "decimals");
     expect(optionAmount, "optionAmount", "object");
 
-    const owner = await getWeb3Owner(this.web3);
+    const owner = await getOwner(this.provider);
 
-    const contract = contracts.instances.option(this.web3, option.address);
+    const contract = contracts.instances.option(this.provider, option.address);
 
     const input = new BigNumber(optionAmount).multipliedBy(
       new BigNumber(10).pow(option.decimals!)
@@ -359,7 +394,7 @@ export default class Helper implements IHelper {
   }): Promise<void> {
     const { option, optionAmount, callback } = params;
 
-    expect(this.web3, "web3");
+    expect(this.provider, "provider");
     expect(option, "option");
     expect(option.decimals, "decimals");
     expect(optionAmount, "optionAmount", "object");
@@ -368,9 +403,9 @@ export default class Helper implements IHelper {
       new BigNumber(10).pow(option.decimals!)
     );
 
-    const owner = await getWeb3Owner(this.web3);
+    const owner = await getOwner(this.provider);
 
-    const contract = contracts.instances.option(this.web3, option.address);
+    const contract = contracts.instances.option(this.provider, option.address);
 
     await contract.methods.exercise(input.toFixed(0).toString()).send(
       {
@@ -387,7 +422,7 @@ export default class Helper implements IHelper {
   }): Promise<void> {
     const { option, optionAmount, callback } = params;
 
-    expect(this.web3, "web3");
+    expect(this.provider, "provider");
     expect(option, "option");
     expect(option.decimals, "decimals");
     expect(optionAmount, "optionAmount", "object");
@@ -396,9 +431,9 @@ export default class Helper implements IHelper {
       new BigNumber(10).pow(option.decimals!)
     );
 
-    const owner = await getWeb3Owner(this.web3);
+    const owner = await getOwner(this.provider);
 
-    const contract = contracts.instances.option(this.web3, option.address);
+    const contract = contracts.instances.option(this.provider, option.address);
 
     await contract.methods.exerciseEth().send(
       {
@@ -415,11 +450,11 @@ export default class Helper implements IHelper {
   }): Promise<void> {
     const { option, callback } = params;
 
-    expect(this.web3, "web3");
+    expect(this.provider, "provider");
     expect(option, "option");
 
-    const owner = await getWeb3Owner(this.web3);
-    const contract = contracts.instances.option(this.web3, option.address);
+    const owner = await getOwner(this.provider);
+    const contract = contracts.instances.option(this.provider, option.address);
 
     await contract.methods.withdraw().send(
       {

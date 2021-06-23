@@ -1,4 +1,6 @@
-import Web3 from "web3";
+import { Contract } from "ethers";
+import { ISignerOrProvider } from "../@types";
+
 import CapProviderABI from "./abis/capProviderABI.json";
 import ConfigurationManagerABI from "./abis/configurationManagerABI.json";
 import ERC20ABI from "./abis/erc20ABI.json";
@@ -8,25 +10,33 @@ import OptionFactoryABI from "./abis/optionFactoryABI.json";
 import OptionHelperABI from "./abis/optionHelperABI.json";
 import OptionABI from "./abis/wPodPutABI.json";
 
-function instance(web3: Web3, address: string, abi: any) {
-  const { Contract } = web3.eth;
-  return new Contract(abi, address);
+function instance(
+  provider: ISignerOrProvider,
+  address: string,
+  abi: any
+): Contract {
+  return new Contract(address, abi, provider);
 }
 
 const instances = {
-  capProvider: (web3: Web3, address: string) =>
-    instance(web3, address, CapProviderABI),
-  configurationManager: (web3: Web3, address: string) =>
-    instance(web3, address, ConfigurationManagerABI),
-  erc20: (web3: Web3, address: string) => instance(web3, address, ERC20ABI),
-  poolFactory: (web3: Web3, address: string) =>
-    instance(web3, address, PoolFactoryABI),
-  pool: (web3: Web3, address: string) => instance(web3, address, PoolABI),
-  optionFactory: (web3: Web3, address: string) =>
-    instance(web3, address, OptionFactoryABI),
-  optionHelper: (web3: Web3, address: string) =>
-    instance(web3, address, OptionHelperABI),
-  option: (web3: Web3, address: string) => instance(web3, address, OptionABI),
+  capProvider: (provider: ISignerOrProvider, address: string): Contract =>
+    instance(provider, address, CapProviderABI),
+  configurationManager: (
+    provider: ISignerOrProvider,
+    address: string
+  ): Contract => instance(provider, address, ConfigurationManagerABI),
+  erc20: (provider: ISignerOrProvider, address: string): Contract =>
+    instance(provider, address, ERC20ABI),
+  poolFactory: (provider: ISignerOrProvider, address: string): Contract =>
+    instance(provider, address, PoolFactoryABI),
+  pool: (provider: ISignerOrProvider, address: string): Contract =>
+    instance(provider, address, PoolABI),
+  optionFactory: (provider: ISignerOrProvider, address: string): Contract =>
+    instance(provider, address, OptionFactoryABI),
+  optionHelper: (provider: ISignerOrProvider, address: string): Contract =>
+    instance(provider, address, OptionHelperABI),
+  option: (provider: ISignerOrProvider, address: string): Contract =>
+    instance(provider, address, OptionABI),
 };
 
 const abis = {

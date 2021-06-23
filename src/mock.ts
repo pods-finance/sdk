@@ -12,19 +12,24 @@ import networks from "./constants/networks";
 import { IAction, IOption } from "./@types";
 import { ActionBuilder, OptionBuilder } from "./builders";
 
+import { Contract, Provider } from "ethers-multicall";
+import { ethers } from "ethers";
+
 import "cross-fetch/polyfill";
+import contracts from "./contracts";
 
 dotenv.config();
 utils.config();
 
 async function tokens(): Promise<void> {
-  const web3Instance = clients.web3.getInfuraInstance(
-    process.env.INFURA_ENDPOINT_KOVAN || ""
+  const provider = clients.provider.getInfuraProvider(
+    "kovan",
+    process.env.TESTING_INFURA_KEY || ""
   );
-  const balance = await web3Instance.eth.getBalance(
+  const balance = await provider.getBalance(
     "0xAFA20A683A4ff46991Cb065Ae507Bf3b0110d47D"
   );
-  console.log("Wallet: ", balance);
+  console.log("Wallet: ", balance.toString());
 
   const token = new Token({
     address: "0xe22da380ee6b445bb8273c81944adeb6e8450422",
@@ -33,10 +38,12 @@ async function tokens(): Promise<void> {
     decimals: new BigNumber(8),
   });
 
+  console.log({ token });
+
   console.log(
     "USDC Balance",
     await token.getBalance({
-      web3: web3Instance,
+      provider,
       owner: "0xAFA20A683A4ff46991Cb065Ae507Bf3b0110d47D",
     })
   );
@@ -81,9 +88,11 @@ async function subgraphActions(): Promise<void> {
 }
 
 async function flowLive(): Promise<void> {
-  const web3Instance = clients.web3.getInfuraInstance(
-    process.env.INFURA_ENDPOINT_KOVAN || ""
+  const provider = clients.provider.getInfuraProvider(
+    "kovan",
+    process.env.TESTING_INFURA_KEY || ""
   );
+
   const subgraphInstance = clients.subgraph.apollo.getClientInstance(
     networks.kovan,
     true
@@ -93,7 +102,7 @@ async function flowLive(): Promise<void> {
     query: queries.option.getList,
     variables: {
       first: 2,
-      skip: 0,
+      skip: 2,
     },
     fetchPolicy: "no-cache",
   });
@@ -104,17 +113,14 @@ async function flowLive(): Promise<void> {
     OptionBuilder.fromData({
       source: item,
       networkId: networks.kovan.networkId,
-      web3: web3Instance,
+      provider,
     })
   );
 
   options.forEach(async (option) => {
     const parameters = await option.pool?.getParameters();
 
-    console.log(
-      parameters,
-      parameters?.impliedVolatility?.humanized.toString()
-    );
+    console.log(parameters, parameters?.totalBalanceA?.humanized.toString());
   });
 }
 
@@ -150,14 +156,43 @@ async function flowActions(): Promise<void> {
   });
 }
 
+async function multicall(): Promise<void> {
+  const provider = new ethers.providers.InfuraProvider(
+    "kovan",
+    process.env.TESTING_INFURA_KEY || ""
+  );
+
+  const tokenAddress = "0xe22da380ee6b445bb8273c81944adeb6e8450422";
+
+  const ethcallProvider = new Provider(provider, 42);
+
+  await ethcallProvider.init(); // Only required when `chainId` is not provided in the `Provider` constructor
+
+  const daiContract = new Contract(tokenAddress, contracts.abis.ERC20ABI);
+
+  const wallet = "0xdfaD0c01a28d9d95486bb3f0821E4F5644704FA7";
+
+  const ethBalanceCall = ethcallProvider.getEthBalance(wallet);
+  const usdcBalanceCall = daiContract.balanceOf(wallet);
+
+  const [ethBalance, daiBalance] = await ethcallProvider.all([
+    ethBalanceCall,
+    usdcBalanceCall,
+  ]);
+
+  console.log("ETH Balance:", ethBalance.toString());
+  console.log("DAI Balance:", daiBalance.toString());
+}
+
 const tests = {
   tokens,
   subgraphActions,
   subgraphOptions,
   flowLive,
   flowActions,
+  multicall,
 };
 
 export async function main() {
-  await tests.flowActions();
+  await tests.flowLive();
 }

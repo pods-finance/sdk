@@ -1,9 +1,9 @@
 import subgraph from "./subgraph";
-import web3 from "./web3";
+import provider from "./provider";
 
 const clients = {
   subgraph,
-  web3,
+  provider,
 };
 
 export default clients;
