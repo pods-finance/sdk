@@ -1,13 +1,14 @@
 import _ from "lodash";
 import BigNumber from "bignumber.js";
 import { IOption } from "./option";
-import { IProvider, ISigner } from "./atoms";
+import { IProvider, ISigner, Optional } from "./atoms";
 
 export interface IHelper {
   readonly address: string;
   readonly networkId: number;
   readonly provider: IProvider;
-  readonly signer: ISigner;
+  /** The signer should not optional! This is meant to enable throwable errors for failing/undefined signers. */
+  readonly signer: Optional<ISigner>;
 
   /** Buy an exact optionAmount with an estimated premiumAmount. Use humanized values (no decimal padding) */
   doBuyExact(params: {

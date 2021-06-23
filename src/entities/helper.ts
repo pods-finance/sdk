@@ -1,14 +1,15 @@
 import _ from "lodash";
 import BigNumber from "bignumber.js";
-import { ISigner, IHelper, IOption, IProvider } from "@types";
-import { expect, getDefaultDeadline, getOwner } from "../utils";
+import { ISigner, IHelper, IOption, IProvider, Optional } from "@types";
+import { expect, getDefaultDeadline } from "../utils";
 import contracts from "../contracts";
+import { ALLOW_LOGS } from "../constants/globals";
 
 export default class Helper implements IHelper {
   address: string;
   networkId: number;
   provider: IProvider;
-  signer: ISigner;
+  signer: Optional<ISigner>;
 
   /**
    * ---------- CONSTRUCTOR & METHODS ----------
@@ -22,7 +23,16 @@ export default class Helper implements IHelper {
     this.address = params.address.toLowerCase();
     this.networkId = params.networkId;
     this.provider = params.provider;
-    this.signer = params.provider.getSigner();
+    try {
+      this.signer = params.provider.getSigner();
+    } catch (error) {
+      this.signer = undefined;
+      if (ALLOW_LOGS)
+        console.error("Pods SDK", {
+          pods: "The expected JSONRpcProvider dosn't have a proper signer.",
+          ethers: error,
+        });
+    }
   }
 
   async doBuyExact(params: {
@@ -54,7 +64,7 @@ export default class Helper implements IHelper {
     const IV = await option.pool!.getIV({ provider: this.provider });
 
     const contract = contracts.instances.optionHelper(
-      this.signer,
+      this.signer!,
       this.address
     );
 
@@ -85,6 +95,7 @@ export default class Helper implements IHelper {
     const { option, premiumAmount, optionAmount, deadline, callback } = params;
 
     expect(this.provider, "provider");
+    expect(this.signer, "signer");
     expect(option, "option");
     expect(option.pool, "pool (option)");
     expect(option.pool?.tokenB, "tokenB (option pool)");
@@ -100,31 +111,29 @@ export default class Helper implements IHelper {
       new BigNumber(10).pow(option.decimals!)
     );
 
-    const owner = await getOwner(this.provider);
-
     const IV = await option.pool!.getIV({ provider: this.provider });
 
     const contract = contracts.instances.optionHelper(
-      this.provider,
+      this.signer!,
       this.address
     );
 
-    await contract.methods
-      .buyOptionsWithExactTokens(
-        option.address,
-        output.toFixed(0).toString(),
-        input.toFixed(0).toString(),
-        (deadline || (await getDefaultDeadline(this.provider)))
-          .toFixed(0)
-          .toString(),
-        IV.raw.toFixed(0).toString()
-      )
-      .send(
-        {
-          from: owner,
-        },
-        callback || _.noop
-      );
+    const transaction = await contract.buyOptionsWithExactTokens(
+      option.address,
+      output.toFixed(0).toString(),
+      input.toFixed(0).toString(),
+      (deadline || (await getDefaultDeadline(this.provider)))
+        .toFixed(0)
+        .toString(),
+      IV.raw.toFixed(0).toString()
+    );
+
+    try {
+      const receipt = await transaction.wait();
+      (callback || _.noop)(null, receipt.transactionHash, receipt);
+    } catch (error) {
+      (callback || _.noop)(error, error.transactionHash);
+    }
   }
 
   async doMintAndSellExact(params: {
@@ -137,6 +146,7 @@ export default class Helper implements IHelper {
     const { option, premiumAmount, optionAmount, deadline, callback } = params;
 
     expect(this.provider, "provider");
+    expect(this.signer, "signer");
     expect(option, "option");
     expect(option.pool, "pool (option)");
     expect(option.pool?.tokenB, "tokenB (option pool)");
@@ -153,31 +163,29 @@ export default class Helper implements IHelper {
       new BigNumber(10).pow(option.pool!.tokenB!.decimals)
     );
 
-    const owner = await getOwner(this.provider);
-
     const IV = await option.pool!.getIV({ provider: this.provider });
 
     const contract = contracts.instances.optionHelper(
-      this.provider,
+      this.signer!,
       this.address
     );
 
-    await contract.methods
-      .mintAndSellOptions(
-        option.address,
-        input.toFixed(0).toString(),
-        output.toFixed(0).toString(),
-        (deadline || (await getDefaultDeadline(this.provider)))
-          .toFixed(0)
-          .toString(),
-        IV.raw.toFixed(0).toString()
-      )
-      .send(
-        {
-          from: owner,
-        },
-        callback || _.noop
-      );
+    const transaction = await contract.mintAndSellOptions(
+      option.address,
+      input.toFixed(0).toString(),
+      output.toFixed(0).toString(),
+      (deadline || (await getDefaultDeadline(this.provider)))
+        .toFixed(0)
+        .toString(),
+      IV.raw.toFixed(0).toString()
+    );
+
+    try {
+      const receipt = await transaction.wait();
+      (callback || _.noop)(null, receipt.transactionHash, receipt);
+    } catch (error) {
+      (callback || _.noop)(error, error.transactionHash);
+    }
   }
 
   async doSellExact(params: {
@@ -190,6 +198,7 @@ export default class Helper implements IHelper {
     const { option, premiumAmount, optionAmount, deadline, callback } = params;
 
     expect(this.provider, "provider");
+    expect(this.signer, "signer");
     expect(option, "option");
     expect(option.pool, "pool (option)");
     expect(option.pool?.tokenB, "tokenB (option pool)");
@@ -206,31 +215,29 @@ export default class Helper implements IHelper {
       new BigNumber(10).pow(option.pool!.tokenB!.decimals)
     );
 
-    const owner = await getOwner(this.provider);
-
     const IV = await option.pool!.getIV({ provider: this.provider });
 
     const contract = contracts.instances.optionHelper(
-      this.provider,
+      this.signer!,
       this.address
     );
 
-    await contract.methods
-      .sellExactOptions(
-        option.address,
-        input.toFixed(0).toString(),
-        output.toFixed(0).toString(),
-        (deadline || (await getDefaultDeadline(this.provider)))
-          .toFixed(0)
-          .toString(),
-        IV.raw.toFixed(0).toString()
-      )
-      .send(
-        {
-          from: owner,
-        },
-        callback || _.noop
-      );
+    const transaction = await contract.sellExactOptions(
+      option.address,
+      input.toFixed(0).toString(),
+      output.toFixed(0).toString(),
+      (deadline || (await getDefaultDeadline(this.provider)))
+        .toFixed(0)
+        .toString(),
+      IV.raw.toFixed(0).toString()
+    );
+
+    try {
+      const receipt = await transaction.wait();
+      (callback || _.noop)(null, receipt.transactionHash, receipt);
+    } catch (error) {
+      (callback || _.noop)(error, error.transactionHash);
+    }
   }
   async doResellExact(params: {
     option: IOption;
@@ -251,6 +258,7 @@ export default class Helper implements IHelper {
     const { option, tokenAAmount, tokenBAmount, callback } = params;
 
     expect(this.provider, "provider");
+    expect(this.signer, "signer");
     expect(option, "option");
     expect(option.pool, "pool (option)");
     expect(option.pool?.tokenB, "tokenB (option pool)");
@@ -267,24 +275,23 @@ export default class Helper implements IHelper {
       new BigNumber(10).pow(option.pool!.tokenB!.decimals)
     );
 
-    const owner = await getOwner(this.provider);
     const contract = contracts.instances.optionHelper(
-      this.provider,
+      this.signer!,
       this.address
     );
 
-    await contract.methods
-      .addLiquidity(
-        option.address,
-        amountA.toFixed(0).toString(),
-        amountB.toFixed(0).toString()
-      )
-      .send(
-        {
-          from: owner,
-        },
-        callback || _.noop
-      );
+    const transaction = await contract.addLiquidity(
+      option.address,
+      amountA.toFixed(0).toString(),
+      amountB.toFixed(0).toString()
+    );
+
+    try {
+      const receipt = await transaction.wait();
+      (callback || _.noop)(null, receipt.transactionHash, receipt);
+    } catch (error) {
+      (callback || _.noop)(error, error.transactionHash);
+    }
   }
   async doRemoveLiquidity(params: {
     option: IOption;
@@ -295,28 +302,28 @@ export default class Helper implements IHelper {
     const { option, percentA, percentB, callback } = params;
 
     expect(this.provider, "provider");
+    expect(this.signer, "signer");
     expect(option, "option");
     expect(option.pool, "pool (option)");
     expect(percentA, "percentA", "object");
     expect(percentB, "percentB", "object");
 
-    const owner = await getOwner(this.provider);
     const contract = contracts.instances.pool(
-      this.provider,
+      this.signer!,
       option.pool!.address
     );
 
-    await contract.methods
-      .removeLiquidity(
-        percentA.toFixed(0).toString(),
-        percentB.toFixed(0).toString()
-      )
-      .send(
-        {
-          from: owner,
-        },
-        callback || _.noop
-      );
+    const transaction = await contract.removeLiquidity(
+      percentA.toFixed(0).toString(),
+      percentB.toFixed(0).toString()
+    );
+
+    try {
+      const receipt = await transaction.wait();
+      (callback || _.noop)(null, receipt.transactionHash, receipt);
+    } catch (error) {
+      (callback || _.noop)(error, error.transactionHash);
+    }
   }
 
   async doAddSingleLiquidity(params: {
@@ -336,6 +343,7 @@ export default class Helper implements IHelper {
     const { option, optionAmount, callback } = params;
 
     expect(this.provider, "provider");
+    expect(this.signer, "signer");
     expect(option, "option");
     expect(option.decimals, "decimals");
     expect(optionAmount, "optionAmount", "object");
@@ -344,21 +352,21 @@ export default class Helper implements IHelper {
       new BigNumber(10).pow(option.decimals!)
     );
 
-    const owner = await getOwner(this.provider);
-
     const contract = contracts.instances.optionHelper(
-      this.provider,
+      this.signer!,
       this.address
     );
 
-    await contract.methods
-      .mint(option.address, output.toFixed(0).toString())
-      .send(
-        {
-          from: owner,
-        },
-        callback || _.noop
-      );
+    const transaction = await contract.mint(
+      option.address,
+      output.toFixed(0).toString()
+    );
+    try {
+      const receipt = await transaction.wait();
+      (callback || _.noop)(null, receipt.transactionHash, receipt);
+    } catch (error) {
+      (callback || _.noop)(error, error.transactionHash);
+    }
   }
   async doUnmint(params: {
     option: IOption;
@@ -368,24 +376,25 @@ export default class Helper implements IHelper {
     const { option, optionAmount, callback } = params;
 
     expect(this.provider, "provider");
+    expect(this.signer, "signer");
     expect(option, "option");
     expect(option.decimals, "decimals");
     expect(optionAmount, "optionAmount", "object");
 
-    const owner = await getOwner(this.provider);
-
-    const contract = contracts.instances.option(this.provider, option.address);
+    const contract = contracts.instances.option(this.signer!, option.address);
 
     const input = new BigNumber(optionAmount).multipliedBy(
       new BigNumber(10).pow(option.decimals!)
     );
 
-    await contract.methods.unmint(input.toFixed(0).toString()).send(
-      {
-        from: owner,
-      },
-      callback || _.noop
-    );
+    const transaction = await contract.unmint(input.toFixed(0).toString());
+
+    try {
+      const receipt = await transaction.wait();
+      (callback || _.noop)(null, receipt.transactionHash, receipt);
+    } catch (error) {
+      (callback || _.noop)(error, error.transactionHash);
+    }
   }
   async doExerciseERC20(params: {
     option: IOption;
@@ -395,6 +404,7 @@ export default class Helper implements IHelper {
     const { option, optionAmount, callback } = params;
 
     expect(this.provider, "provider");
+    expect(this.signer, "signer");
     expect(option, "option");
     expect(option.decimals, "decimals");
     expect(optionAmount, "optionAmount", "object");
@@ -403,16 +413,16 @@ export default class Helper implements IHelper {
       new BigNumber(10).pow(option.decimals!)
     );
 
-    const owner = await getOwner(this.provider);
+    const contract = contracts.instances.option(this.signer!, option.address);
 
-    const contract = contracts.instances.option(this.provider, option.address);
+    const transaction = await contract.exercise(input.toFixed(0).toString());
 
-    await contract.methods.exercise(input.toFixed(0).toString()).send(
-      {
-        from: owner,
-      },
-      callback || _.noop
-    );
+    try {
+      const receipt = await transaction.wait();
+      (callback || _.noop)(null, receipt.transactionHash, receipt);
+    } catch (error) {
+      (callback || _.noop)(error, error.transactionHash);
+    }
   }
 
   async doExerciseUtility(params: {
@@ -423,6 +433,7 @@ export default class Helper implements IHelper {
     const { option, optionAmount, callback } = params;
 
     expect(this.provider, "provider");
+    expect(this.signer, "signer");
     expect(option, "option");
     expect(option.decimals, "decimals");
     expect(optionAmount, "optionAmount", "object");
@@ -431,17 +442,18 @@ export default class Helper implements IHelper {
       new BigNumber(10).pow(option.decimals!)
     );
 
-    const owner = await getOwner(this.provider);
+    const contract = contracts.instances.option(this.signer!, option.address);
 
-    const contract = contracts.instances.option(this.provider, option.address);
+    const transaction = await contract.exerciseEth({
+      value: input,
+    });
 
-    await contract.methods.exerciseEth().send(
-      {
-        from: owner,
-        value: input.toFixed(0).toString(), // The amount of underlying will be 1:1 with the amount of options
-      },
-      callback || _.noop
-    );
+    try {
+      const receipt = await transaction.wait();
+      (callback || _.noop)(null, receipt.transactionHash, receipt);
+    } catch (error) {
+      (callback || _.noop)(error, error.transactionHash);
+    }
   }
 
   async doWithdraw(params: {
@@ -451,16 +463,18 @@ export default class Helper implements IHelper {
     const { option, callback } = params;
 
     expect(this.provider, "provider");
+    expect(this.signer, "signer");
     expect(option, "option");
 
-    const owner = await getOwner(this.provider);
-    const contract = contracts.instances.option(this.provider, option.address);
+    const contract = contracts.instances.option(this.signer!, option.address);
 
-    await contract.methods.withdraw().send(
-      {
-        from: owner,
-      },
-      callback || _.noop
-    );
+    const transaction = await contract.withdraw();
+
+    try {
+      const receipt = await transaction.wait();
+      (callback || _.noop)(null, receipt.transactionHash, receipt);
+    } catch (error) {
+      (callback || _.noop)(error, error.transactionHash);
+    }
   }
 }
