@@ -11,6 +11,7 @@ const _networks: { [key: number]: INetwork } = {
     networkId: 1,
     name: "Mainnet",
     chain: chains.ethereum,
+    tag: "mainnet",
     network: "mainnet",
     token: {
       utility: ["0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"],
@@ -29,6 +30,7 @@ const _networks: { [key: number]: INetwork } = {
     networkId: 42,
     name: "Kovan",
     chain: chains.ethereum,
+    tag: "kovan",
     network: "testnet",
     token: {
       utility: ["0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"],
@@ -49,6 +51,7 @@ const _networks: { [key: number]: INetwork } = {
     name: "Matic",
     chain: chains.polygon,
     network: "mainnet",
+    tag: "matic",
     token: {
       utility: ["0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"],
       wrapped: ["0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270"],
@@ -68,6 +71,7 @@ const _networks: { [key: number]: INetwork } = {
     name: "Mumbai",
     chain: chains.polygon,
     network: "testnet",
+    tag: "mumbai",
     token: {
       utility: ["0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"],
       wrapped: ["0xfe7f1ef1386e6df3d462e30aa5709fb5ef647ec9"],
@@ -87,6 +91,7 @@ const _networks: { [key: number]: INetwork } = {
     name: "Local",
     chain: chains.ethereum,
     network: "testnet",
+    tag: "local",
     token: {
       utility: ["0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"],
       wrapped: [],

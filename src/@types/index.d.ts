@@ -3,6 +3,7 @@ export * from "./action";
 export * from "./actionBuilder";
 export * from "./helper";
 export * from "./helperBuilder";
+export * from "./multicall";
 export * from "./network";
 export * from "./option";
 export * from "./optionBuilder";

@@ -4,7 +4,7 @@ import utils from "./utils";
 
 import BigNumber from "bignumber.js";
 
-import { Token } from "./entities";
+import { Multicall, Token } from "./entities";
 import queries from "./queries";
 import clients from "./clients";
 import networks from "./constants/networks";
@@ -23,13 +23,9 @@ utils.config();
 
 async function tokens(): Promise<void> {
   const provider = clients.provider.getInfuraProvider(
-    "kovan",
+    42,
     process.env.TESTING_INFURA_KEY || ""
   );
-  const balance = await provider.getBalance(
-    "0xAFA20A683A4ff46991Cb065Ae507Bf3b0110d47D"
-  );
-  console.log("Wallet: ", balance.toString());
 
   const token = new Token({
     address: "0xe22da380ee6b445bb8273c81944adeb6e8450422",
@@ -89,7 +85,7 @@ async function subgraphActions(): Promise<void> {
 
 async function flowLive(): Promise<void> {
   const provider = clients.provider.getInfuraProvider(
-    "kovan",
+    42,
     process.env.TESTING_INFURA_KEY || ""
   );
 
@@ -156,7 +152,7 @@ async function flowActions(): Promise<void> {
   });
 }
 
-async function multicall(): Promise<void> {
+async function testMulticall(): Promise<void> {
   const provider = new ethers.providers.InfuraProvider(
     "kovan",
     process.env.TESTING_INFURA_KEY || ""
@@ -184,15 +180,64 @@ async function multicall(): Promise<void> {
   console.log("DAI Balance:", daiBalance.toString());
 }
 
+async function flowMulticall(): Promise<void> {
+  const provider = clients.provider.getInfuraProvider(
+    42,
+    process.env.TESTING_INFURA_KEY || ""
+  );
+
+  const subgraphInstance = clients.subgraph.apollo.getClientInstance(
+    networks.kovan,
+    true
+  );
+
+  const query = await subgraphInstance.query({
+    query: queries.option.getByAddresses,
+    variables: {
+      addresses: ["0x8ac8fd04a4cbc3be5c9c3d97132d4e6a6a258fc6"],
+    },
+    fetchPolicy: "no-cache",
+  });
+
+  const list = _.get(query, "data.options");
+
+  const options: IOption[] = list.map((item: any) =>
+    OptionBuilder.fromData({
+      source: item,
+      networkId: networks.kovan.networkId,
+      provider,
+    })
+  );
+  const start = Date.now();
+  const generalDynamics = await Multicall.getGeneralDynamics({
+    provider,
+    options,
+  });
+  console.log(`Multicall:`, Date.now() - start);
+
+  const userDynamics = await Multicall.getUserDynamics({
+    user: "0xc4d56A1ba1A9993b3d6201b4ED7DCF5d78A5123d",
+    provider,
+    options,
+  });
+  console.log(`Multicall:`, Date.now() - start);
+
+  console.log({
+    generalDynamics,
+    userDynamics,
+  });
+}
+
 const tests = {
   tokens,
   subgraphActions,
   subgraphOptions,
   flowLive,
   flowActions,
-  multicall,
+  testMulticall,
+  flowMulticall,
 };
 
 export async function main() {
-  await tests.flowLive();
+  await tests.flowMulticall();
 }

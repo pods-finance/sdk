@@ -18,7 +18,16 @@ export interface IPoolIndicators {
   fImp?: IValue;
 }
 
-export interface IPoolMetrics {}
+export interface IPoolGeneralMetrics {
+  sellingPrice?: { [key: string]: IValue };
+  buyingPrice?: { [key: string]: IValue };
+  abPrice?: { [key: string]: IValue };
+  IV?: IValue;
+  totalBalances?: IValue[];
+  userPosition?: IValue[];
+  userOptionWithdrawAmounts?: IValue[];
+  userOptionMintedAmounts?: IValue;
+}
 
 export interface IPool {
   readonly address: string;

@@ -1,10 +1,13 @@
-import ethers from "ethers";
+import { ethers } from "ethers";
+import { networks } from "../../constants";
 
 function getInfuraProvider(
-  network: string,
+  networkId: number,
   key: string
 ): ethers.providers.InfuraProvider {
-  return new ethers.providers.InfuraProvider(network, key);
+  const tag = (networks[networkId] || {}).tag;
+
+  return new ethers.providers.InfuraProvider(tag, key);
 }
 
 function toEthersProvider(

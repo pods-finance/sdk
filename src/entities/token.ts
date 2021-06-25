@@ -1,9 +1,10 @@
 import _ from "lodash";
 import BigNumber from "bignumber.js";
-import { IProvider, INetwork, IToken } from "@types";
+import { IProvider, ISigner, INetwork, IToken, Optional } from "@types";
 import networks from "../constants/networks";
 import * as globals from "../constants/globals";
 import contracts from "../contracts";
+import { ethers } from "ethers";
 
 export default class Token implements IToken {
   public readonly address: string;
@@ -85,6 +86,40 @@ export default class Token implements IToken {
     spender?: string;
   }): Promise<BigNumber> {
     return Token.getAllowanceFor({
+      ...params,
+      isUtility: this.isUtility(),
+      address: this.address,
+    });
+  }
+
+  static async doAllowFor(params: {
+    signer: ISigner;
+    spender?: string;
+    address: string;
+    isUtility?: boolean;
+    amount?: BigNumber;
+  }): Promise<Optional<ethers.providers.TransactionReceipt>> {
+    const { signer, address, amount, spender, isUtility } = params || {};
+    if (isUtility === true) return undefined;
+
+    const contract = contracts.instances.erc20(signer, address);
+    const transaction = await contract.approve(
+      spender,
+      _.isNil(amount) || amount.isZero()
+        ? globals.MAX_UINT.toString()
+        : amount.toString()
+    );
+    const receipt = await transaction.wait();
+
+    return receipt;
+  }
+
+  async doAllow(params: {
+    signer: ISigner;
+    spender?: string;
+    amount?: BigNumber;
+  }): Promise<Optional<ethers.providers.TransactionReceipt>> {
+    return Token.doAllowFor({
       ...params,
       isUtility: this.isUtility(),
       address: this.address,

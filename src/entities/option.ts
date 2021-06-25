@@ -296,7 +296,7 @@ export default class Option implements IOption {
 
       return supply;
     } catch (error) {
-      if (ALLOW_LOGS) console.error("Pods SDK", error);
+      if (ALLOW_LOGS()) console.error("Pods SDK", error);
     }
     return zero;
   }
@@ -333,7 +333,7 @@ export default class Option implements IOption {
 
       return size;
     } catch (error) {
-      if (ALLOW_LOGS) console.error("Pods SDK", error);
+      if (ALLOW_LOGS()) console.error("Pods SDK", error);
     }
     return zero;
   }
@@ -365,7 +365,7 @@ export default class Option implements IOption {
 
       return size;
     } catch (error) {
-      if (ALLOW_LOGS) console.error("Pods SDK", error);
+      if (ALLOW_LOGS()) console.error("Pods SDK", error);
     }
     return zero;
   }
@@ -410,7 +410,7 @@ export default class Option implements IOption {
 
       return [UB, SB];
     } catch (error) {
-      if (ALLOW_LOGS) console.error("Pods SDK", error);
+      if (ALLOW_LOGS()) console.error("Pods SDK", error);
     }
     return [zero, zero];
   }

@@ -169,7 +169,7 @@ export default class Pool implements IPool {
 
       return { value, feesA, feesB };
     } catch (error) {
-      if (ALLOW_LOGS) console.error("Pods SDK", error);
+      if (ALLOW_LOGS()) console.error("Pods SDK", error);
     }
     return { value: zero, feesA: zero, feesB: zero };
   }
@@ -222,7 +222,7 @@ export default class Pool implements IPool {
 
       return { value, feesA, feesB };
     } catch (error) {
-      if (ALLOW_LOGS) console.error("Pods SDK", error);
+      if (ALLOW_LOGS()) console.error("Pods SDK", error);
     }
     return { value: zero, feesA: zero, feesB: zero };
   }
@@ -250,7 +250,7 @@ export default class Pool implements IPool {
 
       return { value };
     } catch (error) {
-      if (ALLOW_LOGS) console.error("Pods SDK", error);
+      if (ALLOW_LOGS()) console.error("Pods SDK", error);
     }
     return { value: zero };
   }
@@ -303,7 +303,7 @@ export default class Pool implements IPool {
 
       return { value, feesA, feesB };
     } catch (error) {
-      if (ALLOW_LOGS) console.error("Pods SDK", error);
+      if (ALLOW_LOGS()) console.error("Pods SDK", error);
     }
     return { value: zero, feesA: zero, feesB: zero };
   }
@@ -339,7 +339,7 @@ export default class Pool implements IPool {
 
       return [DBA, DBB];
     } catch (error) {
-      if (ALLOW_LOGS) console.error("Pods SDK", error);
+      if (ALLOW_LOGS()) console.error("Pods SDK", error);
     }
 
     return [zero, zero];
@@ -384,7 +384,7 @@ export default class Pool implements IPool {
 
       return [FBA, FBB];
     } catch (error) {
-      if (ALLOW_LOGS) console.error("Pods SDK", error);
+      if (ALLOW_LOGS()) console.error("Pods SDK", error);
     }
 
     return [zero, zero];
@@ -417,7 +417,7 @@ export default class Pool implements IPool {
       };
       return [TBA, TBB];
     } catch (error) {
-      if (ALLOW_LOGS) console.error("Pods SDK", error);
+      if (ALLOW_LOGS()) console.error("Pods SDK", error);
     }
 
     return [zero, zero];
@@ -488,7 +488,7 @@ export default class Pool implements IPool {
 
       return size;
     } catch (error) {
-      if (ALLOW_LOGS) console.error("Pods SDK", error);
+      if (ALLOW_LOGS()) console.error("Pods SDK", error);
     }
 
     return zero;
@@ -531,7 +531,7 @@ export default class Pool implements IPool {
 
       return [UBA, UBB];
     } catch (error) {
-      if (ALLOW_LOGS) console.error("Pods SDK", error);
+      if (ALLOW_LOGS()) console.error("Pods SDK", error);
     }
 
     return [zero, zero];

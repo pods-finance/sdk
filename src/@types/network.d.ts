@@ -4,6 +4,7 @@ export interface INetwork {
   name: string;
   chain: string;
   network: string;
+  tag: string;
   token: {
     utility: string[];
     wrapped: string[];

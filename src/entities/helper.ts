@@ -27,7 +27,7 @@ export default class Helper implements IHelper {
       this.signer = params.provider.getSigner();
     } catch (error) {
       this.signer = undefined;
-      if (ALLOW_LOGS)
+      if (ALLOW_LOGS())
         console.error("Pods SDK", {
           pods: "The expected JSONRpcProvider dosn't have a proper signer.",
           ethers: error,

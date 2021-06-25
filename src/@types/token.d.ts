@@ -1,5 +1,6 @@
 import BigNumber from "bignumber.js";
-import { IProvider } from "./atoms";
+import { ethers } from "ethers";
+import { IProvider, ISigner, Optional } from "./atoms";
 
 export interface IToken {
   readonly address: string;
@@ -21,4 +22,14 @@ export interface IToken {
     owner: string;
     spender?: string;
   }): Promise<BigNumber>;
+
+  /**
+   * Allow an ERC20 spending
+   * @param params
+   */
+  doAllow(params: {
+    signer: ISigner;
+    spender?: string;
+    amount?: BigNumber;
+  }): Promise<Optional<ethers.providers.TransactionReceipt>>;
 }

@@ -23,10 +23,10 @@ export const DEFAULT_TIMEOUT: number = 60 * 20;
 
 export const MILESTONE_EXPIRATION_SOON: number = 60 * 60 * 24 * 3;
 
-export const SUPRESS_LOGS: boolean = Boolean(
-  process.env.REACT_APP_SDK_ALLOW_LOGS || process.env.SDK_ALLOW_LOGS || false
-);
-
-export const ALLOW_LOGS: boolean = !SUPRESS_LOGS;
+export const ALLOW_LOGS = (): boolean =>
+  Boolean(
+    String(process.env.REACT_APP_SDK_ALLOW_LOGS || "") === "true" ||
+      String(process.env.SDK_ALLOW_LOGS || "") === "true"
+  );
 
 export const MAX_UINT = new BigNumber(2).exponentiatedBy(256).minus(1);
