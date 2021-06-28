@@ -24,9 +24,9 @@ export interface IPoolGeneralMetrics {
   abPrice?: { [key: string]: IValue };
   IV?: IValue;
   totalBalances?: IValue[];
-  userPosition?: IValue[];
+  userPositions?: IValue[];
   userOptionWithdrawAmounts?: IValue[];
-  userOptionMintedAmounts?: IValue;
+  userOptionMintedAmount?: IValue;
 }
 
 export interface IPool {

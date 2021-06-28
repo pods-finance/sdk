@@ -24,6 +24,7 @@ const _networks: { [key: number]: INetwork } = {
       prod: "https://api.thegraph.com/subgraphs/name/pods-finance/pods",
       dev: "https://api.thegraph.com/subgraphs/name/pods-finance/pods-dev",
     },
+    infura: (key) => `https://mainnet.infura.io/v3/${key}`,
   },
   42: {
     chainId: 42,
@@ -44,6 +45,7 @@ const _networks: { [key: number]: INetwork } = {
       dev:
         "https://api.thegraph.com/subgraphs/name/pods-finance/pods-experimental",
     },
+    infura: (key) => `https://kovan.infura.io/v3/${key}`,
   },
   137: {
     chainId: 137,
@@ -64,6 +66,7 @@ const _networks: { [key: number]: INetwork } = {
       dev:
         "https://api.thegraph.com/subgraphs/name/pods-finance/pods-matic-dev",
     },
+    infura: (key) => `https://polygon-mainnet.infura.io/v3/${key}`,
   },
   80001: {
     chainId: 80001,
@@ -84,21 +87,7 @@ const _networks: { [key: number]: INetwork } = {
       dev:
         "https://api.thegraph.com/subgraphs/name/pods-finance/pods-mumbai-dev",
     },
-  },
-  1337: {
-    chainId: 1337,
-    networkId: 1337,
-    name: "Local",
-    chain: chains.ethereum,
-    network: "testnet",
-    tag: "local",
-    token: {
-      utility: ["0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"],
-      wrapped: [],
-      name: "Ether",
-      symbol: "ETH",
-      decimals: 18,
-    },
+    infura: (key) => `https://polygon-mumbai.infura.io/v3/${key}`,
   },
 };
 
@@ -108,7 +97,6 @@ const networks: { [key: string]: INetwork } = {
   kovan: _networks[42],
   matic: _networks[137],
   mumbai: _networks[80001],
-  local: _networks[1337],
 };
 
 export { chains };

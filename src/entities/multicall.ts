@@ -38,7 +38,7 @@ export default class Multicall implements IMulticall {
         throw new Error("Buying price unretrievable");
 
       expect(pool, "option pool");
-      expect(pool!.tokenB, "option pool tokenB");
+      expect(pool?.tokenB, "option pool tokenB");
 
       const amountBIn = ethers.BigNumber.from(values[0]).toString();
       const feesTokenA = ethers.BigNumber.from(values[2]).toString();
@@ -215,7 +215,7 @@ export default class Multicall implements IMulticall {
     return [zero, zero];
   }
 
-  private static _interpretUserPosition(params: {
+  private static _interpretUserPositions(params: {
     result: Result;
     pool: IPool;
   }): IValue[] {
@@ -294,7 +294,7 @@ export default class Multicall implements IMulticall {
     return [zero, zero];
   }
 
-  private static _interpretUserOptionMintedAmounts(params: {
+  private static _interpretUserOptionMintedAmount(params: {
     result: Result;
     option: IOption;
   }): IValue {
@@ -379,7 +379,7 @@ export default class Multicall implements IMulticall {
             },
           ],
           context: {
-            option,
+            address: option.address,
           },
         };
 
@@ -400,8 +400,9 @@ export default class Multicall implements IMulticall {
         const results: Result[] = response.callsReturnContext;
 
         const metrics: IPoolGeneralMetrics = {};
-        const option: IOption = _.get(context, "context.option");
-        const pool: IPool = _.get(context, "context.option.pool");
+        const address = _.get(context, "context.address");
+        const option: IOption = options.find((o) => o.address === address)!;
+        const pool: IPool = option!.pool!;
 
         results.forEach((result: Result) => {
           const reference = result.reference;
@@ -414,7 +415,7 @@ export default class Multicall implements IMulticall {
               });
               break;
             case "buyingPrice":
-              metrics.sellingPrice = Multicall._interpretBuyingPrice({
+              metrics.buyingPrice = Multicall._interpretBuyingPrice({
                 pool,
                 result,
               });
@@ -476,7 +477,7 @@ export default class Multicall implements IMulticall {
           abi: contracts.abis.PoolABI,
           calls: [
             {
-              reference: "userPosition",
+              reference: "userPositions",
               methodName: "getRemoveLiquidityAmounts",
               methodParameters: [
                 new BigNumber(100).toString(),
@@ -486,7 +487,7 @@ export default class Multicall implements IMulticall {
             },
           ],
           context: {
-            option,
+            address: option.address,
           },
         };
 
@@ -501,13 +502,13 @@ export default class Multicall implements IMulticall {
               methodParameters: [user],
             },
             {
-              reference: "userOptionMintedAmounts",
+              reference: "userOptionMintedAmount",
               methodName: "mintedOptions",
               methodParameters: [user],
             },
           ],
           context: {
-            option,
+            address: option.address,
           },
         };
 
@@ -529,15 +530,16 @@ export default class Multicall implements IMulticall {
         const results: Result[] = response.callsReturnContext;
 
         const metrics: IPoolGeneralMetrics = {};
-        const option: IOption = _.get(context, "context.option");
-        const pool: IPool = _.get(context, "context.option.pool");
+        const address = _.get(context, "context.address");
+        const option: IOption = options.find((o) => o.address === address)!;
+        const pool: IPool = option!.pool!;
 
         results.forEach((result: Result) => {
           const reference = result.reference;
 
           switch (reference) {
-            case "userPosition":
-              metrics.userPosition = Multicall._interpretUserPosition({
+            case "userPositions":
+              metrics.userPositions = Multicall._interpretUserPositions({
                 pool,
                 result,
               });
@@ -552,8 +554,8 @@ export default class Multicall implements IMulticall {
               );
               break;
 
-            case "userOptionMintedAmounts":
-              metrics.userOptionMintedAmounts = Multicall._interpretUserOptionMintedAmounts(
+            case "userOptionMintedAmount":
+              metrics.userOptionMintedAmount = Multicall._interpretUserOptionMintedAmount(
                 {
                   option,
                   result,
