@@ -25,6 +25,7 @@ const _networks: { [key: number]: INetwork } = {
       dev: "https://api.thegraph.com/subgraphs/name/pods-finance/pods-dev",
     },
     infura: (key) => `https://mainnet.infura.io/v3/${key}`,
+    multicall2: "0x5ba1e12693dc8f9c48aad8770482f4739beed696",
   },
   42: {
     chainId: 42,
@@ -46,6 +47,7 @@ const _networks: { [key: number]: INetwork } = {
         "https://api.thegraph.com/subgraphs/name/pods-finance/pods-experimental",
     },
     infura: (key) => `https://kovan.infura.io/v3/${key}`,
+    multicall2: "0x5ba1e12693dc8f9c48aad8770482f4739beed696",
   },
   137: {
     chainId: 137,
@@ -67,6 +69,7 @@ const _networks: { [key: number]: INetwork } = {
         "https://api.thegraph.com/subgraphs/name/pods-finance/pods-matic-dev",
     },
     infura: (key) => `https://polygon-mainnet.infura.io/v3/${key}`,
+    multicall2: "0x275617327c958bd06b5d6b871e7f491d76113dd8",
   },
   80001: {
     chainId: 80001,
@@ -88,6 +91,7 @@ const _networks: { [key: number]: INetwork } = {
         "https://api.thegraph.com/subgraphs/name/pods-finance/pods-mumbai-dev",
     },
     infura: (key) => `https://polygon-mumbai.infura.io/v3/${key}`,
+    multicall2: "0xe9939e7Ea7D7fb619Ac57f648Da7B1D425832631",
   },
 };
 

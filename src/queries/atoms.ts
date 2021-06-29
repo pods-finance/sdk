@@ -37,6 +37,9 @@ export const PoolFragment = gql`
     factory {
       id
     }
+    option {
+      id
+    }
   }
 `;
 

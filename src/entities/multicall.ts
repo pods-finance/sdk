@@ -21,6 +21,7 @@ import {
 } from "@types";
 
 import { ALLOW_LOGS } from "../constants/globals";
+import { networks } from "../constants";
 import { expect, zero } from "../utils";
 import { ethers } from "ethers";
 
@@ -66,7 +67,9 @@ export default class Multicall implements IMulticall {
       };
 
       return { value, feesA, feesB };
-    } catch (e) {}
+    } catch (error) {
+      if (ALLOW_LOGS()) console.error("Pods SDK - Multicall", error);
+    }
 
     return { value: zero, feesA: zero, feesB: zero };
   }
@@ -113,7 +116,9 @@ export default class Multicall implements IMulticall {
       };
 
       return { value, feesA, feesB };
-    } catch (e) {}
+    } catch (error) {
+      if (ALLOW_LOGS()) console.error("Pods SDK - Multicall", error);
+    }
 
     return { value: zero, feesA: zero, feesB: zero };
   }
@@ -144,7 +149,9 @@ export default class Multicall implements IMulticall {
       };
 
       return { value };
-    } catch (e) {}
+    } catch (error) {
+      if (ALLOW_LOGS()) console.error("Pods SDK - Multicall", error);
+    }
 
     return { value: zero };
   }
@@ -170,7 +177,9 @@ export default class Multicall implements IMulticall {
       };
 
       return value;
-    } catch (e) {}
+    } catch (error) {
+      if (ALLOW_LOGS()) console.error("Pods SDK - Multicall", error);
+    }
 
     return zero;
   }
@@ -210,7 +219,9 @@ export default class Multicall implements IMulticall {
       };
 
       return [TBA, TBB];
-    } catch (e) {}
+    } catch (error) {
+      if (ALLOW_LOGS()) console.error("Pods SDK - Multicall", error);
+    }
 
     return [zero, zero];
   }
@@ -249,7 +260,9 @@ export default class Multicall implements IMulticall {
       };
 
       return [UBA, UBB];
-    } catch (e) {}
+    } catch (error) {
+      if (ALLOW_LOGS()) console.error("Pods SDK - Multicall", error);
+    }
 
     return [zero, zero];
   }
@@ -289,7 +302,9 @@ export default class Multicall implements IMulticall {
       };
 
       return [UB, SB];
-    } catch (e) {}
+    } catch (error) {
+      if (ALLOW_LOGS()) console.error("Pods SDK - Multicall", error);
+    }
 
     return [zero, zero];
   }
@@ -305,11 +320,10 @@ export default class Multicall implements IMulticall {
       const values = _.get(result, "returnValues");
 
       if (!status || !_.isArray(values) || values.length === 0)
-        throw new Error("Price properties unretrievable");
+        throw new Error("User minted options unretrievable");
 
       expect(option, "option");
-      expect(option?.underlying, "option underlying");
-      expect(option?.strike, "option strike");
+      expect(option?.decimals, "option decimals");
 
       const amount = ethers.BigNumber.from(values[0]).toString();
 
@@ -321,7 +335,42 @@ export default class Multicall implements IMulticall {
       };
 
       return value;
-    } catch (e) {}
+    } catch (error) {
+      if (ALLOW_LOGS()) console.error("Pods SDK - Multicall", error);
+    }
+
+    return zero;
+  }
+
+  private static _interpretUserOptionBalance(params: {
+    result: Result;
+    option: IOption;
+  }): IValue {
+    try {
+      const { result, option } = params;
+
+      const status = _.get(result, "success");
+      const values = _.get(result, "returnValues");
+
+      if (!status || !_.isArray(values) || values.length === 0)
+        throw new Error("User option balance unretrievable");
+
+      expect(option, "option");
+      expect(option?.decimals, "option decimals");
+
+      const amount = ethers.BigNumber.from(values[0]).toString();
+
+      const value: IValue = {
+        raw: new BigNumber(amount),
+        humanized: new BigNumber(amount).dividedBy(
+          new BigNumber(10).pow(option.decimals!)
+        ),
+      };
+
+      return value;
+    } catch (error) {
+      if (ALLOW_LOGS()) console.error("Pods SDK - Multicall", error);
+    }
 
     return zero;
   }
@@ -332,8 +381,14 @@ export default class Multicall implements IMulticall {
   }): Promise<Optional<{ [key: string]: IPoolGeneralMetrics }>> {
     const { provider: base, options } = params;
     expect(base, "ethers provider");
+    const networkId = ((await base.getNetwork()) || {}).chainId;
+    expect(networkId, "ethers provider networkId");
 
-    const engine = new Engine({ ethersProvider: base, tryAggregate: true });
+    const engine = new Engine({
+      ethersProvider: base,
+      tryAggregate: true,
+      multicallCustomContractAddress: networks[networkId].multicall2,
+    });
 
     expect(engine, "multicall provider");
     const calls: CallContext[] = [];
@@ -342,13 +397,12 @@ export default class Multicall implements IMulticall {
       try {
         expect(option?.pool?.tokenA, "option pool tokenA");
         const pool = option.pool!;
-
         const one = new BigNumber(1).times(
           new BigNumber(10).pow(pool!.tokenA!.decimals)
         );
 
         const instructions: CallContext = {
-          reference: option.poolAddress!,
+          reference: option.address!,
           contractAddress: option.poolAddress!,
           abi: contracts.abis.PoolABI,
           calls: [
@@ -406,7 +460,6 @@ export default class Multicall implements IMulticall {
 
         results.forEach((result: Result) => {
           const reference = result.reference;
-
           switch (reference) {
             case "sellingPrice":
               metrics.sellingPrice = Multicall._interpretSellingPrice({
@@ -447,8 +500,8 @@ export default class Multicall implements IMulticall {
       });
 
       return dynamics;
-    } catch (e) {
-      console.error(e);
+    } catch (error) {
+      if (ALLOW_LOGS()) console.error("Pods SDK - Multicall", error);
     }
 
     return undefined;
@@ -462,7 +515,14 @@ export default class Multicall implements IMulticall {
     const { provider: base, options, user } = params;
     expect(base, "ethers provider");
 
-    const engine = new Engine({ ethersProvider: base, tryAggregate: true });
+    const networkId = ((await base.getNetwork()) || {}).chainId;
+    expect(networkId, "ethers provider networkId");
+
+    const engine = new Engine({
+      ethersProvider: base,
+      tryAggregate: true,
+      multicallCustomContractAddress: networks[networkId].multicall2,
+    });
 
     expect(engine, "multicall provider");
     const calls: CallContext[] = [];
@@ -472,7 +532,7 @@ export default class Multicall implements IMulticall {
         expect(option?.pool?.tokenA, "option pool tokenA");
 
         const poolInstructions: CallContext = {
-          reference: option.poolAddress!,
+          reference: `p-${option.address!}`,
           contractAddress: option.poolAddress!,
           abi: contracts.abis.PoolABI,
           calls: [
@@ -492,7 +552,7 @@ export default class Multicall implements IMulticall {
         };
 
         const optionInstructions: CallContext = {
-          reference: option.address!,
+          reference: `o-${option.address!}`,
           contractAddress: option.address!,
           abi: contracts.abis.OptionABI,
           calls: [
@@ -512,8 +572,25 @@ export default class Multicall implements IMulticall {
           },
         };
 
+        const tokenInstructions: CallContext = {
+          reference: `t-${option.address!}`,
+          contractAddress: option.address!,
+          abi: contracts.abis.ERC20ABI,
+          calls: [
+            {
+              reference: "userOptionBalance",
+              methodName: "balanceOf",
+              methodParameters: [user],
+            },
+          ],
+          context: {
+            address: option.address,
+          },
+        };
+
         calls.push(poolInstructions);
         calls.push(optionInstructions);
+        calls.push(tokenInstructions);
       } catch (error) {
         if (ALLOW_LOGS()) console.error("Pods SDK - Multicall", error);
       }
@@ -563,6 +640,15 @@ export default class Multicall implements IMulticall {
               );
               break;
 
+            case "userOptionBalance":
+              metrics.userOptionBalance = Multicall._interpretUserOptionBalance(
+                {
+                  option,
+                  result,
+                }
+              );
+              break;
+
             default:
               break;
           }
@@ -575,8 +661,8 @@ export default class Multicall implements IMulticall {
         else dynamics[option.address] = metrics;
       });
       return dynamics;
-    } catch (e) {
-      console.error(e);
+    } catch (error) {
+      console.error("Pods SDK - Multicall", error);
     }
 
     return undefined;

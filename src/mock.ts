@@ -12,20 +12,15 @@ import networks from "./constants/networks";
 import { IAction, IOption } from "./@types";
 import { ActionBuilder, OptionBuilder } from "./builders";
 
-import { Contract, Provider } from "ethers-multicall";
-import { ethers } from "ethers";
-
 import "cross-fetch/polyfill";
-import contracts from "./contracts";
 
 dotenv.config();
 utils.config();
 
 async function tokens(): Promise<void> {
-  const provider = clients.provider.getInfuraProvider(
-    42,
-    process.env.TESTING_INFURA_KEY || ""
-  );
+  const provider = clients.provider.getBaseProvider(42, {
+    infura: process.env.TESTING_INFURA_KEY || "",
+  });
 
   const token = new Token({
     address: "0xe22da380ee6b445bb8273c81944adeb6e8450422",
@@ -84,10 +79,9 @@ async function subgraphActions(): Promise<void> {
 }
 
 async function flowLive(): Promise<void> {
-  const provider = clients.provider.getInfuraProvider(
-    42,
-    process.env.TESTING_INFURA_KEY || ""
-  );
+  const provider = clients.provider.getBaseProvider(42, {
+    infura: process.env.TESTING_INFURA_KEY || "",
+  });
 
   const subgraphInstance = clients.subgraph.apollo.getClientInstance(
     networks.kovan,
@@ -152,39 +146,10 @@ async function flowActions(): Promise<void> {
   });
 }
 
-async function testMulticall(): Promise<void> {
-  const provider = new ethers.providers.InfuraProvider(
-    "kovan",
-    process.env.TESTING_INFURA_KEY || ""
-  );
-
-  const tokenAddress = "0xe22da380ee6b445bb8273c81944adeb6e8450422";
-
-  const ethcallProvider = new Provider(provider, 42);
-
-  await ethcallProvider.init(); // Only required when `chainId` is not provided in the `Provider` constructor
-
-  const daiContract = new Contract(tokenAddress, contracts.abis.ERC20ABI);
-
-  const wallet = "0xdfaD0c01a28d9d95486bb3f0821E4F5644704FA7";
-
-  const ethBalanceCall = ethcallProvider.getEthBalance(wallet);
-  const usdcBalanceCall = daiContract.balanceOf(wallet);
-
-  const [ethBalance, daiBalance] = await ethcallProvider.all([
-    ethBalanceCall,
-    usdcBalanceCall,
-  ]);
-
-  console.log("ETH Balance:", ethBalance.toString());
-  console.log("DAI Balance:", daiBalance.toString());
-}
-
 async function flowMulticall(): Promise<void> {
-  const provider = clients.provider.getInfuraProvider(
-    42,
-    process.env.TESTING_INFURA_KEY || ""
-  );
+  const provider = clients.provider.getBaseProvider(42, {
+    infura: process.env.TESTING_INFURA_KEY || "",
+  });
 
   const subgraphInstance = clients.subgraph.apollo.getClientInstance(
     networks.kovan,
@@ -234,7 +199,6 @@ const tests = {
   subgraphOptions,
   flowLive,
   flowActions,
-  testMulticall,
   flowMulticall,
 };
 

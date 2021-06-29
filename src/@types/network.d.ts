@@ -17,4 +17,5 @@ export interface INetwork {
     dev: string;
   };
   infura: (key: string) => string;
+  multicall2: string;
 }

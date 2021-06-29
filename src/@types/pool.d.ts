@@ -27,6 +27,7 @@ export interface IPoolGeneralMetrics {
   userPositions?: IValue[];
   userOptionWithdrawAmounts?: IValue[];
   userOptionMintedAmount?: IValue;
+  userOptionBalance?: IValue;
 }
 
 export interface IPool {
