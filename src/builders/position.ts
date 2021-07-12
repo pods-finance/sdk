@@ -1,21 +1,22 @@
 import _ from "lodash";
 import {
-  IAction,
-  IActionBuilder,
-  IActionBuilderParams,
+  Optional,
+  IPosition,
+  IPositionBuilder,
+  IPositionBuilderParams,
   IApolloClient,
 } from "@types";
-import { Action } from "../entities";
+import { Position } from "../entities";
 import OptionBuilder from "./option";
 import queries from "../queries";
 
-export default class ActionBuilder implements IActionBuilder {
+export default class PositionBuilder implements IPositionBuilder {
   private constructor() {}
 
   public static fromData(params: {
     source: { [key: string]: any };
     networkId: number;
-  }): IAction {
+  }): IPosition {
     const body = { ...params.source };
 
     body.networkId = params.networkId;
@@ -23,13 +24,7 @@ export default class ActionBuilder implements IActionBuilder {
     body.optionAddress = _.get(body, "option.id");
     body.poolAddress = _.get(body, "option.pool.id");
 
-    body.metadataOptionsMintedAndSold = _.get(
-      body,
-      "metadata.optionsMintedAndSold"
-    );
-    body.spotPrice = _.get(body, "spotPrice.value");
-
-    const action = new Action(body as IActionBuilderParams);
+    const position = new Position(body as IPositionBuilderParams);
 
     if (_.has(body, "option") && _.has(body, "option.id")) {
       const option = OptionBuilder.fromData({
@@ -37,10 +32,10 @@ export default class ActionBuilder implements IActionBuilder {
         networkId: body.networkId,
       });
 
-      action.option = option;
+      position.option = option;
     }
 
-    return action;
+    return position;
   }
 
   public static async fromOptionAndUser(params: {
@@ -51,26 +46,23 @@ export default class ActionBuilder implements IActionBuilder {
 
     first: number;
     timestamp: number;
-  }): Promise<IAction[]> {
-    const { option, user, client, networkId, first, timestamp } = params;
+  }): Promise<Optional<IPosition>> {
+    const { option, user, client, networkId } = params;
 
     const query = await client.query({
-      query: queries.action.getListByUserAndOptionLightTimestampPaginated,
+      query: queries.position.getByUserAndOption,
       variables: {
-        first,
-        timestamp,
         user: String(user).toLowerCase(),
         option: String(option).toLowerCase(),
       },
       fetchPolicy: "no-cache",
     });
-    const source = _.get(query, "data.actions");
+    const source = _.get(query, "data.position");
 
-    if (_.isNil(query) || _.isNil(source) || !source.length) return [];
+    if (_.isNil(query) || _.isNil(source) || !_.has(source, "id"))
+      return undefined;
 
-    return source.map((item: { [key: string]: any }) =>
-      ActionBuilder.fromData({ source: item, networkId })
-    );
+    return PositionBuilder.fromData({ source, networkId });
   }
 
   public static async fromOptionsAndUser(params: {
@@ -78,35 +70,31 @@ export default class ActionBuilder implements IActionBuilder {
     options: string[];
     user: string;
     networkId: number;
-
-    first: number;
-    timestamp: number;
-  }): Promise<{ [key: string]: IAction[] }> {
-    const { options, user, client, networkId, first, timestamp } = params;
+  }): Promise<{ [key: string]: Optional<IPosition> }> {
+    const { options, user, client, networkId } = params;
 
     const query = await client.query({
-      query: queries.action.getListByUserAndOptionsLightTimestampPaginated,
+      query: queries.position.getByUserAndOptions,
       variables: {
-        first,
-        timestamp,
         user: String(user).toLowerCase(),
         options: options.map((option) => String(option).toLowerCase()),
       },
       fetchPolicy: "no-cache",
     });
-    const source = _.get(query, "data.options");
-
-    if (_.isNil(query) || _.isNil(source) || !source.length) return {};
+    const source = _.get(query, "data.positions");
 
     const result: { [key: string]: any } = {};
-
-    source.forEach((option: { [key: string]: any }) => {
-      result[
-        _.get(option, "id")
-      ] = option.actions.map((action: { [key: string]: any }) =>
-        ActionBuilder.fromData({ source: action, networkId })
-      );
+    options.forEach((option) => {
+      result[_.get(option, "id")] = undefined;
     });
+
+    if (!(_.isNil(query) || _.isNil(source) || !source.length))
+      source.forEach((position: { [key: string]: any }) => {
+        result[_.get(position, "option.id")] = PositionBuilder.fromData({
+          source: position,
+          networkId,
+        });
+      });
 
     return result;
   }
@@ -118,24 +106,22 @@ export default class ActionBuilder implements IActionBuilder {
 
     first: number;
     timestamp: number;
-  }): Promise<IAction[]> {
-    const { user, client, networkId, first, timestamp } = params;
+  }): Promise<IPosition[]> {
+    const { user, client, networkId } = params;
 
     const query = await client.query({
-      query: queries.action.getListByUserLightTimestampPaginated,
+      query: queries.position.getByUser,
       variables: {
-        first,
-        timestamp,
         user: String(user).toLowerCase(),
       },
+      fetchPolicy: "no-cache",
     });
-
-    const source = _.get(query, "data.actions");
+    const source = _.get(query, "data.positions");
 
     if (_.isNil(query) || _.isNil(source) || !source.length) return [];
 
     return source.map((item: { [key: string]: any }) =>
-      ActionBuilder.fromData({ source: item, networkId })
+      PositionBuilder.fromData({ source: item, networkId })
     );
   }
 }

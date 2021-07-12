@@ -1,4 +1,4 @@
-import BigNumber from "bignumber.js";
+import { ethers } from "ethers";
 
 export enum OptionType {
   Put = 0,
@@ -29,4 +29,4 @@ export const ALLOW_LOGS = (): boolean =>
       String(process.env.SDK_ALLOW_LOGS || "") === "true"
   ) || true; // TODO
 
-export const MAX_UINT = new BigNumber(2).exponentiatedBy(256).minus(1);
+export const MAX_UINT = ethers.constants.MaxUint256;

@@ -104,37 +104,6 @@ export const UserFragment = gql`
   }
 `;
 
-export const PositionFragment = gql`
-  fragment PositionFragment on Position {
-    id
-    user {
-      id
-    }
-    option {
-      id
-      pool {
-        id
-      }
-    }
-    premiumPaid
-    premiumReceived
-    optionsBought
-    optionsSold
-    optionsResold
-    optionsMinted
-    optionsUnminted
-    optionsExercised
-    underlyingWithdrawn
-    collateralWithdrawn
-    initialOptionsProvided
-    initialTokensProvided
-    finalOptionsRemoved
-    finalTokensRemoved
-    optionsSent
-    optionsReceived
-  }
-`;
-
 export const ConfigurationFragment = gql`
   fragment ConfigurationFragment on Configuration {
     id
@@ -214,4 +183,45 @@ export const OptionDayActivity = gql`
     dailyGrossVolumeTokens
     dailyActionsCount
   }
+`;
+
+export const PositionFragment = gql`
+  fragment PositionFragment on Position {
+    id
+    premiumPaid
+    premiumReceived
+    optionsBought
+    optionsSold
+    optionsResold
+    optionsMinted
+    optionsUnminted
+    optionsExercised
+    underlyingWithdrawn
+    collateralWithdrawn
+    initialOptionsProvided
+    initialTokensProvided
+    finalOptionsRemoved
+    finalTokensRemoved
+    optionsSent
+    optionsReceived
+  }
+`;
+
+export const PositionWithDependenciesFragment = gql`
+  fragment PositionWithDependenciesFragment on Position {
+    ...PositionFragment
+    user {
+      ...UserFragment
+    }
+    option {
+      ...OptionFragment
+      pool {
+        ...PoolFragment
+      }
+    }
+  }
+  ${PositionFragment}
+  ${UserFragment}
+  ${OptionFragment}
+  ${PoolFragment}
 `;

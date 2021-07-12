@@ -9,6 +9,8 @@ export * from "./option";
 export * from "./optionBuilder";
 export * from "./pool";
 export * from "./poolBuilder";
+export * from "./position";
+export * from "./positionBuilder";
 export * from "./token";
 export * from "./value";
 export * from "./SDK";

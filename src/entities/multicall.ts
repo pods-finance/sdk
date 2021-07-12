@@ -501,7 +501,11 @@ export default class Multicall implements IMulticall {
 
       return dynamics;
     } catch (error) {
-      if (ALLOW_LOGS()) console.error("Pods SDK - Multicall", error);
+      if (ALLOW_LOGS())
+        console.error("Pods SDK - Multicall General", error, {
+          options,
+          networkId,
+        });
     }
 
     return undefined;
@@ -592,7 +596,12 @@ export default class Multicall implements IMulticall {
         calls.push(optionInstructions);
         calls.push(tokenInstructions);
       } catch (error) {
-        if (ALLOW_LOGS()) console.error("Pods SDK - Multicall", error);
+        if (ALLOW_LOGS())
+          console.error("Pods SDK - Multicall User", error, {
+            user,
+            options,
+            networkId,
+          });
       }
     });
 
@@ -662,7 +671,11 @@ export default class Multicall implements IMulticall {
       });
       return dynamics;
     } catch (error) {
-      console.error("Pods SDK - Multicall", error);
+      console.error("Pods SDK - Multicall User", error, {
+        user,
+        options,
+        networkId,
+      });
     }
 
     return undefined;

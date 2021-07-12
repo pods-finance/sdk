@@ -3,6 +3,7 @@ import * as atoms from "./atoms";
 import * as manager from "./manager";
 import * as option from "./option";
 import * as pool from "./pool";
+import * as position from "./position";
 import * as user from "./user";
 
 const queries = {
@@ -10,6 +11,7 @@ const queries = {
   action,
   manager,
   pool,
+  position,
   user,
 };
 

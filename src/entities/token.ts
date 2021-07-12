@@ -74,7 +74,7 @@ export default class Token implements IToken {
   }): Promise<BigNumber> {
     const { provider, owner, address, spender, isUtility } = params || {};
 
-    if (isUtility === true) return new BigNumber(globals.MAX_UINT);
+    if (isUtility === true) return new BigNumber(globals.MAX_UINT.toString());
     const contract = contracts.instances.erc20(provider, address);
     const allowance = await contract.allowance(owner, spender || owner);
     return new BigNumber(allowance.toString());
@@ -105,9 +105,9 @@ export default class Token implements IToken {
     const contract = contracts.instances.erc20(signer, address);
     const transaction = await contract.approve(
       spender,
-      _.isNil(amount) || amount.isZero()
+      _.isNilOrEmptyString(amount) || amount!.isZero()
         ? globals.MAX_UINT.toString()
-        : amount.toString()
+        : amount!.toFixed(0).toString()
     );
     const receipt = await transaction.wait();
 

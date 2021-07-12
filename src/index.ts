@@ -13,8 +13,14 @@ import utils from "./utils";
 import * as builders from "./builders";
 import * as entities from "./entities";
 
-const { Action, Helper, Option, Pool, Token, Multicall } = entities;
-const { ActionBuilder, HelperBuilder, OptionBuilder, PoolBuilder } = builders;
+const { Action, Helper, Option, Pool, Token, Position, Multicall } = entities;
+const {
+  ActionBuilder,
+  HelperBuilder,
+  OptionBuilder,
+  PoolBuilder,
+  PositionBuilder,
+} = builders;
 
 const SDK = {
   clients,
@@ -28,12 +34,14 @@ const SDK = {
   Helper,
   Option,
   Pool,
+  Position,
   Token,
   Multicall,
   ActionBuilder,
   HelperBuilder,
   OptionBuilder,
   PoolBuilder,
+  PositionBuilder,
 };
 
 export {
@@ -42,12 +50,14 @@ export {
   Helper,
   Option,
   Pool,
+  Position,
   Token,
   Multicall,
   ActionBuilder,
   HelperBuilder,
   OptionBuilder,
   PoolBuilder,
+  PositionBuilder,
 };
 
 export default SDK;

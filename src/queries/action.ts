@@ -264,4 +264,48 @@ export const getListByUserAndPoolHeavyTimestampPaginated = gql`
   ${ActionFragmentHeavyWithDependencies}
 `;
 
+export const getListByUserAndOptionsLightTimestampPaginated = gql`
+  query options(
+    $first: Int!
+    $timestamp: Int!
+    $user: Bytes!
+    $options: [Bytes!]!
+  ) {
+    options(where: { id_in: $options }) {
+      id
+      actions(
+        first: $first
+        orderBy: timestamp
+        orderDirection: desc
+        where: { user: $user, timestamp_lt: $timestamp }
+      ) {
+        ...ActionFragmentLightWithDependencies
+      }
+    }
+  }
+  ${ActionFragmentLightWithDependencies}
+`;
+
+export const getListByUserAndOptionsHeavyTimestampPaginated = gql`
+  query actions(
+    $first: Int!
+    $timestamp: Int!
+    $user: Bytes!
+    $options: [Bytes!]!
+  ) {
+    options(where: { id_in: $options }) {
+      id
+      actions(
+        first: $first
+        orderBy: timestamp
+        orderDirection: desc
+        where: { user: $user, timestamp_lt: $timestamp }
+      ) {
+        ...ActionFragmentHeavyWithDependencies
+      }
+    }
+  }
+  ${ActionFragmentHeavyWithDependencies}
+`;
+
 export const getList = getListLight;
