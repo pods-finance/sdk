@@ -205,6 +205,7 @@ export default class Multicall implements IMulticall {
       const rTBB = ethers.BigNumber.from(values[1]).toString();
 
       const TBA: IValue = {
+        label: "TBA",
         raw: new BigNumber(rTBA),
         humanized: new BigNumber(rTBA).dividedBy(
           new BigNumber(10).pow(pool!.tokenA!.decimals)
@@ -212,6 +213,7 @@ export default class Multicall implements IMulticall {
       };
 
       const TBB: IValue = {
+        label: "TBB",
         raw: new BigNumber(rTBB),
         humanized: new BigNumber(rTBB).dividedBy(
           new BigNumber(10).pow(pool!.tokenB!.decimals)
@@ -247,12 +249,14 @@ export default class Multicall implements IMulticall {
       const rUBB = ethers.BigNumber.from(values[1]).toString();
 
       const UBA: IValue = {
+        label: "Balance tokenA",
         raw: new BigNumber(rUBA),
         humanized: new BigNumber(rUBA).dividedBy(
           new BigNumber(10).pow(pool.tokenA!.decimals)
         ),
       };
       const UBB: IValue = {
+        label: "Balance tokenB",
         raw: new BigNumber(rUBB),
         humanized: new BigNumber(rUBB).dividedBy(
           new BigNumber(10).pow(pool.tokenB!.decimals)
@@ -288,6 +292,7 @@ export default class Multicall implements IMulticall {
       const rUB = ethers.BigNumber.from(values[1]).toString();
 
       const SB: IValue = {
+        label: "Balance token",
         raw: new BigNumber(rSB),
         humanized: new BigNumber(rSB).dividedBy(
           new BigNumber(10).pow(option.strike!.decimals)
@@ -295,6 +300,7 @@ export default class Multicall implements IMulticall {
       };
 
       const UB: IValue = {
+        label: "Balance underlying",
         raw: new BigNumber(rUB),
         humanized: new BigNumber(rUB).dividedBy(
           new BigNumber(10).pow(option.underlying!.decimals)
@@ -328,6 +334,7 @@ export default class Multicall implements IMulticall {
       const amount = ethers.BigNumber.from(values[0]).toString();
 
       const value: IValue = {
+        label: "Balance option tokens",
         raw: new BigNumber(amount),
         humanized: new BigNumber(amount).dividedBy(
           new BigNumber(10).pow(option.decimals!)
@@ -361,6 +368,7 @@ export default class Multicall implements IMulticall {
       const amount = ethers.BigNumber.from(values[0]).toString();
 
       const value: IValue = {
+        label: "Balance option tokens in wallet",
         raw: new BigNumber(amount),
         humanized: new BigNumber(amount).dividedBy(
           new BigNumber(10).pow(option.decimals!)

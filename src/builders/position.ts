@@ -85,7 +85,7 @@ export default class PositionBuilder implements IPositionBuilder {
 
     const result: { [key: string]: any } = {};
     options.forEach((option) => {
-      result[_.get(option, "id")] = undefined;
+      result[option] = undefined;
     });
 
     if (!(_.isNil(query) || _.isNil(source) || !source.length))
