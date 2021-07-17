@@ -8,8 +8,11 @@ import { PositionWithDependenciesFragment } from "./atoms";
  */
 
 export const getByUser = gql`
-  query positions($user: Bytes!) {
-    positions(where: { user: $user }) {
+  query positions($user: Bytes!, $first: Int!, $blacklisted: [Bytes!]!) {
+    positions(
+      where: { user: $user, option_not_in: $blacklisted }
+      first: $first
+    ) {
       ...PositionWithDependenciesFragment
     }
   }

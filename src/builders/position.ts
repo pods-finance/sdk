@@ -43,9 +43,6 @@ export default class PositionBuilder implements IPositionBuilder {
     option: string;
     user: string;
     networkId: number;
-
-    first: number;
-    timestamp: number;
   }): Promise<Optional<IPosition>> {
     const { option, user, client, networkId } = params;
 
@@ -105,14 +102,18 @@ export default class PositionBuilder implements IPositionBuilder {
     networkId: number;
 
     first: number;
-    timestamp: number;
+    blacklisted: string[];
   }): Promise<IPosition[]> {
-    const { user, client, networkId } = params;
+    const { user, client, networkId, first, blacklisted } = params;
 
     const query = await client.query({
       query: queries.position.getByUser,
       variables: {
         user: String(user).toLowerCase(),
+        first,
+        blacklisted: blacklisted.map((address) =>
+          String(address).toLowerCase()
+        ),
       },
       fetchPolicy: "no-cache",
     });
