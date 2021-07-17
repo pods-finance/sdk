@@ -27,6 +27,6 @@ export const ALLOW_LOGS = (): boolean =>
   Boolean(
     String(process.env.REACT_APP_SDK_ALLOW_LOGS || "") === "true" ||
       String(process.env.SDK_ALLOW_LOGS || "") === "true"
-  ) || true; // TODO
+  );
 
 export const MAX_UINT = ethers.constants.MaxUint256;

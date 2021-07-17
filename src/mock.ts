@@ -35,7 +35,7 @@ async function tokens(): Promise<void> {
     "USDC Balance",
     await token.getBalance({
       provider,
-      owner: "0xAFA20A683A4ff46991Cb065Ae507Bf3b0110d47D",
+      owner: "",
     })
   );
 }
@@ -146,7 +146,10 @@ async function flowActions(): Promise<void> {
   });
 }
 
-async function flowMulticall(): Promise<void> {
+async function flowMulticall(
+  user: string = "",
+  options: string[] = []
+): Promise<void> {
   const provider = clients.provider.getBaseProvider(42, {
     infura: process.env.TESTING_INFURA_KEY || "",
   });
@@ -159,14 +162,14 @@ async function flowMulticall(): Promise<void> {
   const query = await subgraphInstance.query({
     query: queries.option.getByAddresses,
     variables: {
-      addresses: ["0x8ac8fd04a4cbc3be5c9c3d97132d4e6a6a258fc6"],
+      addresses: options,
     },
     fetchPolicy: "no-cache",
   });
 
   const list = _.get(query, "data.options");
 
-  const options: IOption[] = list.map((item: any) =>
+  const result: IOption[] = list.map((item: any) =>
     OptionBuilder.fromData({
       source: item,
       networkId: networks.kovan.networkId,
@@ -176,14 +179,14 @@ async function flowMulticall(): Promise<void> {
   const start = Date.now();
   const generalDynamics = await Multicall.getGeneralDynamics({
     provider,
-    options,
+    options: result,
   });
   console.log(`Multicall:`, Date.now() - start);
 
   const userDynamics = await Multicall.getUserDynamics({
-    user: "0xc4d56A1ba1A9993b3d6201b4ED7DCF5d78A5123d",
+    user,
     provider,
-    options,
+    options: result,
   });
   console.log(`Multicall:`, Date.now() - start);
 
