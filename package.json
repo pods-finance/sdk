@@ -1,5 +1,5 @@
 {
-  "name": "@pods/sdk",
+  "name": "@pods-finance/sdk",
   "description": "A hybrid networking SDK for future Pods apps and integrations",
   "version": "1.0.0",
   "author": "Pods Finance",
@@ -45,13 +45,17 @@
   ],
   "license": "MIT",
   "main": "dist/index.js",
-  "repository": "git@github.com:pods-finance/sdk.git",
+  "private": false,
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@github.com/pods-finance/sdk.git"
+  },
   "scripts": {
-    "tsdx": "tsdx",
     "build": "tsdx build",
+    "dev": "node dist/sdk.cjs.development.js",
     "lint": "tsdx lint src test",
-    "watch": "tsdx watch",
     "test": "tsdx test",
-    "dev": "node dist/sdk.cjs.development.js"
+    "tsdx": "tsdx",
+    "watch": "tsdx watch"
   }
 }

@@ -184,6 +184,39 @@ export default class Multicall implements IMulticall {
     return zero;
   }
 
+  private static _interpretAdjustedIV(params: {
+    result: Result;
+    pool: IPool;
+  }): IValue {
+    try {
+      const { result, pool } = params;
+
+      const status = _.get(result, "success");
+      const values = _.get(result, "returnValues");
+
+      if (!status || !_.isArray(values) || values.length === 0)
+        throw new Error("Price properties unretrievable");
+
+      expect(pool, "option pool");
+      expect(pool!.tokenB, "option pool tokenB");
+
+      const adjustedIV = ethers.BigNumber.from(values[0]).toString();
+
+      const value: IValue = {
+        raw: new BigNumber(adjustedIV),
+        humanized: new BigNumber(adjustedIV).dividedBy(
+          new BigNumber(10).pow(18)
+        ),
+      };
+
+      return value;
+    } catch (error) {
+      if (ALLOW_LOGS()) console.error("Pods SDK - Multicall", error);
+    }
+
+    return zero;
+  }
+
   private static _interpretTotalBalances(params: {
     result: Result;
     pool: IPool;
@@ -435,6 +468,11 @@ export default class Multicall implements IMulticall {
               methodParameters: [],
             },
             {
+              reference: "adjustedIV",
+              methodName: "getAdjustedIV",
+              methodParameters: [],
+            },
+            {
               reference: "totalBalances",
               methodName: "getPoolBalances",
               methodParameters: [],
@@ -489,6 +527,12 @@ export default class Multicall implements IMulticall {
               break;
             case "IV":
               metrics.IV = Multicall._interpretIV({
+                pool,
+                result,
+              });
+              break;
+            case "adjustedIV":
+              metrics.adjustedIV = Multicall._interpretAdjustedIV({
                 pool,
                 result,
               });

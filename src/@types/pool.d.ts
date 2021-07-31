@@ -23,6 +23,7 @@ export interface IPoolGeneralMetrics {
   buyingPrice?: { [key: string]: IValue };
   abPrice?: { [key: string]: IValue };
   IV?: IValue;
+  adjustedIV?: IValue;
   totalBalances?: IValue[];
   userPositions?: IValue[];
   userOptionWithdrawAmounts?: IValue[];
@@ -49,6 +50,7 @@ export interface IPool {
   getParameters(params?: { provider?: IProvider }): Promise<IPoolIndicators>;
 
   getIV(params?: { provider?: IProvider }): Promise<IValue>;
+  getAdjustedIV(params?: { provider?: IProvider }): Promise<IValue>;
   getABPrice(params?: {
     provider?: IProvider;
   }): Promise<{ [key: string]: IValue }>;

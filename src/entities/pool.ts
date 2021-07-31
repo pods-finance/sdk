@@ -121,6 +121,25 @@ export default class Pool implements IPool {
     return IV;
   }
 
+  async getAdjustedIV(params: { provider?: IProvider } = {}): Promise<IValue> {
+    expect(this.provider || params.provider, "provider");
+
+    const contract = contracts.instances.pool(
+      (this.provider || params.provider)!,
+      this.address
+    );
+    const result = await contract.getAdjustedIV();
+
+    const adjustedIV: IValue = {
+      raw: new BigNumber(result.toString()),
+      humanized: new BigNumber(result.toString()).dividedBy(
+        new BigNumber(10).pow(18)
+      ),
+    };
+
+    return adjustedIV;
+  }
+
   async getBuyingPrice(params: {
     amount: BigNumber;
     provider?: IProvider;
