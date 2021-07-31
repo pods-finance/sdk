@@ -54,7 +54,7 @@
     "build": "tsdx build",
     "dev": "node dist/sdk.cjs.development.js",
     "lint": "tsdx lint src test",
-    "test": "tsdx test",
+    "test": "tsdx test --passWithNoTests",
     "tsdx": "tsdx",
     "watch": "tsdx watch"
   }
