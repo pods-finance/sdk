@@ -1,7 +1,7 @@
 {
   "name": "@pods-finance/sdk",
   "description": "A hybrid networking SDK for future Pods apps and integrations",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "author": "Pods Finance",
   "bugs": {
     "url": "https://github.com/pods-finance/sdk/issues",
