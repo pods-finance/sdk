@@ -1,7 +1,4 @@
 # folders
-build/
-lib/
-dist/
 node_modules/
 .next/
 .VSCodeCounter/
