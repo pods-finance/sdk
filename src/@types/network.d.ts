@@ -1,4 +1,5 @@
 export interface INetwork {
+  supported: boolean;
   chainId: number;
   networkId: number;
   name: string;
@@ -16,6 +17,9 @@ export interface INetwork {
     prod: string;
     dev: string;
   };
+  rpc: string[];
+  faucet?: string;
+  explorer: string;
   infura: (key: string) => string;
   multicall2: string;
 }

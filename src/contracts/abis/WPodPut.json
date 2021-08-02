@@ -12,6 +12,11 @@
         "type": "string"
       },
       {
+        "internalType": "enum IPodOption.OptionType",
+        "name": "optionType",
+        "type": "uint8"
+      },
+      {
         "internalType": "enum IPodOption.ExerciseType",
         "name": "exerciseType",
         "type": "uint8"
@@ -43,7 +48,7 @@
       },
       {
         "internalType": "contract IConfigurationManager",
-        "name": "configurationManager",
+        "name": "_configurationManager",
         "type": "address"
       }
     ],
@@ -111,25 +116,6 @@
       }
     ],
     "name": "Mint",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": true,
-        "internalType": "address",
-        "name": "sender",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "value",
-        "type": "uint256"
-      }
-    ],
-    "name": "Received",
     "type": "event"
   },
   {
@@ -367,13 +353,6 @@
     "name": "exercise",
     "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "exerciseEth",
-    "outputs": [],
-    "stateMutability": "payable",
     "type": "function"
   },
   {
@@ -831,9 +810,5 @@
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
-  },
-  {
-    "stateMutability": "payable",
-    "type": "receive"
   }
 ]

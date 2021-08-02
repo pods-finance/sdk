@@ -3,12 +3,14 @@ import { INetwork } from "@types";
 const chains = {
   polygon: "Polygon",
   ethereum: "Ethereum",
+  xdai: "xDAI",
 };
 
 const _networks: { [key: number]: INetwork } = {
   1: {
     chainId: 1,
     networkId: 1,
+    supported: true,
     name: "Mainnet",
     chain: chains.ethereum,
     tag: "mainnet",
@@ -24,6 +26,8 @@ const _networks: { [key: number]: INetwork } = {
       prod: "https://api.thegraph.com/subgraphs/name/pods-finance/pods",
       dev: "https://api.thegraph.com/subgraphs/name/pods-finance/pods-dev",
     },
+    rpc: ["https://api.mycryptoapi.com/eth", "https://cloudflare-eth.com"],
+    explorer: "https://etherscan.io",
     infura: (key) => `https://mainnet.infura.io/v3/${key}`,
     multicall2: "0x5ba1e12693dc8f9c48aad8770482f4739beed696",
   },
@@ -31,6 +35,7 @@ const _networks: { [key: number]: INetwork } = {
     chainId: 42,
     networkId: 42,
     name: "Kovan",
+    supported: true,
     chain: chains.ethereum,
     tag: "kovan",
     network: "testnet",
@@ -42,10 +47,14 @@ const _networks: { [key: number]: INetwork } = {
       decimals: 18,
     },
     subgraph: {
-      prod: "https://api.thegraph.com/subgraphs/name/pods-finance/pods-kovan",
+      prod:
+        "https://api.thegraph.com/subgraphs/name/pods-finance/pods-experimental", // TODO pods-kovan
       dev:
-        "https://api.thegraph.com/subgraphs/name/pods-finance/pods-experimental",
+        "https://api.thegraph.com/subgraphs/name/pods-finance/pods-experimental", // TODO pods-kovan
     },
+    rpc: [],
+    explorer: "https://kovan.etherscan.io",
+    faucet: "https://faucet.kovan.network",
     infura: (key) => `https://kovan.infura.io/v3/${key}`,
     multicall2: "0x5ba1e12693dc8f9c48aad8770482f4739beed696",
   },
@@ -53,6 +62,7 @@ const _networks: { [key: number]: INetwork } = {
     chainId: 137,
     networkId: 137,
     name: "Matic",
+    supported: true,
     chain: chains.polygon,
     network: "mainnet",
     tag: "matic",
@@ -68,6 +78,11 @@ const _networks: { [key: number]: INetwork } = {
       dev:
         "https://api.thegraph.com/subgraphs/name/pods-finance/pods-matic-dev",
     },
+    rpc: [
+      "https://rpc-mainnet.matic.network",
+      "wss://ws-mainnet.matic.network",
+    ],
+    explorer: "https://polygonscan.io",
     infura: (key) => `https://polygon-mainnet.infura.io/v3/${key}`,
     multicall2: "0x275617327c958bd06b5d6b871e7f491d76113dd8",
   },
@@ -75,6 +90,7 @@ const _networks: { [key: number]: INetwork } = {
     chainId: 80001,
     networkId: 80001,
     name: "Mumbai",
+    supported: true,
     chain: chains.polygon,
     network: "testnet",
     tag: "mumbai",
@@ -90,8 +106,107 @@ const _networks: { [key: number]: INetwork } = {
       dev:
         "https://api.thegraph.com/subgraphs/name/pods-finance/pods-mumbai-dev",
     },
+    rpc: ["https://rpc-mumbai.matic.today", "wss://ws-mumbai.matic.today"],
+    explorer: "https://mumbai.polygonscan.io",
+    faucet: "https://faucet.matic.network",
     infura: (key) => `https://polygon-mumbai.infura.io/v3/${key}`,
     multicall2: "0xe9939e7Ea7D7fb619Ac57f648Da7B1D425832631",
+  },
+  3: {
+    chainId: 3,
+    networkId: 3,
+    name: "Ropsten",
+    supported: false,
+    chain: chains.ethereum,
+    tag: "ropsten",
+    network: "testnet",
+    token: {
+      utility: ["0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"],
+      wrapped: [],
+      name: "Ether",
+      symbol: "ETH",
+      decimals: 18,
+    },
+    subgraph: {
+      prod: "",
+      dev: "",
+    },
+    rpc: [],
+    explorer: "https://ropsten.etherscan.io",
+    infura: () => "",
+    multicall2: "",
+  },
+  4: {
+    chainId: 4,
+    networkId: 4,
+    name: "Rinkeby",
+    supported: false,
+    chain: chains.ethereum,
+    tag: "rinkeby",
+    network: "testnet",
+    token: {
+      utility: ["0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"],
+      wrapped: [],
+      name: "Ether",
+      symbol: "ETH",
+      decimals: 18,
+    },
+    subgraph: {
+      prod: "",
+      dev: "",
+    },
+    rpc: [],
+    explorer: "https://rinkeby.etherscan.io",
+    infura: () => "",
+    multicall2: "",
+  },
+  5: {
+    chainId: 5,
+    networkId: 5,
+    name: "Goerli",
+    supported: false,
+    chain: chains.ethereum,
+    tag: "goerli",
+    network: "testnet",
+    token: {
+      utility: ["0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"],
+      wrapped: [],
+      name: "Ether",
+      symbol: "ETH",
+      decimals: 18,
+    },
+    subgraph: {
+      prod: "",
+      dev: "",
+    },
+    rpc: [],
+    explorer: "https://goerli.etherscan.io",
+    infura: () => "",
+    multicall2: "",
+  },
+  100: {
+    chainId: 100,
+    networkId: 100,
+    name: "xDAI",
+    supported: false,
+    chain: chains.xdai,
+    tag: "xdai",
+    network: "mainnet",
+    token: {
+      utility: ["0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"],
+      wrapped: [],
+      name: "xDAI",
+      symbol: "xDAI",
+      decimals: 18,
+    },
+    subgraph: {
+      prod: "",
+      dev: "",
+    },
+    rpc: [],
+    explorer: "https://blockscout.com/poa/xdai/mainnet/",
+    infura: () => "",
+    multicall2: "",
   },
 };
 
@@ -101,6 +216,12 @@ const networks: { [key: string]: INetwork } = {
   kovan: _networks[42],
   matic: _networks[137],
   mumbai: _networks[80001],
+
+  /** Mentioned but not supported */
+  ropsten: _networks[3],
+  rinkeby: _networks[4],
+  goerli: _networks[5],
+  xdai: _networks[100],
 };
 
 export { chains };

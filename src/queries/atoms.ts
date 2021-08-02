@@ -188,6 +188,7 @@ export const OptionDayActivity = gql`
 export const PositionFragment = gql`
   fragment PositionFragment on Position {
     id
+    expiration
     premiumPaid
     premiumReceived
     optionsBought

@@ -58,7 +58,7 @@ export interface IHelper {
   /** Add single liquidity. Use humanized values (no decimal padding) */
   doAddSingleLiquidity(params: {
     option: IOption;
-    strikeAmount: BigNumber;
+    tokenBAmount: BigNumber;
     callback?: Function;
   }): Promise<void>;
 

@@ -1,14 +1,14 @@
 import { Contract } from "ethers";
 import { ISignerOrProvider } from "../@types";
 
-import CapProviderABI from "./abis/capProviderABI.json";
-import ConfigurationManagerABI from "./abis/configurationManagerABI.json";
-import ERC20ABI from "./abis/erc20ABI.json";
-import PoolFactoryABI from "./abis/optionAMMFactoryABI.json";
-import PoolABI from "./abis/optionAMMPoolABI.json";
-import OptionFactoryABI from "./abis/optionFactoryABI.json";
-import OptionHelperABI from "./abis/optionHelperABI.json";
-import OptionABI from "./abis/wPodPutABI.json";
+import CapProviderABI from "./abis/CapProvider.json";
+import ConfigurationManagerABI from "./abis/ConfigurationManager.json";
+import ERC20ABI from "./abis/ERC20.json";
+import PoolFactoryABI from "./abis/OptionAMMFactory.json";
+import PoolABI from "./abis/OptionAMMPool.json";
+import OptionFactoryABI from "./abis/OptionFactory.json";
+import OptionHelperABI from "./abis/OptionHelper.json";
+import OptionABI from "./abis/WPodPut.json";
 
 function instance(
   provider: ISignerOrProvider,

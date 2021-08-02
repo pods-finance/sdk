@@ -328,11 +328,39 @@ export default class Helper implements IHelper {
 
   async doAddSingleLiquidity(params: {
     option: IOption;
-    strikeAmount: BigNumber;
+    tokenBAmount: BigNumber;
     callback?: Function | undefined;
   }): Promise<void> {
-    console.info({ params });
-    throw new Error("Method not implemented yet.");
+    const { option, tokenBAmount, callback } = params;
+
+    expect(this.provider, "provider");
+    expect(this.signer, "signer");
+    expect(option, "option");
+    expect(option.pool, "pool (option)");
+    expect(option.pool?.tokenB, "tokenB (option pool)");
+    expect(option.pool?.tokenB?.decimals, "decimals (option pool tokenB)");
+    expect(tokenBAmount, "tokenBAmount", "object");
+
+    const amountB = new BigNumber(tokenBAmount).multipliedBy(
+      new BigNumber(10).pow(option.pool!.tokenB!.decimals)
+    );
+
+    const contract = contracts.instances.optionHelper(
+      this.signer!,
+      this.address
+    );
+
+    const transaction = await contract.mintAndAddLiquidityWithCollateral(
+      option.address,
+      amountB.toFixed(0).toString()
+    );
+
+    try {
+      const receipt = await transaction.wait();
+      (callback || _.noop)(null, receipt.transactionHash, receipt);
+    } catch (error) {
+      (callback || _.noop)(error, error.transactionHash);
+    }
   }
 
   async doMint(params: {

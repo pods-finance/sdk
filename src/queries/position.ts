@@ -12,6 +12,8 @@ export const getByUser = gql`
     positions(
       where: { user: $user, option_not_in: $blacklisted }
       first: $first
+      orderBy: expiration
+      orderDirection: desc
     ) {
       ...PositionWithDependenciesFragment
     }
@@ -21,7 +23,11 @@ export const getByUser = gql`
 
 export const getByUserAndOption = gql`
   query positions($user: Bytes!, $option: Bytes!) {
-    positions(where: { user: $user, option: $option }) {
+    positions(
+      where: { user: $user, option: $option }
+      orderBy: expiration
+      orderDirection: desc
+    ) {
       ...PositionWithDependenciesFragment
     }
   }
@@ -30,7 +36,11 @@ export const getByUserAndOption = gql`
 
 export const getByUserAndOptions = gql`
   query positions($user: Bytes!, $options: [Bytes!]!) {
-    positions(where: { user: $user, option_in: $options }) {
+    positions(
+      where: { user: $user, option_in: $options }
+      orderBy: expiration
+      orderDirection: desc
+    ) {
       ...PositionWithDependenciesFragment
     }
   }
