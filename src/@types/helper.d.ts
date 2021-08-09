@@ -16,6 +16,7 @@ export interface IHelper {
     optionAmount: BigNumber;
     premiumAmount: BigNumber;
     deadline?: BigNumber;
+    overrides?: IHelperOverrides;
     callback?: Function;
   }): Promise<void>;
 
@@ -25,6 +26,7 @@ export interface IHelper {
     optionAmount: BigNumber;
     premiumAmount: BigNumber;
     deadline?: BigNumber;
+    overrides?: IHelperOverrides;
     callback?: Function;
   }): Promise<void>;
 
@@ -34,6 +36,7 @@ export interface IHelper {
     optionAmount: BigNumber;
     premiumAmount: BigNumber;
     deadline?: BigNumber;
+    overrides?: IHelperOverrides;
     callback?: Function;
   }): Promise<void>;
 
@@ -43,6 +46,7 @@ export interface IHelper {
     optionAmount: BigNumber;
     premiumAmount: BigNumber;
     deadline?: BigNumber;
+    overrides?: IHelperOverrides;
     callback?: Function;
   }): Promise<void>;
 
@@ -52,6 +56,7 @@ export interface IHelper {
     optionAmount: BigNumber;
     premiumAmount: BigNumber;
     deadline?: BigNumber;
+    overrides?: IHelperOverrides;
     callback?: Function;
   }): Promise<void>;
 
@@ -59,14 +64,16 @@ export interface IHelper {
   doAddSingleLiquidity(params: {
     option: IOption;
     tokenBAmount: BigNumber;
+    overrides?: IHelperOverrides;
     callback?: Function;
   }): Promise<void>;
 
-  /** Add dual liquidity. Use humanized values (no decimal padding) */
+  /** DEPRECATED: Add dual liquidity. Use humanized values (no decimal padding) */
   doAddDualLiquidity(params: {
     option: IOption;
     tokenAAmount: BigNumber;
     tokenBAmount: BigNumber;
+    overrides?: IHelperOverrides;
     callback?: Function;
   }): Promise<void>;
 
@@ -75,13 +82,15 @@ export interface IHelper {
     option: IOption;
     percentA: BigNumber;
     percentB: BigNumber;
+    overrides?: IHelperOverrides;
     callback?: Function;
   }): Promise<void>;
 
-  /** Mint (lock collateral for) optionAmount. Use humanized values (no decimal padding) */
+  /** DEPRECATED: Mint (lock collateral for) optionAmount. Use humanized values (no decimal padding) */
   doMint(params: {
     option: IOption;
     optionAmount: BigNumber;
+    overrides?: IHelperOverrides;
     callback?: Function;
   }): Promise<void>;
 
@@ -89,6 +98,7 @@ export interface IHelper {
   doUnmint(params: {
     option: IOption;
     optionAmount: BigNumber;
+    overrides?: IHelperOverrides;
     callback?: Function;
   }): Promise<void>;
 
@@ -96,6 +106,7 @@ export interface IHelper {
   doExerciseERC20(params: {
     option: IOption;
     optionAmount: BigNumber;
+    overrides?: IHelperOverrides;
     callback?: Function;
   }): Promise<void>;
 
@@ -103,9 +114,18 @@ export interface IHelper {
   doExerciseUtility(params: {
     option: IOption;
     optionAmount: BigNumber;
+    overrides?: IHelperOverrides;
     callback?: Function;
   }): Promise<void>;
 
   /** Withdraw everything available. Use humanized values (no decimal padding). At contract level, this action is triggered from the option contract, not the helper.*/
-  doWithdraw(params: { option: IOption; callback?: Function }): Promise<void>;
+  doWithdraw(params: {
+    option: IOption;
+    overrides?: IHelperOverrides;
+    callback?: Function;
+  }): Promise<void>;
+}
+
+export interface IHelperOverrides {
+  gasLimit?: BigNumber | boolean;
 }

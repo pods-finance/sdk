@@ -1,6 +1,6 @@
 import _ from "lodash";
 import BigNumber from "bignumber.js";
-import { IProvider, IValue } from "@types";
+import { IProvider, IValue, IHelperOverrides } from "@types";
 import { DEFAULT_TIMEOUT } from "../constants/globals";
 declare module "lodash" {
   interface LoDashStatic {
@@ -82,6 +82,36 @@ export async function getOwner(provider: IProvider): Promise<string> {
  */
 export function humanize(raw: BigNumber, decimals: number = 18): BigNumber {
   return raw.dividedBy(new BigNumber(10).pow(decimals));
+}
+
+export async function getOverrides(
+  params: IHelperOverrides | undefined,
+  estimate: Function,
+  args: any[]
+): Promise<{ [key: string]: string }> {
+  if (_.isNilOrEmptyString(params)) return {};
+
+  const overrides: { [key: string]: string } = {};
+  const { gasLimit } = params!;
+
+  /**
+   * Gas limit, especially for sidechains
+   */
+
+  if (!_.isNilOrEmptyString(gasLimit))
+    overrides.gasLimit =
+      gasLimit === true
+        ? (await estimate(...args))
+            .mul(120)
+            .div(100)
+            .toString()
+        : (gasLimit as BigNumber).toString();
+
+  /**
+   * Gas price is not handled yet
+   */
+
+  return overrides;
 }
 
 const utils = {

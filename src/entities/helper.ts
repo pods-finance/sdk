@@ -1,7 +1,14 @@
 import _ from "lodash";
 import BigNumber from "bignumber.js";
-import { ISigner, IHelper, IOption, IProvider, Optional } from "@types";
-import { expect, getDefaultDeadline } from "../utils";
+import {
+  ISigner,
+  IHelper,
+  IHelperOverrides,
+  IOption,
+  IProvider,
+  Optional,
+} from "@types";
+import { expect, getDefaultDeadline, getOverrides } from "../utils";
 import contracts from "../contracts";
 import { ALLOW_LOGS } from "../constants/globals";
 
@@ -40,6 +47,7 @@ export default class Helper implements IHelper {
     optionAmount: BigNumber;
     premiumAmount: BigNumber;
     deadline?: BigNumber | undefined;
+    overrides?: IHelperOverrides;
     callback: Function | undefined;
   }): Promise<void> {
     const { option, premiumAmount, optionAmount, deadline, callback } = params;
@@ -68,15 +76,23 @@ export default class Helper implements IHelper {
       this.address
     );
 
-    const transaction = await contract.buyExactOptions(
+    const args = [
       option.address,
       output.toFixed(0).toString(),
       input.toFixed(0).toString(),
       (deadline || (await getDefaultDeadline(this.provider)))
         .toFixed(0)
         .toString(),
-      IV.raw.toFixed(0).toString()
+      IV.raw.toFixed(0).toString(),
+    ];
+
+    const overrides = await getOverrides(
+      params.overrides,
+      contract.estimateGas.buyExactOptions,
+      args
     );
+
+    const transaction = await contract.buyExactOptions(...args, overrides);
 
     try {
       const receipt = await transaction.wait();
@@ -90,6 +106,7 @@ export default class Helper implements IHelper {
     optionAmount: BigNumber;
     premiumAmount: BigNumber;
     deadline?: BigNumber | undefined;
+    overrides?: IHelperOverrides;
     callback?: Function | undefined;
   }): Promise<void> {
     const { option, premiumAmount, optionAmount, deadline, callback } = params;
@@ -118,14 +135,25 @@ export default class Helper implements IHelper {
       this.address
     );
 
-    const transaction = await contract.buyOptionsWithExactTokens(
+    const args = [
       option.address,
       output.toFixed(0).toString(),
       input.toFixed(0).toString(),
       (deadline || (await getDefaultDeadline(this.provider)))
         .toFixed(0)
         .toString(),
-      IV.raw.toFixed(0).toString()
+      IV.raw.toFixed(0).toString(),
+    ];
+
+    const overrides = await getOverrides(
+      params.overrides,
+      contract.estimateGas.buyOptionsWithExactTokens,
+      args
+    );
+
+    const transaction = await contract.buyOptionsWithExactTokens(
+      ...args,
+      overrides
     );
 
     try {
@@ -141,6 +169,7 @@ export default class Helper implements IHelper {
     optionAmount: BigNumber;
     premiumAmount: BigNumber;
     deadline?: BigNumber | undefined;
+    overrides?: IHelperOverrides;
     callback?: Function | undefined;
   }): Promise<void> {
     const { option, premiumAmount, optionAmount, deadline, callback } = params;
@@ -170,15 +199,23 @@ export default class Helper implements IHelper {
       this.address
     );
 
-    const transaction = await contract.mintAndSellOptions(
+    const args = [
       option.address,
       input.toFixed(0).toString(),
       output.toFixed(0).toString(),
       (deadline || (await getDefaultDeadline(this.provider)))
         .toFixed(0)
         .toString(),
-      IV.raw.toFixed(0).toString()
+      IV.raw.toFixed(0).toString(),
+    ];
+
+    const overrides = await getOverrides(
+      params.overrides,
+      contract.estimateGas.mintAndSellOptions,
+      args
     );
+
+    const transaction = await contract.mintAndSellOptions(...args, overrides);
 
     try {
       const receipt = await transaction.wait();
@@ -193,6 +230,7 @@ export default class Helper implements IHelper {
     optionAmount: BigNumber;
     premiumAmount: BigNumber;
     deadline?: BigNumber | undefined;
+    overrides?: IHelperOverrides;
     callback?: Function | undefined;
   }): Promise<void> {
     const { option, premiumAmount, optionAmount, deadline, callback } = params;
@@ -222,15 +260,23 @@ export default class Helper implements IHelper {
       this.address
     );
 
-    const transaction = await contract.sellExactOptions(
+    const args = [
       option.address,
       input.toFixed(0).toString(),
       output.toFixed(0).toString(),
       (deadline || (await getDefaultDeadline(this.provider)))
         .toFixed(0)
         .toString(),
-      IV.raw.toFixed(0).toString()
+      IV.raw.toFixed(0).toString(),
+    ];
+
+    const overrides = await getOverrides(
+      params.overrides,
+      contract.estimateGas.sellExactOptions,
+      args
     );
+
+    const transaction = await contract.sellExactOptions(...args, overrides);
 
     try {
       const receipt = await transaction.wait();
@@ -244,6 +290,7 @@ export default class Helper implements IHelper {
     optionAmount: BigNumber;
     premiumAmount: BigNumber;
     deadline?: BigNumber | undefined;
+    overrides?: IHelperOverrides;
     callback?: Function | undefined;
   }): Promise<void> {
     return this.doSellExact(params);
@@ -253,6 +300,7 @@ export default class Helper implements IHelper {
     option: IOption;
     tokenAAmount: BigNumber;
     tokenBAmount: BigNumber;
+    overrides?: IHelperOverrides;
     callback?: Function | undefined;
   }): Promise<void> {
     const { option, tokenAAmount, tokenBAmount, callback } = params;
@@ -280,11 +328,19 @@ export default class Helper implements IHelper {
       this.address
     );
 
-    const transaction = await contract.addLiquidity(
+    const args = [
       option.address,
       amountA.toFixed(0).toString(),
-      amountB.toFixed(0).toString()
+      amountB.toFixed(0).toString(),
+    ];
+
+    const overrides = await getOverrides(
+      params.overrides,
+      contract.estimateGas.addLiquidity,
+      args
     );
+
+    const transaction = await contract.addLiquidity(...args, overrides);
 
     try {
       const receipt = await transaction.wait();
@@ -297,6 +353,7 @@ export default class Helper implements IHelper {
     option: IOption;
     percentA: BigNumber;
     percentB: BigNumber;
+    overrides?: IHelperOverrides;
     callback?: Function | undefined;
   }): Promise<void> {
     const { option, percentA, percentB, callback } = params;
@@ -313,10 +370,18 @@ export default class Helper implements IHelper {
       option.pool!.address
     );
 
-    const transaction = await contract.removeLiquidity(
+    const args = [
       percentA.toFixed(0).toString(),
-      percentB.toFixed(0).toString()
+      percentB.toFixed(0).toString(),
+    ];
+
+    const overrides = await getOverrides(
+      params.overrides,
+      contract.estimateGas.removeLiquidity,
+      args
     );
+
+    const transaction = await contract.removeLiquidity(...args, overrides);
 
     try {
       const receipt = await transaction.wait();
@@ -329,6 +394,7 @@ export default class Helper implements IHelper {
   async doAddSingleLiquidity(params: {
     option: IOption;
     tokenBAmount: BigNumber;
+    overrides?: IHelperOverrides;
     callback?: Function | undefined;
   }): Promise<void> {
     const { option, tokenBAmount, callback } = params;
@@ -350,9 +416,17 @@ export default class Helper implements IHelper {
       this.address
     );
 
+    const args = [option.address, amountB.toFixed(0).toString()];
+
+    const overrides = await getOverrides(
+      params.overrides,
+      contract.estimateGas.mintAndAddLiquidityWithCollateral,
+      args
+    );
+
     const transaction = await contract.mintAndAddLiquidityWithCollateral(
-      option.address,
-      amountB.toFixed(0).toString()
+      ...args,
+      overrides
     );
 
     try {
@@ -366,6 +440,7 @@ export default class Helper implements IHelper {
   async doMint(params: {
     option: IOption;
     optionAmount: BigNumber;
+    overrides?: IHelperOverrides;
     callback?: Function | undefined;
   }): Promise<void> {
     const { option, optionAmount, callback } = params;
@@ -385,10 +460,15 @@ export default class Helper implements IHelper {
       this.address
     );
 
-    const transaction = await contract.mint(
-      option.address,
-      output.toFixed(0).toString()
+    const args = [option.address, output.toFixed(0).toString()];
+
+    const overrides = await getOverrides(
+      params.overrides,
+      contract.estimateGas.mint,
+      args
     );
+
+    const transaction = await contract.mint(...args, overrides);
     try {
       const receipt = await transaction.wait();
       (callback || _.noop)(null, receipt.transactionHash, receipt);
@@ -399,6 +479,7 @@ export default class Helper implements IHelper {
   async doUnmint(params: {
     option: IOption;
     optionAmount: BigNumber;
+    overrides?: IHelperOverrides;
     callback?: Function | undefined;
   }): Promise<void> {
     const { option, optionAmount, callback } = params;
@@ -415,7 +496,15 @@ export default class Helper implements IHelper {
       new BigNumber(10).pow(option.decimals!)
     );
 
-    const transaction = await contract.unmint(input.toFixed(0).toString());
+    const args = [input.toFixed(0).toString()];
+
+    const overrides = await getOverrides(
+      params.overrides,
+      contract.estimateGas.unmint,
+      args
+    );
+
+    const transaction = await contract.unmint(...args, overrides);
 
     try {
       const receipt = await transaction.wait();
@@ -427,6 +516,7 @@ export default class Helper implements IHelper {
   async doExerciseERC20(params: {
     option: IOption;
     optionAmount: BigNumber;
+    overrides?: IHelperOverrides;
     callback?: Function | undefined;
   }): Promise<void> {
     const { option, optionAmount, callback } = params;
@@ -443,7 +533,15 @@ export default class Helper implements IHelper {
 
     const contract = contracts.instances.option(this.signer!, option.address);
 
-    const transaction = await contract.exercise(input.toFixed(0).toString());
+    const args = [input.toFixed(0).toString()];
+
+    const overrides = await getOverrides(
+      params.overrides,
+      contract.estimateGas.exercise,
+      args
+    );
+
+    const transaction = await contract.exercise(...args, overrides);
 
     try {
       const receipt = await transaction.wait();
@@ -456,6 +554,7 @@ export default class Helper implements IHelper {
   async doExerciseUtility(params: {
     option: IOption;
     optionAmount: BigNumber;
+    overrides?: IHelperOverrides;
     callback?: Function | undefined;
   }): Promise<void> {
     const { option, optionAmount, callback } = params;
@@ -472,8 +571,15 @@ export default class Helper implements IHelper {
 
     const contract = contracts.instances.option(this.signer!, option.address);
 
+    const overrides = await getOverrides(
+      params.overrides,
+      contract.estimateGas.exerciseEth,
+      []
+    );
+
     const transaction = await contract.exerciseEth({
-      value: input,
+      ...overrides,
+      value: input.toFixed(0).toString(),
     });
 
     try {
@@ -486,6 +592,7 @@ export default class Helper implements IHelper {
 
   async doWithdraw(params: {
     option: IOption;
+    overrides?: IHelperOverrides;
     callback?: Function | undefined;
   }): Promise<void> {
     const { option, callback } = params;
@@ -496,7 +603,13 @@ export default class Helper implements IHelper {
 
     const contract = contracts.instances.option(this.signer!, option.address);
 
-    const transaction = await contract.withdraw();
+    const overrides = await getOverrides(
+      params.overrides,
+      contract.estimateGas.withdraw,
+      []
+    );
+
+    const transaction = await contract.withdraw(overrides);
 
     try {
       const receipt = await transaction.wait();
