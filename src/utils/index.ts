@@ -98,14 +98,16 @@ export async function getOverrides(
    * Gas limit, especially for sidechains
    */
 
-  if (!_.isNilOrEmptyString(gasLimit))
-    overrides.gasLimit =
-      gasLimit === true
-        ? (await estimate(...args))
-            .mul(120)
-            .div(100)
-            .toString()
-        : (gasLimit as BigNumber).toString();
+  try {
+    if (!_.isNilOrEmptyString(gasLimit))
+      overrides.gasLimit =
+        gasLimit === true
+          ? (await estimate(...args))
+              .mul(120)
+              .div(100)
+              .toString()
+          : (gasLimit as BigNumber).toString();
+  } catch (error) {}
 
   /**
    * Gas price is not handled yet
