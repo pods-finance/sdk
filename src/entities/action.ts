@@ -529,7 +529,7 @@ export default class Action implements IAction {
         expect(this.option?.strike?.decimals, "decimals (option strike)");
 
         const value: IValue = {
-          raw: new BigNumber(this.inputTokenB!),
+          raw: new BigNumber(this.outputTokenB!),
           humanized: new BigNumber(this.outputTokenB!).dividedBy(
             new BigNumber(10).pow(this.option!.strike!.decimals)
           ),
@@ -560,7 +560,7 @@ export default class Action implements IAction {
         expect(this.option?.strike?.decimals, "decimals (option strike)");
 
         const value: IValue = {
-          raw: new BigNumber(this.inputTokenB!),
+          raw: new BigNumber(this.outputTokenB!),
           humanized: new BigNumber(this.outputTokenB!).dividedBy(
             new BigNumber(10).pow(this.option!.strike!.decimals)
           ),
