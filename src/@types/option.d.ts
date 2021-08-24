@@ -33,9 +33,29 @@ export interface IOption {
     [key: string]: number | string | boolean | null | undefined;
   };
 
+  /**
+   * Get the total supply representing the amount of options that have already been minted
+   *
+   * @param params
+   * @returns {IValue}
+   */
   getTotalSupply(params?: { provider?: IProvider }): Promise<IValue>;
+
+  /**
+   *
+   * Get the cap representing the maximum allowed amount of options that can be minted
+   *
+   * @param params
+   * @returns {IValue}
+   */
   getCap(params: { manager: string; provider?: IProvider }): Promise<IValue>;
 
+  /**
+   * Get the amount of options that have already been minted by a specific user
+   *
+   * @param params
+   * @returns {IValue}
+   */
   getUserMintedOptions(params: {
     user: string;
     provider?: IProvider;
