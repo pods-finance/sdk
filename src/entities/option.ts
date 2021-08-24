@@ -287,6 +287,7 @@ export default class Option implements IOption {
   }
 
   async getTotalSupply(params: { provider?: IProvider } = {}): Promise<IValue> {
+    expect(this.decimals, "decimals");
     expect(this.provider || params.provider, "provider");
 
     try {
@@ -298,7 +299,9 @@ export default class Option implements IOption {
 
       const supply: IValue = {
         raw: new BigNumber(result.toString()),
-        humanized: new BigNumber(result.toString()),
+        humanized: new BigNumber(result.toString()).dividedBy(
+          new BigNumber(10).pow(this.decimals!)
+        ),
       };
 
       return supply;
@@ -314,6 +317,7 @@ export default class Option implements IOption {
   }): Promise<IValue> {
     const { manager, provider } = params;
 
+    expect(this.decimals, "decimals");
     expect(this.provider || provider, "provider");
     expect(manager, "manager (address)");
 
@@ -332,7 +336,9 @@ export default class Option implements IOption {
 
       const size: IValue = {
         raw: new BigNumber(result.toString()),
-        humanized: new BigNumber(result.toString()),
+        humanized: new BigNumber(result.toString()).dividedBy(
+          new BigNumber(10).pow(this.decimals!)
+        ),
       };
 
       return size;
