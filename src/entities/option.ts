@@ -41,6 +41,7 @@ export default class Option implements IOption {
   private _decimals?: BigNumber;
   private _underlying?: IToken;
   private _strike?: IToken;
+  private _collateral?: IToken;
   private _type: OptionType = OptionType.Put;
   private _strikePrice?: IValue;
   private _expiration?: number;
@@ -94,6 +95,13 @@ export default class Option implements IOption {
   }
   public set strike(value: Optional<IToken>) {
     this._strike = value;
+  }
+
+  public get collateral(): Optional<IToken> {
+    return this._collateral;
+  }
+  public set collateral(value: Optional<IToken>) {
+    this._collateral = value;
   }
 
   public get type(): OptionType {
@@ -172,6 +180,8 @@ export default class Option implements IOption {
       decimals: params.strikeAssetDecimals,
       networkId: this.networkId,
     });
+
+    this._collateral = params.type ? this.underlying : this.strike;
 
     this.strikePrice = {
       raw: params.strikePrice,

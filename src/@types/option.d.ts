@@ -17,6 +17,7 @@ export interface IOption {
   decimals?: BigNumber;
   underlying?: IToken;
   strike?: IToken;
+  collateral?: IToken;
   type?: OptionType;
   strikePrice?: IValue;
   expiration?: number;
