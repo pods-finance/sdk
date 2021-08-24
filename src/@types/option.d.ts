@@ -12,6 +12,9 @@ export interface IOption {
   readonly address: string;
   readonly networkId: number;
 
+  readonly isPut: boolean;
+  readonly isCall: boolean;
+
   provider?: IProvider;
   symbol?: string;
   decimals?: BigNumber;

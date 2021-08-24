@@ -266,38 +266,81 @@ export default class Action implements IAction {
     expect(this.type, "type");
     expect(this.option, "option");
 
-    if (
-      [
-        ActionType.Resell,
-        ActionType.AddLiquidity,
-        ActionType.Unmint,
-        ActionType.TransferFrom,
-      ].includes(this.type)
-    ) {
-      expect(
-        this.option?.pool?.tokenA?.decimals,
-        "decimals (option pool tokenA)"
-      );
+    if (this.option!.isPut) {
+      if (
+        [
+          ActionType.Resell,
+          ActionType.AddLiquidity,
+          ActionType.Unmint,
+          ActionType.TransferFrom,
+        ].includes(this.type)
+      ) {
+        expect(
+          this.option?.pool?.tokenA?.decimals,
+          "decimals (option pool tokenA)"
+        );
 
-      const value: IValue = {
-        raw: new BigNumber(this.inputTokenA!),
-        humanized: new BigNumber(this.inputTokenA!).dividedBy(
-          new BigNumber(10).pow(this.option!.pool!.tokenA!.decimals)
-        ),
-      };
+        const value: IValue = {
+          raw: new BigNumber(this.inputTokenA!),
+          humanized: new BigNumber(this.inputTokenA!).dividedBy(
+            new BigNumber(10).pow(this.option!.pool!.tokenA!.decimals)
+          ),
+        };
 
-      return value;
-    } else if ([ActionType.Exercise].includes(this.type)) {
-      expect(this.option?.underlying?.decimals, "decimals (option underlying)");
+        return value;
+      } else if ([ActionType.Exercise].includes(this.type)) {
+        expect(
+          this.option?.underlying?.decimals,
+          "decimals (option underlying)"
+        );
 
-      const value: IValue = {
-        raw: new BigNumber(this.inputTokenA!),
-        humanized: new BigNumber(this.inputTokenA!).dividedBy(
-          new BigNumber(10).pow(this.option!.underlying!.decimals)
-        ),
-      };
+        const value: IValue = {
+          raw: new BigNumber(this.inputTokenA!),
+          humanized: new BigNumber(this.inputTokenA!).dividedBy(
+            new BigNumber(10).pow(this.option!.underlying!.decimals)
+          ),
+        };
 
-      return value;
+        return value;
+      }
+    } else if (this.option?.isCall) {
+      if (
+        [
+          ActionType.Resell,
+          ActionType.AddLiquidity,
+          ActionType.Unmint,
+          ActionType.TransferFrom,
+          ActionType.Exercise,
+        ].includes(this.type)
+      ) {
+        expect(
+          this.option?.pool?.tokenA?.decimals,
+          "decimals (option pool tokenA)"
+        );
+
+        const value: IValue = {
+          raw: new BigNumber(this.inputTokenA!),
+          humanized: new BigNumber(this.inputTokenA!).dividedBy(
+            new BigNumber(10).pow(this.option!.pool!.tokenA!.decimals)
+          ),
+        };
+
+        return value;
+      } else if ([ActionType.Sell, ActionType.Mint].includes(this.type)) {
+        expect(
+          this.option?.collateral?.decimals,
+          "decimals (option collateral)"
+        );
+
+        const value: IValue = {
+          raw: new BigNumber(this.inputTokenA!),
+          humanized: new BigNumber(this.inputTokenA!).dividedBy(
+            new BigNumber(10).pow(this.option!.collateral!.decimals)
+          ),
+        };
+
+        return value;
+      }
     }
 
     return zero;
@@ -308,33 +351,62 @@ export default class Action implements IAction {
     expect(this.type, "type");
     expect(this.option, "option");
 
-    if ([ActionType.AddLiquidity].includes(this.type)) {
-      expect(
-        this.option?.pool?.tokenB?.decimals,
-        "decimals (option pool tokenB)"
-      );
+    if (this.option!.isPut) {
+      if ([ActionType.AddLiquidity].includes(this.type)) {
+        expect(
+          this.option?.pool?.tokenB?.decimals,
+          "decimals (option pool tokenB)"
+        );
 
-      const value: IValue = {
-        raw: new BigNumber(this.inputTokenB!),
-        humanized: new BigNumber(this.inputTokenB!).dividedBy(
-          new BigNumber(10).pow(this.option!.pool!.tokenB!.decimals)
-        ),
-      };
+        const value: IValue = {
+          raw: new BigNumber(this.inputTokenB!),
+          humanized: new BigNumber(this.inputTokenB!).dividedBy(
+            new BigNumber(10).pow(this.option!.pool!.tokenB!.decimals)
+          ),
+        };
 
-      return value;
-    } else if (
-      [ActionType.Buy, ActionType.Sell, ActionType.Mint].includes(this.type)
-    ) {
-      expect(this.option?.strike?.decimals, "decimals (option strike)");
+        return value;
+      } else if (
+        [ActionType.Buy, ActionType.Sell, ActionType.Mint].includes(this.type)
+      ) {
+        expect(this.option?.strike?.decimals, "decimals (option strike)");
 
-      const value: IValue = {
-        raw: new BigNumber(this.inputTokenB!),
-        humanized: new BigNumber(this.inputTokenB!).dividedBy(
-          new BigNumber(10).pow(this.option!.strike!.decimals)
-        ),
-      };
+        const value: IValue = {
+          raw: new BigNumber(this.inputTokenB!),
+          humanized: new BigNumber(this.inputTokenB!).dividedBy(
+            new BigNumber(10).pow(this.option!.strike!.decimals)
+          ),
+        };
 
-      return value;
+        return value;
+      }
+    } else if (this.option!.isCall) {
+      if ([ActionType.AddLiquidity].includes(this.type)) {
+        expect(
+          this.option?.pool?.tokenB?.decimals,
+          "decimals (option pool tokenB)"
+        );
+
+        const value: IValue = {
+          raw: new BigNumber(this.inputTokenB!),
+          humanized: new BigNumber(this.inputTokenB!).dividedBy(
+            new BigNumber(10).pow(this.option!.pool!.tokenB!.decimals)
+          ),
+        };
+
+        return value;
+      } else if ([ActionType.Buy, ActionType.Exercise].includes(this.type)) {
+        expect(this.option?.strike?.decimals, "decimals (option strike)");
+
+        const value: IValue = {
+          raw: new BigNumber(this.inputTokenB!),
+          humanized: new BigNumber(this.inputTokenB!).dividedBy(
+            new BigNumber(10).pow(this.option!.strike!.decimals)
+          ),
+        };
+
+        return value;
+      }
     }
 
     return zero;
@@ -344,41 +416,85 @@ export default class Action implements IAction {
     expect(this.outputTokenA, "outputTokenA");
     expect(this.type, "type");
     expect(this.option, "option");
+    if (this.option!.isPut) {
+      if (
+        [
+          ActionType.Buy,
+          ActionType.Mint,
+          ActionType.RemoveLiquidity,
+          ActionType.TransferTo,
+        ].includes(this.type)
+      ) {
+        expect(
+          this.option?.pool?.tokenA?.decimals,
+          "decimals (option pool tokenA)"
+        );
 
-    if (
-      [
-        ActionType.Buy,
-        ActionType.Mint,
-        ActionType.RemoveLiquidity,
-        ActionType.TransferTo,
-      ].includes(this.type)
-    ) {
-      expect(
-        this.option?.pool?.tokenA?.decimals,
-        "decimals (option pool tokenA)"
-      );
+        const value: IValue = {
+          raw: new BigNumber(this.outputTokenA!),
+          humanized: new BigNumber(this.outputTokenA!).dividedBy(
+            new BigNumber(10).pow(this.option!.pool!.tokenA!.decimals)
+          ),
+        };
 
-      const value: IValue = {
-        raw: new BigNumber(this.outputTokenA!),
-        humanized: new BigNumber(this.outputTokenA!).dividedBy(
-          new BigNumber(10).pow(this.option!.pool!.tokenA!.decimals)
-        ),
-      };
+        return value;
+      } else if ([ActionType.Withdraw].includes(this.type)) {
+        expect(
+          this.option?.underlying?.decimals,
+          "decimals (option underlying)"
+        );
 
-      return value;
-    } else if ([ActionType.Withdraw].includes(this.type)) {
-      expect(this.option?.underlying?.decimals, "decimals (option underlying)");
+        const value: IValue = {
+          raw: new BigNumber(this.outputTokenA!),
+          humanized: new BigNumber(this.outputTokenA!).dividedBy(
+            new BigNumber(10).pow(this.option!.underlying!.decimals)
+          ),
+        };
 
-      const value: IValue = {
-        raw: new BigNumber(this.outputTokenA!),
-        humanized: new BigNumber(this.outputTokenA!).dividedBy(
-          new BigNumber(10).pow(this.option!.underlying!.decimals)
-        ),
-      };
+        return value;
+      }
+    } else if (this.option!.isCall) {
+      if (
+        [
+          ActionType.Buy,
+          ActionType.Mint,
+          ActionType.RemoveLiquidity,
+          ActionType.TransferTo,
+        ].includes(this.type)
+      ) {
+        expect(
+          this.option?.pool?.tokenA?.decimals,
+          "decimals (option pool tokenA)"
+        );
 
-      return value;
+        const value: IValue = {
+          raw: new BigNumber(this.outputTokenA!),
+          humanized: new BigNumber(this.outputTokenA!).dividedBy(
+            new BigNumber(10).pow(this.option!.pool!.tokenA!.decimals)
+          ),
+        };
+
+        return value;
+      } else if (
+        [ActionType.Withdraw, ActionType.Exercise, ActionType.Unmint].includes(
+          this.type
+        )
+      ) {
+        expect(
+          this.option?.collateral?.decimals,
+          "decimals (option collateral)"
+        );
+
+        const value: IValue = {
+          raw: new BigNumber(this.outputTokenA!),
+          humanized: new BigNumber(this.outputTokenA!).dividedBy(
+            new BigNumber(10).pow(this.option!.collateral!.decimals)
+          ),
+        };
+
+        return value;
+      }
     }
-
     return zero;
   }
 
@@ -386,40 +502,72 @@ export default class Action implements IAction {
     expect(this.outputTokenB, "outputTokenB");
     expect(this.type, "type");
     expect(this.option, "option");
+    if (this.option!.isPut) {
+      if ([ActionType.RemoveLiquidity].includes(this.type)) {
+        expect(
+          this.option?.pool?.tokenB?.decimals,
+          "decimals (option pool tokenB)"
+        );
 
-    if ([ActionType.RemoveLiquidity].includes(this.type)) {
-      expect(
-        this.option?.pool?.tokenB?.decimals,
-        "decimals (option pool tokenB)"
-      );
+        const value: IValue = {
+          raw: new BigNumber(this.outputTokenB!),
+          humanized: new BigNumber(this.outputTokenB!).dividedBy(
+            new BigNumber(10).pow(this.option!.pool!.tokenB!.decimals)
+          ),
+        };
 
-      const value: IValue = {
-        raw: new BigNumber(this.outputTokenB!),
-        humanized: new BigNumber(this.outputTokenB!).dividedBy(
-          new BigNumber(10).pow(this.option!.pool!.tokenB!.decimals)
-        ),
-      };
+        return value;
+      } else if (
+        [
+          ActionType.Sell,
+          ActionType.Resell,
+          ActionType.Unmint,
+          ActionType.Exercise,
+          ActionType.Withdraw,
+        ].includes(this.type)
+      ) {
+        expect(this.option?.strike?.decimals, "decimals (option strike)");
 
-      return value;
-    } else if (
-      [
-        ActionType.Sell,
-        ActionType.Resell,
-        ActionType.Unmint,
-        ActionType.Exercise,
-        ActionType.Withdraw,
-      ].includes(this.type)
-    ) {
-      expect(this.option?.strike?.decimals, "decimals (option strike)");
+        const value: IValue = {
+          raw: new BigNumber(this.inputTokenB!),
+          humanized: new BigNumber(this.outputTokenB!).dividedBy(
+            new BigNumber(10).pow(this.option!.strike!.decimals)
+          ),
+        };
 
-      const value: IValue = {
-        raw: new BigNumber(this.inputTokenB!),
-        humanized: new BigNumber(this.outputTokenB!).dividedBy(
-          new BigNumber(10).pow(this.option!.strike!.decimals)
-        ),
-      };
+        return value;
+      }
+    } else if (this.option!.isCall) {
+      if ([ActionType.RemoveLiquidity].includes(this.type)) {
+        expect(
+          this.option?.pool?.tokenB?.decimals,
+          "decimals (option pool tokenB)"
+        );
 
-      return value;
+        const value: IValue = {
+          raw: new BigNumber(this.outputTokenB!),
+          humanized: new BigNumber(this.outputTokenB!).dividedBy(
+            new BigNumber(10).pow(this.option!.pool!.tokenB!.decimals)
+          ),
+        };
+
+        return value;
+      } else if (
+        [ActionType.Sell, ActionType.Resell, ActionType.Withdraw].includes(
+          this.type
+        )
+      ) {
+        expect(this.option?.strike?.decimals, "decimals (option strike)");
+
+        const value: IValue = {
+          raw: new BigNumber(this.inputTokenB!),
+          humanized: new BigNumber(this.outputTokenB!).dividedBy(
+            new BigNumber(10).pow(this.option!.strike!.decimals)
+          ),
+        };
+
+        return value;
+      }
     }
 
     return zero;

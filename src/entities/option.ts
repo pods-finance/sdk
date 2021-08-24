@@ -153,6 +153,14 @@ export default class Option implements IOption {
     this._poolAddress = value;
   }
 
+  public get isPut(): boolean {
+    return this.type === OptionType.Put;
+  }
+
+  public get isCall(): boolean {
+    return this.type === OptionType.Call;
+  }
+
   /**
    * ---------- CONSTRUCTOR & METHODS ----------
    */
