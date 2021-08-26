@@ -21,7 +21,7 @@ export interface IPosition {
   readonly optionsReceived: BigNumber;
 
   readonly underlyingWithdrawn: BigNumber;
-  readonly collateralWithdrawn: BigNumber;
+  readonly strikeWithdrawn: BigNumber;
 
   readonly initialOptionsProvided: BigNumber;
   readonly initialTokensProvided: BigNumber;
@@ -50,7 +50,7 @@ export interface IPosition {
   getOptionsReceivedValue(): IValue;
 
   getUnderlyingWithdrawnValue(): IValue;
-  getCollateralWithdrawnValue(): IValue;
+  getStrikeWithdrawnValue(): IValue;
 
   getInitialOptionsProvidedValue(): IValue;
   getInitialTokensProvidedValue(): IValue;

@@ -5,6 +5,11 @@ export enum OptionType {
   Call = 1,
 }
 
+export enum OptionExerciseType {
+  European = 0,
+  American = 1,
+}
+
 export enum ActionType {
   Buy = "Buy",
   Sell = "Sell",

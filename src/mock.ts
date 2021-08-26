@@ -196,6 +196,32 @@ async function flowMulticall(
   });
 }
 
+async function flowMulticallStatics(): Promise<void> {
+  const provider = clients.provider.getBaseProvider(42, {
+    infura: process.env.TESTING_INFURA_KEY || "",
+  });
+
+  const options = await Multicall.getOptionsStatics({
+    provider,
+    addresses: ["0x057d924eadc7d40b794fe5b366ab32a54a40f816"],
+  });
+
+  const tokens = await Multicall.getTokenSymbols({
+    provider,
+    addresses: [
+      "0x824B1E309c4eB33501fB49f5de9Cb7481686a799",
+      "0xe22da380ee6B445bb8273C81944ADEB6E8450422",
+    ],
+  });
+
+  const pools = await Multicall.getPoolStatics({
+    provider,
+    addresses: ["0x5d23da35e307f38baa260cb3f598e99d15337457"],
+  });
+
+  console.log(options, pools, tokens);
+}
+
 const tests = {
   tokens,
   subgraphActions,
@@ -203,8 +229,9 @@ const tests = {
   flowLive,
   flowActions,
   flowMulticall,
+  flowMulticallStatics,
 };
 
 export async function main() {
-  await tests.flowMulticall();
+  await tests.flowMulticallStatics();
 }

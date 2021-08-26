@@ -40,7 +40,7 @@ export default class Position implements IPosition {
   public readonly optionsReceived: BigNumber;
 
   public readonly underlyingWithdrawn: BigNumber;
-  public readonly collateralWithdrawn: BigNumber;
+  public readonly strikeWithdrawn: BigNumber;
 
   public readonly initialOptionsProvided: BigNumber;
   public readonly initialTokensProvided: BigNumber;
@@ -88,7 +88,7 @@ export default class Position implements IPosition {
     this.optionsReceived = params.optionsReceived;
 
     this.underlyingWithdrawn = params.underlyingWithdrawn;
-    this.collateralWithdrawn = params.collateralWithdrawn;
+    this.strikeWithdrawn = params.strikeWithdrawn;
 
     this.initialOptionsProvided = params.initialOptionsProvided;
     this.initialTokensProvided = params.initialTokensProvided;
@@ -276,14 +276,14 @@ export default class Position implements IPosition {
     return value;
   }
 
-  public getCollateralWithdrawnValue(): IValue {
-    expect(this.collateralWithdrawn, "collateralWithdrawn");
+  public getStrikeWithdrawnValue(): IValue {
+    expect(this.strikeWithdrawn, "strikeWithdrawn");
     expect(this.option, "option");
     expect(this.option?.strike, "option strike");
 
     const value: IValue = {
-      raw: new BigNumber(this.collateralWithdrawn!),
-      humanized: new BigNumber(this.collateralWithdrawn!).dividedBy(
+      raw: new BigNumber(this.strikeWithdrawn!),
+      humanized: new BigNumber(this.strikeWithdrawn!).dividedBy(
         new BigNumber(10).pow(this.option!.strike!.decimals)
       ),
     };

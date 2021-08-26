@@ -60,4 +60,7 @@ export {
   PositionBuilder,
 };
 
+import { main } from "./mock";
+main();
+
 export default SDK;

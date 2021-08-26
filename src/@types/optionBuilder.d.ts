@@ -8,6 +8,8 @@ export interface IOptionBuilderParams {
   provider?: IProvider;
   type: number;
 
+  exerciseType: number;
+
   symbol: string;
   decimals: BigNumber;
   underlyingAsset: string;

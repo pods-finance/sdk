@@ -20,7 +20,7 @@ export interface IPositionBuilderParams {
   optionsReceived: BigNumber;
 
   underlyingWithdrawn: BigNumber;
-  collateralWithdrawn: BigNumber;
+  strikeWithdrawn: BigNumber;
 
   initialOptionsProvided: BigNumber;
   initialTokensProvided: BigNumber;
