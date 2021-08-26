@@ -17,6 +17,7 @@ import {
 } from "@types";
 import {
   OptionType,
+  OptionExerciseType,
   MILESTONE_EXPIRATION_SOON,
   ALLOW_LOGS,
 } from "../constants/globals";
@@ -43,6 +44,7 @@ export default class Option implements IOption {
   private _strike?: IToken;
   private _collateral?: IToken;
   private _type: OptionType = OptionType.Put;
+  private _exerciseType: OptionExerciseType = OptionExerciseType.European;
   private _strikePrice?: IValue;
   private _expiration?: number;
   private _exerciseStart?: number;
@@ -111,6 +113,13 @@ export default class Option implements IOption {
     this._type = value;
   }
 
+  public get exerciseType(): OptionExerciseType {
+    return this._exerciseType;
+  }
+  public set exerciseType(value: OptionExerciseType) {
+    this._exerciseType = value;
+  }
+
   public get strikePrice(): Optional<IValue> {
     return this._strikePrice;
   }
@@ -172,6 +181,10 @@ export default class Option implements IOption {
 
   init(params: IOptionBuilderParams): IOption {
     this.type = params.type ? OptionType.Call : OptionType.Put;
+    this.exerciseType = params.exerciseType
+      ? OptionExerciseType.American
+      : OptionExerciseType.European;
+
     this.symbol = params.symbol;
     this.decimals = params.decimals || 18;
     this.provider = params.provider;

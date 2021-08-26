@@ -9,12 +9,16 @@ export const OptionFragment = gql`
     id
     from
     type
+    exerciseType
     underlyingAsset
     underlyingAssetDecimals
     underlyingAssetSymbol
     strikeAsset
     strikeAssetDecimals
     strikeAssetSymbol
+    collateralAsset
+    collateralAssetDecimals
+    collateralAssetSymbol
     strikePrice
     expiration
     exerciseWindowSize
@@ -198,7 +202,7 @@ export const PositionFragment = gql`
     optionsUnminted
     optionsExercised
     underlyingWithdrawn
-    collateralWithdrawn
+    strikeWithdrawn
     initialOptionsProvided
     initialTokensProvided
     finalOptionsRemoved
