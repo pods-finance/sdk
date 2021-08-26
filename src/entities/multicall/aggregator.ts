@@ -236,8 +236,6 @@ export default class MulticallAggregator {
     const { provider, options } = params;
     const calls: CallContext[] = [];
 
-    console.log({ provider });
-
     options.forEach((option) => {
       try {
         expect(option?.pool?.tokenA, "option pool tokenA");
