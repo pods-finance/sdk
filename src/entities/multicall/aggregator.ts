@@ -20,7 +20,7 @@ import {
 import { ALLOW_LOGS } from "../../constants/globals";
 import { expect } from "../../utils";
 
-import MulticallInterpreter from "./interpreter";
+import MulticallParser from "./parser";
 import MulticallEngine from "./engine";
 
 export default class MulticallAggregator {
@@ -316,44 +316,40 @@ export default class MulticallAggregator {
           const reference = result.reference;
           switch (reference) {
             case "sellingPrice":
-              metrics.sellingPrice = MulticallInterpreter.interpretSellingPrice(
-                {
-                  pool,
-                  result,
-                }
-              );
+              metrics.sellingPrice = MulticallParser.interpretSellingPrice({
+                pool,
+                result,
+              });
               break;
             case "buyingPrice":
-              metrics.buyingPrice = MulticallInterpreter.interpretBuyingPrice({
+              metrics.buyingPrice = MulticallParser.interpretBuyingPrice({
                 pool,
                 result,
               });
               break;
             case "abPrice":
-              metrics.abPrice = MulticallInterpreter.interpretABPrice({
+              metrics.abPrice = MulticallParser.interpretABPrice({
                 pool,
                 result,
               });
               break;
             case "IV":
-              metrics.IV = MulticallInterpreter.interpretIV({
+              metrics.IV = MulticallParser.interpretIV({
                 pool,
                 result,
               });
               break;
             case "adjustedIV":
-              metrics.adjustedIV = MulticallInterpreter.interpretAdjustedIV({
+              metrics.adjustedIV = MulticallParser.interpretAdjustedIV({
                 pool,
                 result,
               });
               break;
             case "totalBalances":
-              metrics.totalBalances = MulticallInterpreter.interpretTotalBalances(
-                {
-                  pool,
-                  result,
-                }
-              );
+              metrics.totalBalances = MulticallParser.interpretTotalBalances({
+                pool,
+                result,
+              });
               break;
             default:
               break;
@@ -479,16 +475,14 @@ export default class MulticallAggregator {
 
           switch (reference) {
             case "userPositions":
-              metrics.userPositions = MulticallInterpreter.interpretUserPositions(
-                {
-                  pool,
-                  result,
-                }
-              );
+              metrics.userPositions = MulticallParser.interpretUserPositions({
+                pool,
+                result,
+              });
               break;
 
             case "userOptionWithdrawAmounts":
-              metrics.userOptionWithdrawAmounts = MulticallInterpreter.interpretUserOptionWithdrawAmounts(
+              metrics.userOptionWithdrawAmounts = MulticallParser.interpretUserOptionWithdrawAmounts(
                 {
                   option,
                   result,
@@ -497,7 +491,7 @@ export default class MulticallAggregator {
               break;
 
             case "userOptionMintedAmount":
-              metrics.userOptionMintedAmount = MulticallInterpreter.interpretUserOptionMintedAmount(
+              metrics.userOptionMintedAmount = MulticallParser.interpretUserOptionMintedAmount(
                 {
                   option,
                   result,
@@ -506,7 +500,7 @@ export default class MulticallAggregator {
               break;
 
             case "userOptionBalance":
-              metrics.userOptionBalance = MulticallInterpreter.interpretUserOptionBalance(
+              metrics.userOptionBalance = MulticallParser.interpretUserOptionBalance(
                 {
                   option,
                   result,

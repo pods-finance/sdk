@@ -4,4 +4,4 @@ export { default as Option } from "./option";
 export { default as Pool } from "./pool";
 export { default as Position } from "./position";
 export { default as Token } from "./token";
-export { default as Multicall } from "./multicall";
+export { default as Multicall } from "./multicall/index";

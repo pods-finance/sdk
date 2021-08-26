@@ -8,7 +8,7 @@ import { IOption, IPool, IValue } from "@types";
 import { ALLOW_LOGS } from "../../constants/globals";
 import { expect, zero } from "../../utils";
 
-export default class Interpreter {
+export default class Parser {
   public static interpretBuyingPrice(params: {
     result: Result;
     pool: IPool;

@@ -9,6 +9,9 @@ export interface IToken {
   readonly name: string;
   readonly networkId: number;
 
+  isUtility(): boolean;
+  isUtilityWrapped(): boolean;
+
   getBalance(params: {
     provider: IProvider;
     owner: string;

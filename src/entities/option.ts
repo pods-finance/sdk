@@ -162,14 +162,6 @@ export default class Option implements IOption {
     this._poolAddress = value;
   }
 
-  public get isPut(): boolean {
-    return this.type === OptionType.Put;
-  }
-
-  public get isCall(): boolean {
-    return this.type === OptionType.Call;
-  }
-
   /**
    * ---------- CONSTRUCTOR & METHODS ----------
    */
@@ -221,6 +213,14 @@ export default class Option implements IOption {
     this.poolAddress = _.toString(params.poolAddress).toLowerCase();
 
     return this as IOption;
+  }
+
+  isPut(): boolean {
+    return this.type === OptionType.Put;
+  }
+
+  isCall(): boolean {
+    return this.type === OptionType.Call;
   }
 
   getDurations(): {

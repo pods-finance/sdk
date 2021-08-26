@@ -164,6 +164,10 @@ export default class Helper implements IHelper {
     }
   }
 
+  /**
+   * Mint and sell an exact amount of options, labeled as "writing" in the app
+   * @param params
+   */
   async doMintAndSellExact(params: {
     option: IOption;
     optionAmount: BigNumber;
@@ -407,6 +411,11 @@ export default class Helper implements IHelper {
     expect(option.pool?.tokenB?.decimals, "decimals (option pool tokenB)");
     expect(tokenBAmount, "tokenBAmount", "object");
 
+    if (option.isCall())
+      throw new Error(
+        "Adding liquidity with a single asset is not allowed for calls."
+      );
+
     const amountB = new BigNumber(tokenBAmount).multipliedBy(
       new BigNumber(10).pow(option.pool!.tokenB!.decimals)
     );
@@ -449,7 +458,13 @@ export default class Helper implements IHelper {
     expect(this.signer, "signer");
     expect(option, "option");
     expect(option.decimals, "decimals");
+    expect(option.collateral, "collateral (option)");
     expect(optionAmount, "optionAmount", "object");
+
+    if (option.isCall() && option.collateral!.isUtility())
+      throw new Error(
+        "Minting from the Option Helper with utility tokens (e.g. ETH, MATIC) is not allowed for calls. Please interact with the option contract itself."
+      );
 
     const output = new BigNumber(optionAmount).multipliedBy(
       new BigNumber(10).pow(option.decimals!)
@@ -476,6 +491,7 @@ export default class Helper implements IHelper {
       (callback || _.noop)(error, error.transactionHash);
     }
   }
+
   async doUnmint(params: {
     option: IOption;
     optionAmount: BigNumber;

@@ -266,7 +266,7 @@ export default class Action implements IAction {
     expect(this.type, "type");
     expect(this.option, "option");
 
-    if (this.option!.isPut) {
+    if (this.option!.isPut()) {
       if (
         [
           ActionType.Resell,
@@ -303,7 +303,7 @@ export default class Action implements IAction {
 
         return value;
       }
-    } else if (this.option?.isCall) {
+    } else if (this.option?.isCall()) {
       if (
         [
           ActionType.Resell,
@@ -351,7 +351,7 @@ export default class Action implements IAction {
     expect(this.type, "type");
     expect(this.option, "option");
 
-    if (this.option!.isPut) {
+    if (this.option!.isPut()) {
       if ([ActionType.AddLiquidity].includes(this.type)) {
         expect(
           this.option?.pool?.tokenB?.decimals,
@@ -380,7 +380,7 @@ export default class Action implements IAction {
 
         return value;
       }
-    } else if (this.option!.isCall) {
+    } else if (this.option!.isCall()) {
       if ([ActionType.AddLiquidity].includes(this.type)) {
         expect(
           this.option?.pool?.tokenB?.decimals,
@@ -416,7 +416,7 @@ export default class Action implements IAction {
     expect(this.outputTokenA, "outputTokenA");
     expect(this.type, "type");
     expect(this.option, "option");
-    if (this.option!.isPut) {
+    if (this.option!.isPut()) {
       if (
         [
           ActionType.Buy,
@@ -453,7 +453,7 @@ export default class Action implements IAction {
 
         return value;
       }
-    } else if (this.option!.isCall) {
+    } else if (this.option!.isCall()) {
       if (
         [
           ActionType.Buy,
@@ -502,7 +502,7 @@ export default class Action implements IAction {
     expect(this.outputTokenB, "outputTokenB");
     expect(this.type, "type");
     expect(this.option, "option");
-    if (this.option!.isPut) {
+    if (this.option!.isPut()) {
       if ([ActionType.RemoveLiquidity].includes(this.type)) {
         expect(
           this.option?.pool?.tokenB?.decimals,
@@ -537,7 +537,7 @@ export default class Action implements IAction {
 
         return value;
       }
-    } else if (this.option!.isCall) {
+    } else if (this.option!.isCall()) {
       if ([ActionType.RemoveLiquidity].includes(this.type)) {
         expect(
           this.option?.pool?.tokenB?.decimals,

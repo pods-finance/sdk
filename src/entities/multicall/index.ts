@@ -1,5 +1,5 @@
-import MulticallAggregator from "./helper/aggregator";
-import MulticallEngine from "./helper/engine";
+import MulticallAggregator from "./aggregator";
+import MulticallEngine from "./engine";
 
 const Multicall = {
   use: MulticallEngine.use,

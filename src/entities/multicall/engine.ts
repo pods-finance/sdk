@@ -73,7 +73,6 @@ export default class MulticallEngine {
 
       results.forEach((result: Result) => {
         const reference = _.get(result, "reference");
-
         const status = _.get(result, "success");
         const values = _.get(result, "returnValues");
 
