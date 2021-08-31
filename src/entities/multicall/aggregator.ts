@@ -394,7 +394,7 @@ export default class MulticallAggregator {
               methodParameters: [
                 new BigNumber(100).toString(),
                 new BigNumber(100).toString(),
-                user,
+                _.toString(user).toLowerCase(),
               ],
             },
           ],
@@ -411,12 +411,12 @@ export default class MulticallAggregator {
             {
               reference: "userOptionWithdrawAmounts",
               methodName: "getSellerWithdrawAmounts",
-              methodParameters: [user],
+              methodParameters: [_.toString(user).toLowerCase()],
             },
             {
               reference: "userOptionMintedAmount",
               methodName: "mintedOptions",
-              methodParameters: [user],
+              methodParameters: [_.toString(user).toLowerCase()],
             },
           ],
         };
@@ -432,7 +432,7 @@ export default class MulticallAggregator {
             {
               reference: "userOptionBalance",
               methodName: "balanceOf",
-              methodParameters: [user],
+              methodParameters: [_.toString(user).toLowerCase()],
             },
           ],
         };

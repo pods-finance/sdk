@@ -9,6 +9,13 @@ import { ALLOW_LOGS } from "../../constants/globals";
 import { expect, zero } from "../../utils";
 
 export default class Parser {
+  /**
+   *
+   * Errors have been suppressed from pricing methods
+   *
+   * @param params
+   * @returns
+   */
   public static interpretBuyingPrice(params: {
     result: Result;
     pool: IPool;
@@ -51,7 +58,7 @@ export default class Parser {
 
       return { value, feesA, feesB };
     } catch (error) {
-      if (ALLOW_LOGS()) console.error("Pods SDK - Multicall", error);
+      if (false && ALLOW_LOGS()) console.error("Pods SDK - Multicall", error);
     }
 
     return { value: zero, feesA: zero, feesB: zero };
@@ -100,7 +107,7 @@ export default class Parser {
 
       return { value, feesA, feesB };
     } catch (error) {
-      if (ALLOW_LOGS()) console.error("Pods SDK - Multicall", error);
+      if (false && ALLOW_LOGS()) console.error("Pods SDK - Multicall", error);
     }
 
     return { value: zero, feesA: zero, feesB: zero };
@@ -133,7 +140,7 @@ export default class Parser {
 
       return { value };
     } catch (error) {
-      if (ALLOW_LOGS()) console.error("Pods SDK - Multicall", error);
+      if (false && ALLOW_LOGS()) console.error("Pods SDK - Multicall", error);
     }
 
     return { value: zero };
@@ -161,7 +168,7 @@ export default class Parser {
 
       return value;
     } catch (error) {
-      if (ALLOW_LOGS()) console.error("Pods SDK - Multicall", error);
+      if (ALLOW_LOGS()) console.error("Pods SDK - Multicall", error, params);
     }
 
     return zero;
@@ -194,7 +201,7 @@ export default class Parser {
 
       return value;
     } catch (error) {
-      if (ALLOW_LOGS()) console.error("Pods SDK - Multicall", error);
+      if (ALLOW_LOGS()) console.error("Pods SDK - Multicall", error, params);
     }
 
     return zero;
@@ -238,7 +245,7 @@ export default class Parser {
 
       return [TBA, TBB];
     } catch (error) {
-      if (ALLOW_LOGS()) console.error("Pods SDK - Multicall", error);
+      if (ALLOW_LOGS()) console.error("Pods SDK - Multicall", error, params);
     }
 
     return [zero, zero];
@@ -281,7 +288,7 @@ export default class Parser {
 
       return [UBA, UBB];
     } catch (error) {
-      if (ALLOW_LOGS()) console.error("Pods SDK - Multicall", error);
+      if (ALLOW_LOGS()) console.error("Pods SDK - Multicall", error, params);
     }
 
     return [zero, zero];
@@ -325,7 +332,7 @@ export default class Parser {
 
       return [UB, SB];
     } catch (error) {
-      if (ALLOW_LOGS()) console.error("Pods SDK - Multicall", error);
+      if (ALLOW_LOGS()) console.error("Pods SDK - Multicall", error, params);
     }
 
     return [zero, zero];
@@ -359,7 +366,7 @@ export default class Parser {
 
       return value;
     } catch (error) {
-      if (ALLOW_LOGS()) console.error("Pods SDK - Multicall", error);
+      if (ALLOW_LOGS()) console.error("Pods SDK - Multicall", error, params);
     }
 
     return zero;
@@ -393,7 +400,7 @@ export default class Parser {
 
       return value;
     } catch (error) {
-      if (ALLOW_LOGS()) console.error("Pods SDK - Multicall", error);
+      if (ALLOW_LOGS()) console.error("Pods SDK - Multicall", error, params);
     }
 
     return zero;
