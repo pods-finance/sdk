@@ -4,6 +4,8 @@ const chains = {
   polygon: "Polygon",
   ethereum: "Ethereum",
   xdai: "xDAI",
+  arbitrum: "Arbitrum",
+  optimism: "Optimism",
 };
 
 const _networks: { [key: number]: INetwork } = {
@@ -207,6 +209,54 @@ const _networks: { [key: number]: INetwork } = {
     infura: () => "",
     multicall2: "",
   },
+  42161: {
+    chainId: 42161,
+    networkId: 42161,
+    name: "Arbitrum One",
+    supported: false,
+    chain: chains.arbitrum,
+    network: "mainnet",
+    tag: "arbitrum",
+    token: {
+      utility: ["0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"],
+      wrapped: ["0x82af49447d8a07e3bd95bd0d56f35241523fbab1"],
+      name: "Ether",
+      symbol: "ETH",
+      decimals: 18,
+    },
+    subgraph: {
+      prod: "",
+      dev: "",
+    },
+    rpc: ["https://arb1.arbitrum.io/rpc", "wss://arb1.arbitrum.io/ws"],
+    explorer: "https://arbiscan.io",
+    infura: (key) => `https://mainnet.infura.io/v3/${key}`,
+    multicall2: "",
+  },
+  10: {
+    chainId: 10,
+    networkId: 10,
+    name: "Optimism",
+    supported: false,
+    chain: chains.optimism,
+    network: "mainnet",
+    tag: "optimism",
+    token: {
+      utility: ["0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"],
+      wrapped: [""],
+      name: "Ether",
+      symbol: "ETH",
+      decimals: 18,
+    },
+    subgraph: {
+      prod: "",
+      dev: "",
+    },
+    rpc: ["https://mainnet.optimism.io/"],
+    explorer: "https://optimistic.etherscan.io/",
+    infura: (key) => `https://mainnet.infura.io/v3/${key}`,
+    multicall2: "",
+  },
 };
 
 const networks: { [key: string]: INetwork } = {
@@ -221,6 +271,8 @@ const networks: { [key: string]: INetwork } = {
   rinkeby: _networks[4],
   goerli: _networks[5],
   xdai: _networks[100],
+  arbitrum: _networks[42161],
+  optimism: _networks[10],
 };
 
 export { chains };
