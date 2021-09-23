@@ -18,7 +18,7 @@ import {
 } from "@types";
 
 import { ALLOW_LOGS } from "../../constants/globals";
-import { expect } from "../../utils";
+import { expect, zero } from "../../utils";
 
 import MulticallParser from "./parser";
 import MulticallEngine from "./engine";
@@ -249,7 +249,7 @@ export default class MulticallAggregator {
           contractAddress: option.poolAddress!,
           abi: contracts.abis.PoolABI,
           context: {
-            address: option.address,
+            id: option.address,
           },
           calls: [
             {
@@ -306,7 +306,7 @@ export default class MulticallAggregator {
         const results: Result[] = response.callsReturnContext;
 
         const metrics: IPoolGeneralMetrics = {};
-        const address = _.get(context, "context.address");
+        const address = _.get(context, "context.id");
         const option: IOption = options.find((o) => o.address === address)!;
         const pool: IPool = option!.pool!;
 
@@ -385,7 +385,7 @@ export default class MulticallAggregator {
           contractAddress: option.poolAddress!,
           abi: contracts.abis.PoolABI,
           context: {
-            address: option.address,
+            id: option.address,
           },
           calls: [
             {
@@ -405,7 +405,7 @@ export default class MulticallAggregator {
           contractAddress: option.address!,
           abi: contracts.abis.OptionABI,
           context: {
-            address: option.address,
+            id: option.address,
           },
           calls: [
             {
@@ -426,7 +426,7 @@ export default class MulticallAggregator {
           contractAddress: option.address!,
           abi: contracts.abis.ERC20ABI,
           context: {
-            address: option.address,
+            id: option.address,
           },
           calls: [
             {
@@ -464,7 +464,7 @@ export default class MulticallAggregator {
         const results: Result[] = response.callsReturnContext;
 
         const metrics: IPoolGeneralMetrics = {};
-        const address = _.get(context, "context.address");
+        const address = _.get(context, "context.id");
         const option: IOption = options.find((o) => o.address === address)!;
         const pool: IPool = option!.pool!;
 
@@ -523,6 +523,133 @@ export default class MulticallAggregator {
         user,
         options,
       });
+    }
+
+    return undefined;
+  }
+
+  static async getUserRebalanceDynamics(params: {
+    provider: IProvider;
+    user: string;
+    options: IOption[];
+  }): Promise<Optional<{ [key: string]: IPoolGeneralMetrics }>> {
+    const { provider, options, user } = params;
+    const calls: CallContext[] = [];
+
+    const dynamics = await MulticallAggregator.getUserDynamics({
+      provider,
+      user,
+      options,
+    });
+
+    if (_.isNil(dynamics)) return undefined;
+
+    options.forEach((option) => {
+      try {
+        expect(option?.pool?.tokenA, "option pool tokenA");
+
+        const dynamic: IPoolGeneralMetrics = _.get(dynamics, option.address);
+        const positions = dynamic.userPositions;
+        const mint = dynamic.userOptionMintedAmount;
+        let [surplus, shortage]: BigNumber[] = [zero.humanized, zero.humanized];
+
+        if (positions?.length && mint) {
+          const removable = positions[0]; // The user's option token position for pool side A
+          const active = BigNumber.max(removable.humanized, mint.humanized);
+          const difference: BigNumber = removable.humanized.minus(active);
+
+          if (difference.isGreaterThan(zero.humanized)) {
+            surplus = difference
+              .absoluteValue()
+              .times(new BigNumber(10).pow(option!.pool!.tokenA!.decimals));
+          } else {
+            shortage = difference
+              .absoluteValue()
+              .times(new BigNumber(10).pow(option!.pool!.tokenA!.decimals));
+          }
+        }
+
+        const poolInstructions: CallContext = {
+          reference: `p-${option.address!}`,
+          contractAddress: option.poolAddress!,
+          abi: contracts.abis.PoolABI,
+          context: {
+            id: option.address,
+            surplus, // Handle the IValue transition in the interpretor
+            shortage, // Handle the IValue transition in the interpretor
+            isNumbers: true,
+            isShortage: !shortage.isEqualTo(zero.raw),
+            isSurplus: !surplus.isEqualTo(zero.raw),
+          },
+          calls: [
+            shortage.isEqualTo(zero.raw)
+              ? {
+                  reference: "rebalancePrice",
+                  methodName: "getOptionTradeDetailsExactAInput",
+                  methodParameters: [surplus.toFixed(0).toString()],
+                }
+              : {
+                  reference: "rebalancePrice",
+                  methodName: "getOptionTradeDetailsExactAOutput",
+                  methodParameters: [shortage.toFixed(0).toString()],
+                },
+          ],
+        };
+
+        calls.push(poolInstructions);
+      } catch (error) {
+        if (ALLOW_LOGS())
+          console.error("Pods SDK - Multicall Surplus", error, {
+            user,
+            options,
+          });
+      }
+    });
+
+    try {
+      const items = await MulticallEngine.use({
+        provider,
+        calls,
+      });
+
+      if (_.isNil(items)) return undefined;
+
+      const dynamics: { [key: string]: IPoolGeneralMetrics } = {};
+
+      Object.keys(items).forEach((key) => {
+        const response: Response = items[key];
+        const context: Context = response.originalContractCallContext;
+        const results: Result[] = response.callsReturnContext;
+
+        const metrics: IPoolGeneralMetrics = {};
+        const address = _.get(context, "context.id");
+        const option: IOption = options.find((o) => o.address === address)!;
+        const pool: IPool = option!.pool!;
+
+        results.forEach((result: Result) => {
+          const reference = result.reference;
+          switch (reference) {
+            case "rebalancePrice":
+              metrics.rebalancePrice = MulticallParser.interpretRebalancePrice({
+                pool,
+                result,
+                context: _.get(context, "context"),
+              });
+              break;
+            default:
+              break;
+          }
+        });
+
+        dynamics[option.address] = metrics;
+      });
+
+      return dynamics;
+    } catch (error) {
+      if (ALLOW_LOGS())
+        console.error("Pods SDK - Multicall Surplus", error, {
+          dynamics,
+        });
     }
 
     return undefined;

@@ -12,3 +12,9 @@ export type ISigner = ethers.Signer;
 export type ISignerOrProvider = IProvider | ISigner;
 
 export type Optional<Base> = Base | undefined;
+
+export interface ITransactionError {
+  transaction: ethers.Transaction;
+  transactionHash: string;
+  receipt: ethers.providers.TransactionReceipt;
+}

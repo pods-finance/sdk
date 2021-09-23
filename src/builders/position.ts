@@ -9,6 +9,7 @@ import {
 import { Position } from "../entities";
 import OptionBuilder from "./option";
 import queries from "../queries";
+import { OptionType } from "../constants/globals";
 
 export default class PositionBuilder implements IPositionBuilder {
   private constructor() {}
@@ -64,11 +65,11 @@ export default class PositionBuilder implements IPositionBuilder {
 
   public static async fromOptionsAndUser(params: {
     client: IApolloClient;
-    options: string[];
+    addresses: string[];
     user: string;
     networkId: number;
   }): Promise<{ [key: string]: Optional<IPosition> }> {
-    const { options, user, client, networkId } = params;
+    const { addresses: options, user, client, networkId } = params;
 
     const query = await client.query({
       query: queries.position.getByUserAndOptions,
@@ -103,8 +104,9 @@ export default class PositionBuilder implements IPositionBuilder {
 
     first: number;
     blacklisted: string[];
-  }): Promise<IPosition[]> {
-    const { user, client, networkId, first, blacklisted } = params;
+    optionTypes: number[];
+  }): Promise<{ [key: string]: Optional<IPosition> }> {
+    const { user, client, networkId, first, blacklisted, optionTypes } = params;
 
     const query = await client.query({
       query: queries.position.getByUser,
@@ -114,15 +116,23 @@ export default class PositionBuilder implements IPositionBuilder {
         blacklisted: blacklisted.map((address) =>
           String(address).toLowerCase()
         ),
+        optionTypes: optionTypes || [OptionType.Put, OptionType.Call],
       },
       fetchPolicy: "no-cache",
     });
     const source = _.get(query, "data.positions");
 
-    if (_.isNil(query) || _.isNil(source) || !source.length) return [];
+    const result: { [key: string]: any } = {};
 
-    return source.map((item: { [key: string]: any }) =>
-      PositionBuilder.fromData({ source: item, networkId })
-    );
+    if (_.isNil(query) || _.isNil(source) || !source.length) return result;
+
+    source.forEach((item: { [key: string]: any }) => {
+      result[_.get(item, "option.address")] = PositionBuilder.fromData({
+        source: item,
+        networkId,
+      });
+    });
+
+    return result;
   }
 }

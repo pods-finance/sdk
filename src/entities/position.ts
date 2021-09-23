@@ -45,6 +45,9 @@ export default class Position implements IPosition {
   public readonly initialOptionsProvided: BigNumber;
   public readonly initialTokensProvided: BigNumber;
 
+  public readonly remainingOptionsProvided: BigNumber;
+  public readonly remainingTokensProvided: BigNumber;
+
   public readonly finalOptionsRemoved: BigNumber;
   public readonly finalTokensRemoved: BigNumber;
 
@@ -92,6 +95,9 @@ export default class Position implements IPosition {
 
     this.initialOptionsProvided = params.initialOptionsProvided;
     this.initialTokensProvided = params.initialTokensProvided;
+
+    this.remainingOptionsProvided = params.remainingOptionsProvided;
+    this.remainingTokensProvided = params.remainingTokensProvided;
 
     this.finalOptionsRemoved = params.finalOptionsRemoved;
     this.finalTokensRemoved = params.finalTokensRemoved;
@@ -348,6 +354,38 @@ export default class Position implements IPosition {
     const value: IValue = {
       raw: new BigNumber(this.finalTokensRemoved!),
       humanized: new BigNumber(this.finalTokensRemoved!).dividedBy(
+        new BigNumber(10).pow(this.option!.pool!.tokenB!.decimals)
+      ),
+    };
+
+    return value;
+  }
+
+  public getRemainingOptionsProvidedValue(): IValue {
+    expect(this.remainingOptionsProvided, "remainingOptionsProvided");
+    expect(this.option, "option");
+    expect(this.option?.pool, "option pool");
+    expect(this.option?.pool?.tokenA, "option pool tokenA");
+
+    const value: IValue = {
+      raw: new BigNumber(this.remainingOptionsProvided!),
+      humanized: new BigNumber(this.remainingOptionsProvided!).dividedBy(
+        new BigNumber(10).pow(this.option!.pool!.tokenA!.decimals)
+      ),
+    };
+
+    return value;
+  }
+
+  public getRemainingTokensProvidedValue(): IValue {
+    expect(this.remainingTokensProvided, "remainingTokensProvided");
+    expect(this.option, "option");
+    expect(this.option?.pool, "option pool");
+    expect(this.option?.pool?.tokenB, "option pool tokenB");
+
+    const value: IValue = {
+      raw: new BigNumber(this.remainingTokensProvided!),
+      humanized: new BigNumber(this.remainingTokensProvided!).dividedBy(
         new BigNumber(10).pow(this.option!.pool!.tokenB!.decimals)
       ),
     };

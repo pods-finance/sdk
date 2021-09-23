@@ -25,6 +25,9 @@ export interface IPositionBuilderParams {
   initialOptionsProvided: BigNumber;
   initialTokensProvided: BigNumber;
 
+  remainingOptionsProvided: BigNumber;
+  remainingTokensProvided: BigNumber;
+
   finalOptionsRemoved: BigNumber;
   finalTokensRemoved: BigNumber;
 

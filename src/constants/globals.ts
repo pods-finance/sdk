@@ -34,4 +34,10 @@ export const ALLOW_LOGS = (): boolean =>
       String(process.env.SDK_ALLOW_LOGS || "") === "true"
   );
 
+export const ALLOW_LOGS_LVL2 = (): boolean =>
+  Boolean(
+    String(process.env.REACT_APP_SDK_ALLOW_LOGS_LVL2 || "") === "true" ||
+      String(process.env.SDK_ALLOW_LOGS_LVL2 || "") === "true"
+  );
+
 export const MAX_UINT = ethers.constants.MaxUint256;

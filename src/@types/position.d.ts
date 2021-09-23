@@ -26,6 +26,9 @@ export interface IPosition {
   readonly initialOptionsProvided: BigNumber;
   readonly initialTokensProvided: BigNumber;
 
+  readonly remainingOptionsProvided: BigNumber;
+  readonly remainingTokensProvided: BigNumber;
+
   readonly finalOptionsRemoved: BigNumber;
   readonly finalTokensRemoved: BigNumber;
 

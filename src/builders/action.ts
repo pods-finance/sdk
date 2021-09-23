@@ -8,6 +8,7 @@ import {
 import { Action } from "../entities";
 import OptionBuilder from "./option";
 import queries from "../queries";
+import { OptionType } from "../constants/globals";
 
 export default class ActionBuilder implements IActionBuilder {
   private constructor() {}
@@ -75,14 +76,21 @@ export default class ActionBuilder implements IActionBuilder {
 
   public static async fromOptionsAndUser(params: {
     client: IApolloClient;
-    options: string[];
+    addresses: string[];
     user: string;
     networkId: number;
 
     first: number;
     timestamp: number;
   }): Promise<{ [key: string]: IAction[] }> {
-    const { options, user, client, networkId, first, timestamp } = params;
+    const {
+      addresses: options,
+      user,
+      client,
+      networkId,
+      first,
+      timestamp,
+    } = params;
 
     const query = await client.query({
       query: queries.action.getListByUserAndOptionsLightTimestampPaginated,
@@ -118,8 +126,9 @@ export default class ActionBuilder implements IActionBuilder {
 
     first: number;
     timestamp: number;
+    optionTypes: number[];
   }): Promise<IAction[]> {
-    const { user, client, networkId, first, timestamp } = params;
+    const { user, client, networkId, first, timestamp, optionTypes } = params;
 
     const query = await client.query({
       query: queries.action.getListByUserLightTimestampPaginated,
@@ -127,6 +136,7 @@ export default class ActionBuilder implements IActionBuilder {
         first,
         timestamp,
         user: String(user).toLowerCase(),
+        optionTypes: optionTypes || [OptionType.Put, OptionType.Call],
       },
     });
 

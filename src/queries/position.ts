@@ -8,9 +8,18 @@ import { PositionWithDependenciesFragment } from "./atoms";
  */
 
 export const getByUser = gql`
-  query positions($user: Bytes!, $first: Int!, $blacklisted: [Bytes!]!) {
+  query positions(
+    $user: Bytes!
+    $first: Int!
+    $blacklisted: [Bytes!]!
+    $optionTypes: [Int!]!
+  ) {
     positions(
-      where: { user: $user, option_not_in: $blacklisted }
+      where: {
+        user: $user
+        option_not_in: $blacklisted
+        optionType_in: $optionTypes
+      }
       first: $first
       orderBy: expiration
       orderDirection: desc

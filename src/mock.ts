@@ -148,7 +148,7 @@ async function flowActions(): Promise<void> {
 
 async function flowMulticall(
   user: string = "",
-  options: string[] = []
+  addresses: string[] = []
 ): Promise<void> {
   const provider = clients.provider.getBaseProvider(42, {
     infura: process.env.TESTING_INFURA_KEY || "",
@@ -162,7 +162,7 @@ async function flowMulticall(
   const query = await subgraphInstance.query({
     query: queries.option.getByAddresses,
     variables: {
-      addresses: options,
+      addresses: addresses,
     },
     fetchPolicy: "no-cache",
   });

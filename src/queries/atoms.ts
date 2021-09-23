@@ -7,6 +7,7 @@ import gql from "graphql-tag";
 export const OptionFragment = gql`
   fragment OptionFragment on Option {
     id
+    address
     from
     type
     exerciseType
@@ -32,6 +33,7 @@ export const OptionFragment = gql`
 export const PoolFragment = gql`
   fragment PoolFragment on Pool {
     id
+    address
     tokenA
     tokenADecimals
     tokenASymbol
@@ -67,6 +69,7 @@ export const ActionFragmentLight = gql`
         id
       }
     }
+    optionType
   }
 `;
 
@@ -193,6 +196,7 @@ export const PositionFragment = gql`
   fragment PositionFragment on Position {
     id
     expiration
+    optionType
     premiumPaid
     premiumReceived
     optionsBought
@@ -205,6 +209,8 @@ export const PositionFragment = gql`
     strikeWithdrawn
     initialOptionsProvided
     initialTokensProvided
+    remainingOptionsProvided
+    remainingTokensProvided
     finalOptionsRemoved
     finalTokensRemoved
     optionsSent

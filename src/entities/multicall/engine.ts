@@ -17,6 +17,8 @@ import { expect } from "../../utils";
 
 export default class MulticallEngine {
   /**
+   * Pass the instructions/calls to the multicall engine and wait for them to be processed or "used"
+   * [!] Please pass an "id" to the context of the instructions for MulticallEngine.parse to work as intended
    *
    * @param {object} params
    * @param {IProvider} params.provider Etheres provider
@@ -53,6 +55,14 @@ export default class MulticallEngine {
     return undefined;
   }
 
+  /**
+   * Pass the results to the multicall usage call for them to be interpreted
+   * [!] Please check that an "id" is passed to the context of the instructions for parse to work as intended
+   *
+   * @param {object} params
+   * @param {object} params.items Items resulting from MulticallEngine.use
+   * @returns
+   */
   static async parse(params: {
     items: { [key: string]: Response };
   }): Promise<Optional<{ [key: string]: any }>> {
@@ -79,7 +89,7 @@ export default class MulticallEngine {
         if (!status || !_.isArray(values) || values.length === 0)
           details[reference] = undefined;
         else {
-          let detail = undefined;
+          let detail: unknown = values;
           if (isString) {
             detail = String(values[0]);
           } else if (isNumber) {
@@ -89,6 +99,11 @@ export default class MulticallEngine {
           } else if (isNumbers) {
             detail = _.attempt(() =>
               values.map((v) => ethers.BigNumber.from(v).toString())
+            );
+          } else {
+            console.warn(
+              "Pods SDK",
+              "The multicall engine parser cannot find a specified result type (e.g. isNumber/isNumbers/isString)."
             );
           }
           details[reference] = detail;

@@ -5,7 +5,7 @@ import { CallReturnContext as Result } from "ethereum-multicall";
 
 import { IOption, IPool, IValue } from "@types";
 
-import { ALLOW_LOGS } from "../../constants/globals";
+import { ALLOW_LOGS, ALLOW_LOGS_LVL2 } from "../../constants/globals";
 import { expect, zero } from "../../utils";
 
 export default class Parser {
@@ -25,8 +25,13 @@ export default class Parser {
       const status = _.get(result, "success");
       const values = _.get(result, "returnValues");
 
-      if (!status || !_.isArray(values) || values.length === 0)
-        throw new Error("Buying price unretrievable");
+      if (!status || !_.isArray(values) || values.length === 0) {
+        if (ALLOW_LOGS_LVL2())
+          throw new Error(
+            "Buying price unretrievable - possible pool imbalance"
+          );
+        else return { value: zero, feesA: zero, feesB: zero };
+      }
 
       expect(pool, "option pool");
       expect(pool?.tokenB, "option pool tokenB");
@@ -58,7 +63,7 @@ export default class Parser {
 
       return { value, feesA, feesB };
     } catch (error) {
-      if (false && ALLOW_LOGS()) console.error("Pods SDK - Multicall", error);
+      if (ALLOW_LOGS()) console.error("Pods SDK - Multicall", error);
     }
 
     return { value: zero, feesA: zero, feesB: zero };
@@ -74,8 +79,13 @@ export default class Parser {
       const status = _.get(result, "success");
       const values = _.get(result, "returnValues");
 
-      if (!status || !_.isArray(values) || values.length === 0)
-        throw new Error("Selling price unretrievable");
+      if (!status || !_.isArray(values) || values.length === 0) {
+        if (ALLOW_LOGS_LVL2())
+          throw new Error(
+            "Selling price unretrievable - possible pool imbalance"
+          );
+        else return { value: zero, feesA: zero, feesB: zero };
+      }
 
       expect(pool, "option pool");
       expect(pool!.tokenB, "option pool tokenB");
@@ -107,7 +117,7 @@ export default class Parser {
 
       return { value, feesA, feesB };
     } catch (error) {
-      if (false && ALLOW_LOGS()) console.error("Pods SDK - Multicall", error);
+      if (ALLOW_LOGS()) console.error("Pods SDK - Multicall", error);
     }
 
     return { value: zero, feesA: zero, feesB: zero };
@@ -124,7 +134,7 @@ export default class Parser {
       const values = _.get(result, "returnValues");
 
       if (!status || !_.isArray(values) || values.length === 0)
-        throw new Error("AB price unretrievable");
+        throw new Error("AB price unretrievable - possible pool imbalance");
 
       expect(pool, "option pool");
       expect(pool!.tokenB, "option pool tokenB");
@@ -140,7 +150,7 @@ export default class Parser {
 
       return { value };
     } catch (error) {
-      if (false && ALLOW_LOGS()) console.error("Pods SDK - Multicall", error);
+      if (ALLOW_LOGS()) console.error("Pods SDK - Multicall", error);
     }
 
     return { value: zero };
@@ -185,7 +195,7 @@ export default class Parser {
       const values = _.get(result, "returnValues");
 
       if (!status || !_.isArray(values) || values.length === 0)
-        throw new Error("Price properties unretrievable");
+        throw new Error("Adjusted IV unretrievable");
 
       expect(pool, "option pool");
       expect(pool!.tokenB, "option pool tokenB");
@@ -218,7 +228,7 @@ export default class Parser {
       const values = _.get(result, "returnValues");
 
       if (!status || !_.isArray(values) || values.length === 0)
-        throw new Error("Price properties unretrievable");
+        throw new Error("Total balances unretrievable");
 
       expect(pool, "option pool");
       expect(pool!.tokenB, "option pool tokenB");
@@ -305,7 +315,14 @@ export default class Parser {
       const values = _.get(result, "returnValues");
 
       if (!status || !_.isArray(values) || values.length === 0)
-        throw new Error("Withdrawable amounts unretrievable");
+        if (ALLOW_LOGS_LVL2())
+          /**
+           * This error will require ALLOW_LOGS_LVL2 because
+           *      the contract method reverts not only on-error, but also when
+           *      the withdrawable values per wallet addres are [0,0]
+           */
+          throw new Error("Withdrawable amounts unretrievable");
+        else return [zero, zero];
 
       expect(option, "option");
       expect(option?.underlying, "option underlying");
@@ -404,5 +421,78 @@ export default class Parser {
     }
 
     return zero;
+  }
+
+  public static interpretRebalancePrice(params: {
+    result: Result;
+    pool: IPool;
+    context: { [key: string]: unknown };
+  }): { [key: string]: IValue | unknown } {
+    try {
+      const { result, pool, context: _context } = params;
+
+      const status = _.get(result, "success");
+      const values = _.get(result, "returnValues");
+
+      if (!status || !_.isArray(values) || values.length === 0)
+        throw new Error(
+          "Selling price unretrievable - possible pool imbalance"
+        );
+
+      expect(pool, "option pool");
+      expect(pool!.tokenB, "option pool tokenB");
+      expect(pool!.tokenA, "option pool tokenA");
+
+      const amount = ethers.BigNumber.from(values[0]).toString();
+      const feesTokenA = ethers.BigNumber.from(values[2]).toString();
+      const feesTokenB = ethers.BigNumber.from(values[3]).toString();
+
+      const value: IValue = {
+        raw: new BigNumber(amount),
+        humanized: new BigNumber(amount).dividedBy(
+          new BigNumber(10).pow(pool!.tokenB!.decimals)
+        ),
+      };
+
+      const feesA: IValue = {
+        raw: new BigNumber(feesTokenA),
+        humanized: new BigNumber(feesTokenA).dividedBy(
+          new BigNumber(10).pow(pool!.tokenB!.decimals)
+        ),
+      };
+
+      const feesB: IValue = {
+        raw: new BigNumber(feesTokenB),
+        humanized: new BigNumber(feesTokenB).dividedBy(
+          new BigNumber(10).pow(pool!.tokenB!.decimals)
+        ),
+      };
+
+      const surplus: IValue = {
+        raw: new BigNumber((_context.surplus as string) || 0),
+        humanized: new BigNumber((_context.surplus as string) || 0).dividedBy(
+          new BigNumber(10).pow(pool!.tokenA!.decimals)
+        ),
+      };
+
+      const shortage: IValue = {
+        raw: new BigNumber((_context.shortage as string) || 0),
+        humanized: new BigNumber((_context.shortage as string) || 0).dividedBy(
+          new BigNumber(10).pow(pool!.tokenA!.decimals)
+        ),
+      };
+
+      const context = {
+        ..._context,
+        surplus,
+        shortage,
+      };
+
+      return { value, feesA, feesB, context };
+    } catch (error) {
+      if (false && ALLOW_LOGS()) console.error("Pods SDK - Multicall", error);
+    }
+
+    return { value: zero, feesA: zero, feesB: zero };
   }
 }

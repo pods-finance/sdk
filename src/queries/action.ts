@@ -85,12 +85,13 @@ export const getByAddressesHeavy = gql`
 `;
 
 export const getListLight = gql`
-  query actions($first: Int!, $skip: Int!) {
+  query actions($first: Int!, $skip: Int!, $optionTypes: [Int!]!) {
     actions(
       first: $first
       skip: $skip
       orderBy: timestamp
       orderDirection: desc
+      where: { optionType_in: $optionTypes }
     ) {
       ...ActionFragmentLightWithDependencies
     }
@@ -99,12 +100,13 @@ export const getListLight = gql`
 `;
 
 export const getListHeavy = gql`
-  query actions($first: Int!, $skip: Int!) {
+  query actions($first: Int!, $skip: Int!, $optionTypes: [Int!]!) {
     actions(
       first: $first
       skip: $skip
       orderBy: timestamp
       orderDirection: desc
+      where: { optionType_in: $optionTypes }
     ) {
       ...ActionFragmentHeavyWithDependencies
     }
@@ -113,10 +115,10 @@ export const getListHeavy = gql`
 `;
 
 export const getListLightTimestampPaginated = gql`
-  query actions($first: Int!, $timestamp: Int!) {
+  query actions($first: Int!, $timestamp: Int!, $optionTypes: [Int!]!) {
     actions(
       first: $first
-      where: { timestamp_lt: $timestamp }
+      where: { timestamp_lt: $timestamp, optionType_in: $optionTypes }
       orderBy: timestamp
       orderDirection: desc
     ) {
@@ -127,10 +129,10 @@ export const getListLightTimestampPaginated = gql`
 `;
 
 export const getListHeavyTimestampPaginated = gql`
-  query actions($first: Int!, $timestamp: Int!) {
+  query actions($first: Int!, $timestamp: Int!, $optionTypes: [Int!]!) {
     actions(
       first: $first
-      where: { timestamp_lt: $timestamp }
+      where: { timestamp_lt: $timestamp, optionType_in: $optionTypes }
       orderBy: timestamp
       orderDirection: desc
     ) {
@@ -141,13 +143,18 @@ export const getListHeavyTimestampPaginated = gql`
 `;
 
 export const getListByUserLight = gql`
-  query actions($first: Int!, $skip: Int!, $user: Bytes!) {
+  query actions(
+    $first: Int!
+    $skip: Int!
+    $user: Bytes!
+    $optionTypes: [Int!]!
+  ) {
     actions(
       first: $first
       skip: $skip
       orderBy: timestamp
       orderDirection: desc
-      where: { user: $user }
+      where: { user: $user, optionType_in: $optionTypes }
     ) {
       ...ActionFragmentLightWithDependencies
     }
@@ -156,13 +163,18 @@ export const getListByUserLight = gql`
 `;
 
 export const getListByUserHeavy = gql`
-  query actions($first: Int!, $skip: Int!, $user: Bytes!) {
+  query actions(
+    $first: Int!
+    $skip: Int!
+    $user: Bytes!
+    $optionTypes: [Int!]!
+  ) {
     actions(
       first: $first
       skip: $skip
       orderBy: timestamp
       orderDirection: desc
-      where: { user: $user }
+      where: { user: $user, optionType_in: $optionTypes }
     ) {
       ...ActionFragmentHeavyWithDependencies
     }
@@ -171,12 +183,21 @@ export const getListByUserHeavy = gql`
 `;
 
 export const getListByUserLightTimestampPaginated = gql`
-  query actions($first: Int!, $timestamp: Int!, $user: Bytes!) {
+  query actions(
+    $first: Int!
+    $timestamp: Int!
+    $user: Bytes!
+    $optionTypes: [Int!]!
+  ) {
     actions(
       first: $first
       orderBy: timestamp
       orderDirection: desc
-      where: { user: $user, timestamp_lt: $timestamp }
+      where: {
+        user: $user
+        timestamp_lt: $timestamp
+        optionType_in: $optionTypes
+      }
     ) {
       ...ActionFragmentLightWithDependencies
     }
@@ -185,12 +206,21 @@ export const getListByUserLightTimestampPaginated = gql`
 `;
 
 export const getListByUserHeavyTimestampPaginated = gql`
-  query actions($first: Int!, $timestamp: Int!, $user: Bytes!) {
+  query actions(
+    $first: Int!
+    $timestamp: Int!
+    $user: Bytes!
+    $optionTypes: [Int!]!
+  ) {
     actions(
       first: $first
       orderBy: timestamp
       orderDirection: desc
-      where: { user: $user, timestamp_lt: $timestamp }
+      where: {
+        user: $user
+        timestamp_lt: $timestamp
+        optionType_in: $optionTypes
+      }
     ) {
       ...ActionFragmentHeavyWithDependencies
     }

@@ -6,6 +6,7 @@ import {
   IHelperOverrides,
   IOption,
   IProvider,
+  ITransactionError,
   Optional,
 } from "@types";
 import { expect, getDefaultDeadline, getOverrides } from "../utils";
@@ -98,7 +99,7 @@ export default class Helper implements IHelper {
       const receipt = await transaction.wait();
       (callback || _.noop)(null, receipt.transactionHash, receipt);
     } catch (error) {
-      (callback || _.noop)(error, error.transactionHash);
+      (callback || _.noop)(error, (error as ITransactionError).transactionHash);
     }
   }
   async doBuyEstimated(params: {
@@ -160,7 +161,7 @@ export default class Helper implements IHelper {
       const receipt = await transaction.wait();
       (callback || _.noop)(null, receipt.transactionHash, receipt);
     } catch (error) {
-      (callback || _.noop)(error, error.transactionHash);
+      (callback || _.noop)(error, (error as ITransactionError).transactionHash);
     }
   }
 
@@ -225,7 +226,7 @@ export default class Helper implements IHelper {
       const receipt = await transaction.wait();
       (callback || _.noop)(null, receipt.transactionHash, receipt);
     } catch (error) {
-      (callback || _.noop)(error, error.transactionHash);
+      (callback || _.noop)(error, (error as ITransactionError).transactionHash);
     }
   }
 
@@ -286,7 +287,7 @@ export default class Helper implements IHelper {
       const receipt = await transaction.wait();
       (callback || _.noop)(null, receipt.transactionHash, receipt);
     } catch (error) {
-      (callback || _.noop)(error, error.transactionHash);
+      (callback || _.noop)(error, (error as ITransactionError).transactionHash);
     }
   }
   async doResellExact(params: {
@@ -350,7 +351,7 @@ export default class Helper implements IHelper {
       const receipt = await transaction.wait();
       (callback || _.noop)(null, receipt.transactionHash, receipt);
     } catch (error) {
-      (callback || _.noop)(error, error.transactionHash);
+      (callback || _.noop)(error, (error as ITransactionError).transactionHash);
     }
   }
   async doRemoveLiquidity(params: {
@@ -391,7 +392,7 @@ export default class Helper implements IHelper {
       const receipt = await transaction.wait();
       (callback || _.noop)(null, receipt.transactionHash, receipt);
     } catch (error) {
-      (callback || _.noop)(error, error.transactionHash);
+      (callback || _.noop)(error, (error as ITransactionError).transactionHash);
     }
   }
 
@@ -442,7 +443,7 @@ export default class Helper implements IHelper {
       const receipt = await transaction.wait();
       (callback || _.noop)(null, receipt.transactionHash, receipt);
     } catch (error) {
-      (callback || _.noop)(error, error.transactionHash);
+      (callback || _.noop)(error, (error as ITransactionError).transactionHash);
     }
   }
 
@@ -488,7 +489,7 @@ export default class Helper implements IHelper {
       const receipt = await transaction.wait();
       (callback || _.noop)(null, receipt.transactionHash, receipt);
     } catch (error) {
-      (callback || _.noop)(error, error.transactionHash);
+      (callback || _.noop)(error, (error as ITransactionError).transactionHash);
     }
   }
 
@@ -526,7 +527,7 @@ export default class Helper implements IHelper {
       const receipt = await transaction.wait();
       (callback || _.noop)(null, receipt.transactionHash, receipt);
     } catch (error) {
-      (callback || _.noop)(error, error.transactionHash);
+      (callback || _.noop)(error, (error as ITransactionError).transactionHash);
     }
   }
   async doExerciseERC20(params: {
@@ -563,7 +564,7 @@ export default class Helper implements IHelper {
       const receipt = await transaction.wait();
       (callback || _.noop)(null, receipt.transactionHash, receipt);
     } catch (error) {
-      (callback || _.noop)(error, error.transactionHash);
+      (callback || _.noop)(error, (error as ITransactionError).transactionHash);
     }
   }
 
@@ -602,7 +603,7 @@ export default class Helper implements IHelper {
       const receipt = await transaction.wait();
       (callback || _.noop)(null, receipt.transactionHash, receipt);
     } catch (error) {
-      (callback || _.noop)(error, error.transactionHash);
+      (callback || _.noop)(error, (error as ITransactionError).transactionHash);
     }
   }
 
@@ -631,7 +632,7 @@ export default class Helper implements IHelper {
       const receipt = await transaction.wait();
       (callback || _.noop)(null, receipt.transactionHash, receipt);
     } catch (error) {
-      (callback || _.noop)(error, error.transactionHash);
+      (callback || _.noop)(error, (error as ITransactionError).transactionHash);
     }
   }
 }
