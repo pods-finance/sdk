@@ -10,6 +10,7 @@ import {
 
 import contracts from "../../contracts";
 import {
+  IPosition,
   IOption,
   IPool,
   IProvider,
@@ -532,8 +533,9 @@ export default class MulticallAggregator {
     provider: IProvider;
     user: string;
     options: IOption[];
+    positions: { [key: string]: Optional<IPosition> };
   }): Promise<Optional<{ [key: string]: IPoolGeneralMetrics }>> {
-    const { provider, options, user } = params;
+    const { provider, options, user, positions } = params;
     const calls: CallContext[] = [];
 
     const dynamics = await MulticallAggregator.getUserDynamics({
@@ -547,16 +549,18 @@ export default class MulticallAggregator {
     options.forEach((option) => {
       try {
         expect(option?.pool?.tokenA, "option pool tokenA");
-
+        const address = option.address;
+        const position = positions[address];
         const dynamic: IPoolGeneralMetrics = _.get(dynamics, option.address);
-        const positions = dynamic.userPositions;
-        const mint = dynamic.userOptionMintedAmount;
+        const liquidity = dynamic.userPositions;
         let [surplus, shortage]: BigNumber[] = [zero.humanized, zero.humanized];
 
-        if (positions?.length && mint) {
-          const removable = positions[0]; // The user's option token position for pool side A
-          const active = BigNumber.max(removable.humanized, mint.humanized);
-          const difference: BigNumber = removable.humanized.minus(active);
+        if (liquidity?.length && position) {
+          const deposits = position.getInitialOptionsProvidedValue().humanized;
+          const removals = position.getFinalOptionsRemovedValue().humanized;
+          const initials: BigNumber = deposits.minus(removals);
+          const removable = liquidity[0]; // The user's option token position for pool side A
+          const difference: BigNumber = removable.humanized.minus(initials);
 
           if (difference.isGreaterThan(zero.humanized)) {
             surplus = difference
@@ -576,7 +580,8 @@ export default class MulticallAggregator {
           context: {
             id: option.address,
             surplus, // Handle the IValue transition in the interpretor
-            shortage, // Handle the IValue transition in the interpretor
+            shortage, // Handle the IValue transition in the interpretor,
+            position,
             isNumbers: true,
             isShortage: !shortage.isEqualTo(zero.raw),
             isSurplus: !surplus.isEqualTo(zero.raw),
@@ -602,6 +607,7 @@ export default class MulticallAggregator {
           console.error("Pods SDK - Multicall Surplus", error, {
             user,
             options,
+            positions,
           });
       }
     });
