@@ -148,4 +148,61 @@ export default class ActionBuilder implements IActionBuilder {
       ActionBuilder.fromData({ source: item, networkId })
     );
   }
+
+  public static async fromOption(params: {
+    client: IApolloClient;
+    option: string;
+    networkId: number;
+
+    first: number;
+    timestamp: number;
+  }): Promise<IAction[]> {
+    const { option, client, networkId, first, timestamp } = params;
+
+    const query = await client.query({
+      query: queries.action.getListByOptionHeavyTimestampPaginated,
+      variables: {
+        first,
+        timestamp,
+        option: String(option).toLowerCase(),
+      },
+      fetchPolicy: "no-cache",
+    });
+
+    const source = _.get(query, "data.actions");
+
+    if (_.isNil(query) || _.isNil(source) || !source.length) return [];
+
+    return source.map((item: { [key: string]: any }) =>
+      ActionBuilder.fromData({ source: item, networkId })
+    );
+  }
+
+  public static async fromNetwork(params: {
+    client: IApolloClient;
+    networkId: number;
+
+    first: number;
+    timestamp: number;
+    optionTypes: number[];
+  }): Promise<IAction[]> {
+    const { client, networkId, first, timestamp, optionTypes } = params;
+
+    const query = await client.query({
+      query: queries.action.getListHeavyTimestampPaginated,
+      variables: {
+        first,
+        timestamp,
+        optionTypes: optionTypes || [OptionType.Put, OptionType.Call],
+      },
+    });
+
+    const source = _.get(query, "data.actions");
+
+    if (_.isNil(query) || _.isNil(source) || !source.length) return [];
+
+    return source.map((item: { [key: string]: any }) =>
+      ActionBuilder.fromData({ source: item, networkId })
+    );
+  }
 }

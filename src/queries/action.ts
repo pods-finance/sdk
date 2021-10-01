@@ -338,4 +338,62 @@ export const getListByUserAndOptionsHeavyTimestampPaginated = gql`
   ${ActionFragmentHeavyWithDependencies}
 `;
 
+export const getListByOptionLight = gql`
+  query actions($first: Int!, $skip: Int!, $option: Bytes!) {
+    actions(
+      first: $first
+      skip: $skip
+      orderBy: timestamp
+      orderDirection: desc
+      where: { option: $option }
+    ) {
+      ...ActionFragmentLightWithDependencies
+    }
+  }
+  ${ActionFragmentLightWithDependencies}
+`;
+
+export const getListByOptionHeavy = gql`
+  query actions($first: Int!, $skip: Int!, $option: Bytes!) {
+    actions(
+      first: $first
+      skip: $skip
+      orderBy: timestamp
+      orderDirection: desc
+      where: { option: $option }
+    ) {
+      ...ActionFragmentHeavyWithDependencies
+    }
+  }
+  ${ActionFragmentHeavyWithDependencies}
+`;
+
+export const getListByOptionLightTimestampPaginated = gql`
+  query actions($first: Int!, $timestamp: Int!, $option: Bytes!) {
+    actions(
+      first: $first
+      orderBy: timestamp
+      orderDirection: desc
+      where: { option: $option, timestamp_lt: $timestamp }
+    ) {
+      ...ActionFragmentLightWithDependencies
+    }
+  }
+  ${ActionFragmentLightWithDependencies}
+`;
+
+export const getListByOptionHeavyTimestampPaginated = gql`
+  query actions($first: Int!, $timestamp: Int!, $option: Bytes!) {
+    actions(
+      first: $first
+      orderBy: timestamp
+      orderDirection: desc
+      where: { option: $option, timestamp_lt: $timestamp }
+    ) {
+      ...ActionFragmentHeavyWithDependencies
+    }
+  }
+  ${ActionFragmentHeavyWithDependencies}
+`;
+
 export const getList = getListLight;
