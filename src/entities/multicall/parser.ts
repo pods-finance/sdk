@@ -271,8 +271,16 @@ export default class Parser {
       const status = _.get(result, "success");
       const values = _.get(result, "returnValues");
 
-      if (!status || !_.isArray(values) || values.length === 0)
-        throw new Error("User position unretrievable");
+      if (!status || !_.isArray(values) || values.length === 0) {
+        if (ALLOW_LOGS_LVL2())
+          /**
+           * This error will require ALLOW_LOGS_LVL2 because
+           *      the contract method reverts not only on-error, but also when
+           *      the withdrawable values per wallet addres are [0,0]
+           */
+          throw new Error("User position unretrievable");
+        else return [zero, zero];
+      }
 
       expect(pool, "option pool");
       expect(pool!.tokenB, "option pool tokenB");
