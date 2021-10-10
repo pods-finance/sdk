@@ -9,7 +9,7 @@ import {
 import { Position } from "../entities";
 import OptionBuilder from "./option";
 import queries from "../queries";
-import { OptionType } from "../constants/globals";
+import { OptionType, ADDRESS_ZERO } from "../constants/globals";
 
 export default class PositionBuilder implements IPositionBuilder {
   private constructor() {}
@@ -107,6 +107,8 @@ export default class PositionBuilder implements IPositionBuilder {
     optionTypes: number[];
   }): Promise<{ [key: string]: Optional<IPosition> }> {
     const { user, client, networkId, first, blacklisted, optionTypes } = params;
+
+    if (!blacklisted.length) blacklisted.push(ADDRESS_ZERO);
 
     const query = await client.query({
       query: queries.position.getByUser,

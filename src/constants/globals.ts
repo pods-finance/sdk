@@ -41,3 +41,5 @@ export const ALLOW_LOGS_LVL2 = (): boolean =>
   );
 
 export const MAX_UINT = ethers.constants.MaxUint256;
+
+export const ADDRESS_ZERO = ethers.constants.AddressZero;
