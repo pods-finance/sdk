@@ -217,6 +217,40 @@ export default class Parser {
     return zero;
   }
 
+  public static interpretTotalSupply(params: {
+    result: Result;
+    pool: IPool;
+  }): IValue {
+    try {
+      const { result, pool } = params;
+
+      const status = _.get(result, "success");
+      const values = _.get(result, "returnValues");
+
+      if (!status || !_.isArray(values) || values.length === 0)
+        throw new Error("Total Supply unretrievable");
+
+      expect(pool, "option pool");
+      expect(pool!.tokenA, "option pool tokenA");
+
+      const supply = ethers.BigNumber.from(values[0]).toString();
+
+      const value: IValue = {
+        label: "Total supply of minted options",
+        raw: new BigNumber(supply),
+        humanized: new BigNumber(supply).dividedBy(
+          new BigNumber(10).pow(pool!.tokenA!.decimals)
+        ),
+      };
+
+      return value;
+    } catch (error) {
+      if (ALLOW_LOGS()) console.error("Pods SDK - Multicall", error, params);
+    }
+
+    return zero;
+  }
+
   public static interpretTotalBalances(params: {
     result: Result;
     pool: IPool;

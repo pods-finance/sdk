@@ -29,6 +29,7 @@ export interface IPoolGeneralMetrics {
   userOptionWithdrawAmounts?: IValue[];
   userOptionMintedAmount?: IValue;
   userOptionBalance?: IValue;
+  totalSupply?: IValue;
   rebalancePrice?: { [key: string]: IValue | unknown };
 }
 

@@ -228,8 +228,6 @@ export default class MulticallAggregator {
     return undefined;
   }
 
-  // TODO getOptionsPoolAddresses from registry
-
   static async getGeneralDynamics(params: {
     provider: IProvider;
     options: IOption[];
@@ -245,8 +243,8 @@ export default class MulticallAggregator {
           new BigNumber(10).pow(pool!.tokenA!.decimals)
         );
 
-        const instructions: CallContext = {
-          reference: option.address!,
+        const poolInstructions: CallContext = {
+          reference: `p-${option.address!}`,
           contractAddress: option.poolAddress!,
           abi: contracts.abis.PoolABI,
           context: {
@@ -286,7 +284,24 @@ export default class MulticallAggregator {
           ],
         };
 
-        calls.push(instructions);
+        const optionInstructions: CallContext = {
+          reference: `o-${option.address!}`,
+          contractAddress: option.address!,
+          abi: contracts.abis.OptionABI,
+          context: {
+            id: option.address,
+          },
+          calls: [
+            {
+              reference: "totalSupply",
+              methodName: "totalSupply",
+              methodParameters: [],
+            },
+          ],
+        };
+
+        calls.push(poolInstructions);
+        calls.push(optionInstructions);
       } catch (error) {
         if (ALLOW_LOGS()) console.error("Pods SDK - Multicall", error);
       }
@@ -350,12 +365,23 @@ export default class MulticallAggregator {
                 result,
               });
               break;
+            case "totalSupply":
+              metrics.totalSupply = MulticallParser.interpretTotalSupply({
+                pool,
+                result,
+              });
+              break;
             default:
               break;
           }
         });
 
-        dynamics[option.address] = metrics;
+        if (_.has(dynamics, option.address))
+          dynamics[option.address] = {
+            ...dynamics[option.address],
+            ...metrics,
+          };
+        else dynamics[option.address] = metrics;
       });
 
       return dynamics;
