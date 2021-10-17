@@ -7,6 +7,7 @@ import * as position from "./position";
 import * as user from "./user";
 
 const queries = {
+  atoms,
   option,
   action,
   manager,
