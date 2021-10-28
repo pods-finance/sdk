@@ -395,7 +395,11 @@ export default class Action implements IAction {
         };
 
         return value;
-      } else if ([ActionType.Buy, ActionType.Exercise].includes(this.type)) {
+      } else if (
+        [ActionType.Buy, ActionType.Exercise, ActionType.Sell].includes(
+          this.type
+        )
+      ) {
         expect(this.option?.strike?.decimals, "decimals (option strike)");
 
         const value: IValue = {
