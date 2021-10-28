@@ -49,6 +49,7 @@ export default class Option implements IOption {
   private _expiration?: number;
   private _exerciseStart?: number;
   private _exerciseWindowSize?: number;
+  private _seriesFeeVolume?: IValue;
   private _factoryAddress?: string;
   private _poolAddress?: string;
   private _pool?: IPool;
@@ -118,6 +119,13 @@ export default class Option implements IOption {
   }
   public set exerciseType(value: OptionExerciseType) {
     this._exerciseType = value;
+  }
+
+  public get seriesFeeVolume(): Optional<IValue> {
+    return this._seriesFeeVolume;
+  }
+  public set seriesFeeVolume(value: Optional<IValue>) {
+    this._seriesFeeVolume = value;
   }
 
   public get strikePrice(): Optional<IValue> {
@@ -211,6 +219,13 @@ export default class Option implements IOption {
 
     this.factoryAddress = _.toString(params.factoryAddress).toLowerCase();
     this.poolAddress = _.toString(params.poolAddress).toLowerCase();
+
+    this.seriesFeeVolume = {
+      raw: params.seriesFeeVolume,
+      humanized: new BigNumber(params.seriesFeeVolume).dividedBy(
+        new BigNumber(10).pow(this.strike!.decimals)
+      ),
+    };
 
     return this as IOption;
   }

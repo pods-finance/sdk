@@ -25,6 +25,7 @@ export interface IOption {
   exerciseWindowSize?: number;
   factoryAddress?: string;
   poolAddress?: string;
+  seriesFeeVolume?: IValue;
 
   pool?: IPool;
 

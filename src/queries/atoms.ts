@@ -24,6 +24,7 @@ export const OptionFragment = gql`
     expiration
     exerciseWindowSize
     exerciseStart
+    seriesFeeVolume
     factory {
       id
     }
@@ -160,7 +161,7 @@ export const OptionHelperFragment = gql`
 `;
 
 export const OptionHourActivity = gql`
-  fragment OptionFactoryFragment on OptionFactory {
+  fragment OptionFactoryFragmentHour on OptionFactory {
     id
     option {
       id
@@ -177,7 +178,7 @@ export const OptionHourActivity = gql`
 `;
 
 export const OptionDayActivity = gql`
-  fragment OptionFactoryFragment on OptionFactory {
+  fragment OptionFactoryFragmentDay on OptionFactory {
     id
     option {
       id

@@ -26,6 +26,8 @@ export interface IOptionBuilderParams {
   factoryAddress: string;
   poolAddress: string;
 
+  seriesFeeVolume: BigNumber;
+
   pool?: IPoolBuilderParams;
 }
 
