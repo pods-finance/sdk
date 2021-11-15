@@ -233,7 +233,7 @@ const _networks: { [key: number]: INetwork } = {
     rpc: ["https://arb1.arbitrum.io/rpc", "wss://arb1.arbitrum.io/ws"],
     explorer: "https://arbiscan.io",
     infura: (key) => `https://mainnet.infura.io/v3/${key}`,
-    multicall2: "0x80C7DD17B01855a6D2347444a0FCC36136a314de",
+    multicall2: "0x842eC2c7D803033Edf55E478F461FC547Bc54EB2",
   },
   10: {
     chainId: 10,
