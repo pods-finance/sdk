@@ -212,7 +212,7 @@ const _networks: { [key: number]: INetwork } = {
   42161: {
     chainId: 42161,
     networkId: 42161,
-    name: "Arbitrum One",
+    name: "Arbitrum",
     supported: false,
     chain: chains.arbitrum,
     network: "mainnet",
@@ -221,17 +221,19 @@ const _networks: { [key: number]: INetwork } = {
       utility: ["0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"],
       wrapped: ["0x82af49447d8a07e3bd95bd0d56f35241523fbab1"],
       name: "Ether",
-      symbol: "ETH",
+      symbol: "AETH",
       decimals: 18,
     },
     subgraph: {
-      prod: "",
-      dev: "",
+      prod:
+        "https://api.thegraph.com/subgraphs/name/pods-finance/pods-arbitrum",
+      dev:
+        "https://api.thegraph.com/subgraphs/name/pods-finance/pods-arbitrum-dev",
     },
     rpc: ["https://arb1.arbitrum.io/rpc", "wss://arb1.arbitrum.io/ws"],
     explorer: "https://arbiscan.io",
     infura: (key) => `https://mainnet.infura.io/v3/${key}`,
-    multicall2: "",
+    multicall2: "0x80C7DD17B01855a6D2347444a0FCC36136a314de",
   },
   10: {
     chainId: 10,
