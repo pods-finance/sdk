@@ -183,7 +183,7 @@ const _networks: { [key: number]: INetwork } = {
     rpc: [],
     explorer: "https://goerli.etherscan.io",
     faucet: "https://goerli-faucet.slock.it/",
-    infura: (key) => `https://kovan.infura.io/v3/${key}`,
+    infura: (key) => `https://goerli.infura.io/v3/${key}`,
     multicall2: "0x5ba1e12693dc8f9c48aad8770482f4739beed696",
   },
   100: {
