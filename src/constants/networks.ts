@@ -8,6 +8,8 @@ const chains = {
   optimism: "Optimism",
 };
 
+
+
 const _networks: { [key: number]: INetwork } = {
   1: {
     chainId: 1,
