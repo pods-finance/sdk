@@ -219,10 +219,10 @@ export default class Parser {
 
   public static interpretTotalSupply(params: {
     result: Result;
-    pool: IPool;
+    option: IOption;
   }): IValue {
     try {
-      const { result, pool } = params;
+      const { result, option } = params;
 
       const status = _.get(result, "success");
       const values = _.get(result, "returnValues");
@@ -230,8 +230,8 @@ export default class Parser {
       if (!status || !_.isArray(values) || values.length === 0)
         throw new Error("Total Supply unretrievable");
 
-      expect(pool, "option pool");
-      expect(pool!.tokenA, "option pool tokenA");
+      expect(option, "option pool");
+      expect(option!.decimals, "option decimals");
 
       const supply = ethers.BigNumber.from(values[0]).toString();
 
@@ -239,7 +239,7 @@ export default class Parser {
         label: "Total supply of minted options",
         raw: new BigNumber(supply),
         humanized: new BigNumber(supply).dividedBy(
-          new BigNumber(10).pow(pool!.tokenA!.decimals)
+          new BigNumber(10).pow(option!.decimals!)
         ),
       };
 

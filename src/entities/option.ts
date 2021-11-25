@@ -36,6 +36,7 @@ export default class Option implements IOption {
 
   public readonly address: string;
   public readonly networkId: number;
+  public readonly uuid: string;
 
   private _provider?: IProvider;
   private _symbol?: string;
@@ -177,6 +178,7 @@ export default class Option implements IOption {
   constructor(params: { address: string; networkId: number }) {
     this.address = params.address.toLowerCase();
     this.networkId = params.networkId;
+    this.uuid = `${this.address}-${this.networkId}`;
   }
 
   init(params: IOptionBuilderParams): IOption {

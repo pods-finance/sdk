@@ -231,77 +231,83 @@ export default class MulticallAggregator {
   static async getGeneralDynamics(params: {
     provider: IProvider;
     options: IOption[];
+    includeOption?: boolean;
+    includePool?: boolean;
   }): Promise<Optional<{ [key: string]: IPoolGeneralMetrics }>> {
-    const { provider, options } = params;
+    const { provider, options, includePool, includeOption } = params;
     const calls: CallContext[] = [];
 
     options.forEach((option) => {
       try {
-        expect(option?.pool?.tokenA, "option pool tokenA");
-        const pool = option.pool!;
-        const one = new BigNumber(1).times(
-          new BigNumber(10).pow(pool!.tokenA!.decimals)
-        );
+        if (includePool !== false) {
+          expect(option?.pool?.tokenA, "option pool tokenA");
+          const pool = option.pool!;
+          const one = new BigNumber(1).times(
+            new BigNumber(10).pow(pool!.tokenA!.decimals)
+          );
 
-        const poolInstructions: CallContext = {
-          reference: `p-${option.address!}`,
-          contractAddress: option.poolAddress!,
-          abi: contracts.abis.PoolABI,
-          context: {
-            id: option.address,
-          },
-          calls: [
-            {
-              reference: "sellingPrice",
-              methodName: "getOptionTradeDetailsExactAInput",
-              methodParameters: [one.toFixed(0).toString()],
+          const poolInstructions: CallContext = {
+            reference: `p-${option.address!}`,
+            contractAddress: option.poolAddress!,
+            abi: contracts.abis.PoolABI,
+            context: {
+              id: option.address,
             },
-            {
-              reference: "buyingPrice",
-              methodName: "getOptionTradeDetailsExactAOutput",
-              methodParameters: [one.toFixed(0).toString()],
-            },
-            {
-              reference: "abPrice",
-              methodName: "getABPrice",
-              methodParameters: [],
-            },
-            {
-              reference: "IV",
-              methodName: "priceProperties",
-              methodParameters: [],
-            },
-            {
-              reference: "adjustedIV",
-              methodName: "getAdjustedIV",
-              methodParameters: [],
-            },
-            {
-              reference: "totalBalances",
-              methodName: "getPoolBalances",
-              methodParameters: [],
-            },
-          ],
-        };
+            calls: [
+              {
+                reference: "sellingPrice",
+                methodName: "getOptionTradeDetailsExactAInput",
+                methodParameters: [one.toFixed(0).toString()],
+              },
+              {
+                reference: "buyingPrice",
+                methodName: "getOptionTradeDetailsExactAOutput",
+                methodParameters: [one.toFixed(0).toString()],
+              },
+              {
+                reference: "abPrice",
+                methodName: "getABPrice",
+                methodParameters: [],
+              },
+              {
+                reference: "IV",
+                methodName: "priceProperties",
+                methodParameters: [],
+              },
+              {
+                reference: "adjustedIV",
+                methodName: "getAdjustedIV",
+                methodParameters: [],
+              },
+              {
+                reference: "totalBalances",
+                methodName: "getPoolBalances",
+                methodParameters: [],
+              },
+            ],
+          };
+          calls.push(poolInstructions);
+        }
 
-        const optionInstructions: CallContext = {
-          reference: `o-${option.address!}`,
-          contractAddress: option.address!,
-          abi: contracts.abis.OptionABI,
-          context: {
-            id: option.address,
-          },
-          calls: [
-            {
-              reference: "totalSupply",
-              methodName: "totalSupply",
-              methodParameters: [],
+        if (includeOption !== false) {
+          const optionInstructions: CallContext = {
+            reference: `o-${option.address!}`,
+            contractAddress: option.address!,
+            abi: contracts.abis.OptionABI,
+            context: {
+              id: option.address,
             },
-          ],
-        };
+            calls: [
+              {
+                reference: "totalSupply",
+                methodName: "totalSupply",
+                methodParameters: [],
+              },
+            ],
+          };
 
-        calls.push(poolInstructions);
-        calls.push(optionInstructions);
+          calls.push(optionInstructions);
+        }
       } catch (error) {
         if (ALLOW_LOGS()) console.error("Pods SDK - Multicall", error);
       }
@@ -367,7 +373,7 @@ export default class MulticallAggregator {
               break;
             case "totalSupply":
               metrics.totalSupply = MulticallParser.interpretTotalSupply({
-                pool,
+                option,
                 result,
               });
               break;
@@ -399,74 +405,88 @@ export default class MulticallAggregator {
     provider: IProvider;
     user: string;
     options: IOption[];
+    includeOption?: boolean;
+    includePool?: boolean;
+    includeTokens?: boolean;
   }): Promise<Optional<{ [key: string]: IPoolGeneralMetrics }>> {
-    const { provider, options, user } = params;
+    const {
+      provider,
+      options,
+      user,
+      includeOption,
+      includePool,
+      includeTokens,
+    } = params;
     const calls: CallContext[] = [];
 
     options.forEach((option) => {
       try {
-        expect(option?.pool?.tokenA, "option pool tokenA");
+        if (includePool !== false) {
+          expect(option?.pool?.tokenA, "option pool tokenA");
 
-        const poolInstructions: CallContext = {
-          reference: `p-${option.address!}`,
-          contractAddress: option.poolAddress!,
-          abi: contracts.abis.PoolABI,
-          context: {
-            id: option.address,
-          },
-          calls: [
-            {
-              reference: "userPositions",
-              methodName: "getRemoveLiquidityAmounts",
-              methodParameters: [
-                new BigNumber(100).toString(),
-                new BigNumber(100).toString(),
-                _.toString(user).toLowerCase(),
-              ],
+          const poolInstructions: CallContext = {
+            reference: `p-${option.address!}`,
+            contractAddress: option.poolAddress!,
+            abi: contracts.abis.PoolABI,
+            context: {
+              id: option.address,
             },
-          ],
-        };
+            calls: [
+              {
+                reference: "userPositions",
+                methodName: "getRemoveLiquidityAmounts",
+                methodParameters: [
+                  new BigNumber(100).toString(),
+                  new BigNumber(100).toString(),
+                  _.toString(user).toLowerCase(),
+                ],
+              },
+            ],
+          };
+          calls.push(poolInstructions);
+        }
+        if (includeOption !== false) {
+          const optionInstructions: CallContext = {
+            reference: `o-${option.address!}`,
+            contractAddress: option.address!,
+            abi: contracts.abis.OptionABI,
+            context: {
+              id: option.address,
+            },
+            calls: [
+              {
+                reference: "userOptionWithdrawAmounts",
+                methodName: "getSellerWithdrawAmounts",
+                methodParameters: [_.toString(user).toLowerCase()],
+              },
+              {
+                reference: "userOptionMintedAmount",
+                methodName: "mintedOptions",
+                methodParameters: [_.toString(user).toLowerCase()],
+              },
+            ],
+          };
+          calls.push(optionInstructions);
+        }
+        if (includeTokens !== false) {
+          const tokenInstructions: CallContext = {
+            reference: `t-${option.address!}`,
+            contractAddress: option.address!,
+            abi: contracts.abis.ERC20ABI,
+            context: {
+              id: option.address,
+            },
+            calls: [
+              {
+                reference: "userOptionBalance",
+                methodName: "balanceOf",
+                methodParameters: [_.toString(user).toLowerCase()],
+              },
+            ],
+          };
 
-        const optionInstructions: CallContext = {
-          reference: `o-${option.address!}`,
-          contractAddress: option.address!,
-          abi: contracts.abis.OptionABI,
-          context: {
-            id: option.address,
-          },
-          calls: [
-            {
-              reference: "userOptionWithdrawAmounts",
-              methodName: "getSellerWithdrawAmounts",
-              methodParameters: [_.toString(user).toLowerCase()],
-            },
-            {
-              reference: "userOptionMintedAmount",
-              methodName: "mintedOptions",
-              methodParameters: [_.toString(user).toLowerCase()],
-            },
-          ],
-        };
-
-        const tokenInstructions: CallContext = {
-          reference: `t-${option.address!}`,
-          contractAddress: option.address!,
-          abi: contracts.abis.ERC20ABI,
-          context: {
-            id: option.address,
-          },
-          calls: [
-            {
-              reference: "userOptionBalance",
-              methodName: "balanceOf",
-              methodParameters: [_.toString(user).toLowerCase()],
-            },
-          ],
-        };
-
-        calls.push(poolInstructions);
-        calls.push(optionInstructions);
-        calls.push(tokenInstructions);
+          calls.push(tokenInstructions);
+        }
       } catch (error) {
         if (ALLOW_LOGS())
           console.error("Pods SDK - Multicall User", error, {

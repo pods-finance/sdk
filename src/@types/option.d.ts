@@ -11,6 +11,7 @@ import { OptionType } from "../constants/globals";
 export interface IOption {
   readonly address: string;
   readonly networkId: number;
+  readonly uuid: string;
 
   provider?: IProvider;
   symbol?: string;
