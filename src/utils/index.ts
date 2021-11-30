@@ -1,7 +1,7 @@
 import _ from "lodash";
 import BigNumber from "bignumber.js";
 import { IProvider, IValue, IHelperOverrides } from "@types";
-import { DEFAULT_TIMEOUT } from "../constants/globals";
+import { DEFAULT_TIMEOUT, ALLOW_LOGS } from "../constants/globals";
 declare module "lodash" {
   interface LoDashStatic {
     isNilOrEmptyString(value: any): boolean;
@@ -99,15 +99,23 @@ export async function getOverrides(
    */
 
   try {
-    if (!_.isNilOrEmptyString(gasLimit))
-      overrides.gasLimit =
-        gasLimit === true
-          ? (await estimate(...args))
-              .mul(120)
-              .div(100)
-              .toString()
-          : (gasLimit as BigNumber).toString();
-  } catch (error) {}
+    if (!_.isNilOrEmptyString(gasLimit) && gasLimit !== false) {
+      if (gasLimit !== true)
+        overrides.gasLimit = (gasLimit as BigNumber).toString();
+      else {
+        const limit = await estimate(...args);
+        if (limit) {
+          overrides.gasLimit = new BigNumber(limit.toString())
+            .multipliedBy(120)
+            .dividedBy(100)
+            .toFixed(0)
+            .toString();
+        }
+      }
+    }
+  } catch (error) {
+    if (ALLOW_LOGS()) console.error("Pods SDK", " Gas Simulator", error);
+  }
 
   /**
    * Gas price is not handled yet

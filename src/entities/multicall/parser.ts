@@ -230,7 +230,7 @@ export default class Parser {
       if (!status || !_.isArray(values) || values.length === 0)
         throw new Error("Total Supply unretrievable");
 
-      expect(option, "option pool");
+      expect(option, "option");
       expect(option!.decimals, "option decimals");
 
       const supply = ethers.BigNumber.from(values[0]).toString();
