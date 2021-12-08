@@ -60,16 +60,17 @@ export interface IHelper {
     callback?: Function;
   }): Promise<void>;
 
-  /** Add single liquidity. Use humanized values (no decimal padding) */
-  doAddSingleLiquidity(params: {
+  /** Remove dual liquidity. Use integer values from 0 to 100 */
+  doRemoveLiquidity(params: {
     option: IOption;
-    tokenBAmount: BigNumber;
+    percentA: BigNumber;
+    percentB: BigNumber;
     overrides?: IHelperOverrides;
     callback?: Function;
   }): Promise<void>;
 
-  /** DEPRECATED: Add dual liquidity. Use humanized values (no decimal padding) */
-  doAddDualLiquidity(params: {
+  /** Add dual liquidity with pre-minted options and strike. Use humanized values (no decimal padding) */
+  doAddLiquidityWithOptionsAndStrike(params: {
     option: IOption;
     tokenAAmount: BigNumber;
     tokenBAmount: BigNumber;
@@ -77,11 +78,19 @@ export interface IHelper {
     callback?: Function;
   }): Promise<void>;
 
-  /** Remove dual liquidity. Use integer values from 0 to 100 */
-  doRemoveLiquidity(params: {
+  /** Add dual liquidity collateral (for post-minting options) and anti-collateral for tokenB. Use humanized values (no decimal padding) */
+  doMintAndAddLiquidityWithCollateralAndStrike(params: {
     option: IOption;
-    percentA: BigNumber;
-    percentB: BigNumber;
+    tokenAAmount: BigNumber;
+    tokenBAmount: BigNumber;
+    overrides?: IHelperOverrides;
+    callback?: Function;
+  }): Promise<void>;
+
+  /** PUT ONLY: Add single liquidity with collateral. Use humanized values (no decimal padding) */
+  doMintPutAndAddLiquidityWithCollateral(params: {
+    option: IOption;
+    tokenBAmount: BigNumber;
     overrides?: IHelperOverrides;
     callback?: Function;
   }): Promise<void>;

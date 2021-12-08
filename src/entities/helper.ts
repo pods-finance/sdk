@@ -300,8 +300,49 @@ export default class Helper implements IHelper {
   }): Promise<void> {
     return this.doSellExact(params);
   }
+  async doRemoveLiquidity(params: {
+    option: IOption;
+    percentA: BigNumber;
+    percentB: BigNumber;
+    overrides?: IHelperOverrides;
+    callback?: Function | undefined;
+  }): Promise<void> {
+    const { option, percentA, percentB, callback } = params;
 
-  async doAddDualLiquidity(params: {
+    expect(this.provider, "provider");
+    expect(this.signer, "signer");
+    expect(option, "option");
+    expect(option.pool, "pool (option)");
+    expect(percentA, "percentA", "object");
+    expect(percentB, "percentB", "object");
+
+    const contract = contracts.instances.pool(
+      this.signer!,
+      option.pool!.address
+    );
+
+    const args = [
+      percentA.toFixed(0).toString(),
+      percentB.toFixed(0).toString(),
+    ];
+
+    const overrides = await getOverrides(
+      params.overrides,
+      contract.estimateGas.removeLiquidity,
+      args
+    );
+
+    const transaction = await contract.removeLiquidity(...args, overrides);
+
+    try {
+      const receipt = await transaction.wait();
+      (callback || _.noop)(null, receipt.transactionHash, receipt);
+    } catch (error) {
+      (callback || _.noop)(error, (error as ITransactionError).transactionHash);
+    }
+  }
+
+  async doAddLiquidityWithOptionsAndStrike(params: {
     option: IOption;
     tokenAAmount: BigNumber;
     tokenBAmount: BigNumber;
@@ -354,49 +395,8 @@ export default class Helper implements IHelper {
       (callback || _.noop)(error, (error as ITransactionError).transactionHash);
     }
   }
-  async doRemoveLiquidity(params: {
-    option: IOption;
-    percentA: BigNumber;
-    percentB: BigNumber;
-    overrides?: IHelperOverrides;
-    callback?: Function | undefined;
-  }): Promise<void> {
-    const { option, percentA, percentB, callback } = params;
 
-    expect(this.provider, "provider");
-    expect(this.signer, "signer");
-    expect(option, "option");
-    expect(option.pool, "pool (option)");
-    expect(percentA, "percentA", "object");
-    expect(percentB, "percentB", "object");
-
-    const contract = contracts.instances.pool(
-      this.signer!,
-      option.pool!.address
-    );
-
-    const args = [
-      percentA.toFixed(0).toString(),
-      percentB.toFixed(0).toString(),
-    ];
-
-    const overrides = await getOverrides(
-      params.overrides,
-      contract.estimateGas.removeLiquidity,
-      args
-    );
-
-    const transaction = await contract.removeLiquidity(...args, overrides);
-
-    try {
-      const receipt = await transaction.wait();
-      (callback || _.noop)(null, receipt.transactionHash, receipt);
-    } catch (error) {
-      (callback || _.noop)(error, (error as ITransactionError).transactionHash);
-    }
-  }
-
-  async doAddSingleLiquidity(params: {
+  async doMintPutAndAddLiquidityWithCollateral(params: {
     option: IOption;
     tokenBAmount: BigNumber;
     overrides?: IHelperOverrides;
@@ -438,6 +438,62 @@ export default class Helper implements IHelper {
       ...args,
       overrides
     );
+
+    try {
+      const receipt = await transaction.wait();
+      (callback || _.noop)(null, receipt.transactionHash, receipt);
+    } catch (error) {
+      (callback || _.noop)(error, (error as ITransactionError).transactionHash);
+    }
+  }
+
+  async doMintAndAddLiquidityWithCollateralAndStrike(params: {
+    option: IOption;
+    tokenAAmount: BigNumber;
+    tokenBAmount: BigNumber;
+    overrides?: IHelperOverrides;
+    callback?: Function | undefined;
+  }): Promise<void> {
+    const { option, tokenAAmount, tokenBAmount, callback } = params;
+
+    expect(this.provider, "provider");
+    expect(this.signer, "signer");
+    expect(option, "option");
+    expect(option.collateral, "collateral (option)");
+    expect(option.collateral?.decimals, "decimals (option collateral)");
+    expect(option.pool?.tokenB?.decimals, "decimals (option pool tokenB)");
+    expect(option.pool, "pool (option)");
+    expect(option.pool?.tokenB, "tokenB (option pool)");
+    expect(option.pool?.tokenB?.decimals, "decimals (option pool tokenB)");
+    expect(tokenAAmount, "tokenAAmount", "object");
+    expect(tokenBAmount, "tokenBAmount", "object");
+
+    const amountA = new BigNumber(tokenAAmount).multipliedBy(
+      new BigNumber(10).pow(option.collateral!.decimals!)
+    );
+
+    const amountB = new BigNumber(tokenBAmount).multipliedBy(
+      new BigNumber(10).pow(option.pool!.tokenB!.decimals)
+    );
+
+    const contract = contracts.instances.optionHelper(
+      this.signer!,
+      this.address
+    );
+
+    const args = [
+      option.address,
+      amountA.toFixed(0).toString(),
+      amountB.toFixed(0).toString(),
+    ];
+
+    const overrides = await getOverrides(
+      params.overrides,
+      contract.estimateGas.mintAndAddLiquidity,
+      args
+    );
+
+    const transaction = await contract.mintAndAddLiquidity(...args, overrides);
 
     try {
       const receipt = await transaction.wait();
