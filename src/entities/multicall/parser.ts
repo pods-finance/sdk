@@ -1,7 +1,11 @@
 import _ from "lodash";
 import BigNumber from "bignumber.js";
 import { ethers } from "ethers";
-import { CallReturnContext as Result } from "ethereum-multicall";
+
+import {
+  CallReturnContext as Result,
+  ContractCallContext as CallContext,
+} from "ethereum-multicall";
 
 import { IOption, IPool, IValue } from "@types";
 
@@ -121,134 +125,6 @@ export default class Parser {
     }
 
     return { value: zero, feesA: zero, feesB: zero };
-  }
-
-  public static interpretABPrice(params: {
-    result: Result;
-    pool: IPool;
-  }): { [key: string]: IValue } {
-    try {
-      const { result, pool } = params;
-
-      const status = _.get(result, "success");
-      const values = _.get(result, "returnValues");
-
-      if (!status || !_.isArray(values) || values.length === 0)
-        throw new Error("AB price unretrievable - possible pool imbalance");
-
-      expect(pool, "option pool");
-      expect(pool!.tokenB, "option pool tokenB");
-
-      const amount = ethers.BigNumber.from(values[0]).toString();
-
-      const value: IValue = {
-        raw: new BigNumber(amount),
-        humanized: new BigNumber(amount).dividedBy(
-          new BigNumber(10).pow(pool!.tokenB!.decimals)
-        ),
-      };
-
-      return { value };
-    } catch (error) {
-      if (ALLOW_LOGS()) console.error("Pods SDK - Multicall", error);
-    }
-
-    return { value: zero };
-  }
-
-  public static interpretIV(params: { result: Result; pool: IPool }): IValue {
-    try {
-      const { result, pool } = params;
-
-      const status = _.get(result, "success");
-      const values = _.get(result, "returnValues");
-
-      if (!status || !_.isArray(values) || values.length === 0)
-        throw new Error("Price properties unretrievable");
-
-      expect(pool, "option pool");
-      expect(pool!.tokenB, "option pool tokenB");
-
-      const IV = ethers.BigNumber.from(values[5]).toString();
-
-      const value: IValue = {
-        raw: new BigNumber(IV),
-        humanized: new BigNumber(IV).dividedBy(new BigNumber(10).pow(18)),
-      };
-
-      return value;
-    } catch (error) {
-      if (ALLOW_LOGS()) console.error("Pods SDK - Multicall", error, params);
-    }
-
-    return zero;
-  }
-
-  public static interpretAdjustedIV(params: {
-    result: Result;
-    pool: IPool;
-  }): IValue {
-    try {
-      const { result, pool } = params;
-
-      const status = _.get(result, "success");
-      const values = _.get(result, "returnValues");
-
-      if (!status || !_.isArray(values) || values.length === 0)
-        throw new Error("Adjusted IV unretrievable");
-
-      expect(pool, "option pool");
-      expect(pool!.tokenB, "option pool tokenB");
-
-      const adjustedIV = ethers.BigNumber.from(values[0]).toString();
-
-      const value: IValue = {
-        raw: new BigNumber(adjustedIV),
-        humanized: new BigNumber(adjustedIV).dividedBy(
-          new BigNumber(10).pow(18)
-        ),
-      };
-
-      return value;
-    } catch (error) {
-      if (ALLOW_LOGS()) console.error("Pods SDK - Multicall", error, params);
-    }
-
-    return zero;
-  }
-
-  public static interpretTotalSupply(params: {
-    result: Result;
-    option: IOption;
-  }): IValue {
-    try {
-      const { result, option } = params;
-
-      const status = _.get(result, "success");
-      const values = _.get(result, "returnValues");
-
-      if (!status || !_.isArray(values) || values.length === 0)
-        throw new Error("Total Supply unretrievable");
-
-      expect(option, "option");
-      expect(option!.decimals, "option decimals");
-
-      const supply = ethers.BigNumber.from(values[0]).toString();
-
-      const value: IValue = {
-        label: "Total supply of minted options",
-        raw: new BigNumber(supply),
-        humanized: new BigNumber(supply).dividedBy(
-          new BigNumber(10).pow(option!.decimals!)
-        ),
-      };
-
-      return value;
-    } catch (error) {
-      if (ALLOW_LOGS()) console.error("Pods SDK - Multicall", error, params);
-    }
-
-    return zero;
   }
 
   public static interpretTotalBalances(params: {
@@ -536,5 +412,73 @@ export default class Parser {
     }
 
     return { value: zero, feesA: zero, feesB: zero };
+  }
+
+  public static interpretSingleAmount(params: {
+    result: Result;
+    decimals: BigNumber;
+    label: string;
+    position?: number;
+  }): IValue {
+    try {
+      const { result, decimals, label, position } = params;
+
+      const status = _.get(result, "success");
+      const values = _.get(result, "returnValues");
+
+      if (!status || !_.isArray(values) || values.length === 0)
+        throw new Error(`Unretrievable: ${label}`);
+
+      expect(label, `Missing label, cannot interpret amount`);
+      expect(decimals, `Missing decimals, cannot interpret: ${label}`);
+
+      const _amout = values[position || 0];
+      if (_.isNilOrEmptyString(_amout))
+        throw new Error(`Missing value in result for: ${label}`);
+
+      const amount = ethers.BigNumber.from(_amout).toString();
+
+      const value: IValue = {
+        label,
+        raw: new BigNumber(amount),
+        humanized: new BigNumber(amount).dividedBy(
+          new BigNumber(10).pow(decimals!)
+        ),
+      };
+
+      return value;
+    } catch (error) {
+      if (ALLOW_LOGS()) console.error("Pods SDK - Multicall", error, params);
+    }
+
+    return zero;
+  }
+
+  public static call(
+    reference: string,
+    methodName: string,
+    methodParameters: any[]
+  ): { reference: string; methodName: string; methodParameters: any[] } {
+    return {
+      reference,
+      methodName,
+      methodParameters,
+    };
+  }
+
+  public static instructions(
+    reference: string,
+    contractAddress: string,
+    abi: any[],
+    context: { [key: string]: string; id: string },
+    calls: { reference: string; methodName: string; methodParameters: any[] }[]
+  ): CallContext {
+    return {
+      reference,
+      contractAddress,
+      abi,
+      context,
+      calls,
+    };
   }
 }

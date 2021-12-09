@@ -233,8 +233,15 @@ export default class MulticallAggregator {
     options: IOption[];
     includeOption?: boolean;
     includePool?: boolean;
+    includeTokens?: boolean;
   }): Promise<Optional<{ [key: string]: IPoolGeneralMetrics }>> {
-    const { provider, options, includePool, includeOption } = params;
+    const {
+      provider,
+      options,
+      includePool,
+      includeOption,
+      includeTokens,
+    } = params;
     const calls: CallContext[] = [];
 
     options.forEach((option) => {
@@ -246,14 +253,14 @@ export default class MulticallAggregator {
             new BigNumber(10).pow(pool!.tokenA!.decimals)
           );
 
-          const poolInstructions: CallContext = {
-            reference: `p-${option.address!}`,
-            contractAddress: option.poolAddress!,
-            abi: contracts.abis.PoolABI,
-            context: {
+          const poolInstructions: CallContext = MulticallParser.instructions(
+            `p-${option.address!}`,
+            option.poolAddress!,
+            contracts.abis.PoolABI,
+            {
               id: option.address,
             },
-            calls: [
+            [
               {
                 reference: "sellingPrice",
                 methodName: "getOptionTradeDetailsExactAInput",
@@ -284,29 +291,70 @@ export default class MulticallAggregator {
                 methodName: "getPoolBalances",
                 methodParameters: [],
               },
-            ],
-          };
+            ]
+          );
+
           calls.push(poolInstructions);
         }
 
         if (includeOption !== false) {
-          const optionInstructions: CallContext = {
-            reference: `o-${option.address!}`,
-            contractAddress: option.address!,
-            abi: contracts.abis.OptionABI,
-            context: {
+          const optionInstructions: CallContext = MulticallParser.instructions(
+            `o-${option.address!}`,
+            option.address!,
+            contracts.abis.OptionABI,
+            {
               id: option.address,
             },
-            calls: [
+            [
               {
                 reference: "totalSupply",
                 methodName: "totalSupply",
                 methodParameters: [],
               },
-            ],
-          };
+            ]
+          );
 
           calls.push(optionInstructions);
+        }
+
+        if (includeTokens !== false) {
+          expect(option?.underlying, "option underlying");
+          expect(option?.strike, "option strike");
+
+          const underlyingInstructions: CallContext = MulticallParser.instructions(
+            `t-${option.address!}-underlying`,
+            option.underlying!.address!,
+            contracts.abis.ERC20ABI,
+            {
+              id: option.address,
+            },
+            [
+              {
+                reference: `optionUnderlyingBalance`,
+                methodName: "balanceOf",
+                methodParameters: [_.toString(option.address).toLowerCase()],
+              },
+            ]
+          );
+
+          const strikeInstructions: CallContext = MulticallParser.instructions(
+            `t-${option.address!}-strike`,
+            option.strike!.address!,
+            contracts.abis.ERC20ABI,
+            {
+              id: option.address,
+            },
+            [
+              {
+                reference: `optionStrikeBalance`,
+                methodName: "balanceOf",
+                methodParameters: [_.toString(option.address).toLowerCase()],
+              },
+            ]
+          );
+
+          calls.push(underlyingInstructions);
+          calls.push(strikeInstructions);
         }
       } catch (error) {
         if (ALLOW_LOGS()) console.error("Pods SDK - Multicall", error);
@@ -347,35 +395,63 @@ export default class MulticallAggregator {
                 result,
               });
               break;
-            case "abPrice":
-              metrics.abPrice = MulticallParser.interpretABPrice({
-                pool,
-                result,
-              });
-              break;
-            case "IV":
-              metrics.IV = MulticallParser.interpretIV({
-                pool,
-                result,
-              });
-              break;
-            case "adjustedIV":
-              metrics.adjustedIV = MulticallParser.interpretAdjustedIV({
-                pool,
-                result,
-              });
-              break;
+
             case "totalBalances":
               metrics.totalBalances = MulticallParser.interpretTotalBalances({
                 pool,
                 result,
               });
               break;
-            case "totalSupply":
-              metrics.totalSupply = MulticallParser.interpretTotalSupply({
-                option,
+            case "abPrice":
+              metrics.abPrice = {
+                value: MulticallParser.interpretSingleAmount({
+                  decimals: pool!.tokenB!.decimals,
+                  result,
+                  label: "ABPrice",
+                }),
+              };
+              break;
+            case "IV":
+              metrics.IV = MulticallParser.interpretSingleAmount({
+                decimals: new BigNumber(18),
                 result,
+                label: "Adjusted implied volatility",
+                position: 5,
               });
+              break;
+            case "adjustedIV":
+              metrics.adjustedIV = MulticallParser.interpretSingleAmount({
+                decimals: new BigNumber(18),
+                result,
+                label: "Adjusted implied volatility",
+              });
+              break;
+
+            case "totalSupply":
+              metrics.totalSupply = MulticallParser.interpretSingleAmount({
+                decimals: option!.decimals!,
+                result,
+                label: "Total supply",
+              });
+              break;
+            case "optionUnderlyingBalance":
+              metrics.optionUnderlyingBalance = MulticallParser.interpretSingleAmount(
+                {
+                  decimals: option!.underlying!.decimals,
+                  result,
+                  label: "Underlying tokens stored in option",
+                }
+              );
+              break;
+            case "optionStrikeBalance":
+              metrics.optionStrikeBalance = MulticallParser.interpretSingleAmount(
+                {
+                  decimals: option!.strike!.decimals,
+                  result,
+                  label: "Strike tokens stored in option",
+                }
+              );
+              break;
               break;
             default:
               break;

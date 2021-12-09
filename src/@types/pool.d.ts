@@ -31,6 +31,9 @@ export interface IPoolGeneralMetrics {
   userOptionBalance?: IValue;
   totalSupply?: IValue;
   rebalancePrice?: { [key: string]: IValue | unknown };
+
+  optionUnderlyingBalance?: IValue;
+  optionStrikeBalance?: IValue;
 }
 
 export interface IPool {
