@@ -51,7 +51,7 @@ const _networks: { [key: number]: INetwork } = {
     subgraph: {
       prod: "https://api.thegraph.com/subgraphs/name/pods-finance/pods-kovan",
       dev:
-        "https://api.thegraph.com/subgraphs/name/pods-finance/pods-experimental", // kovan-dev
+        "https://api.thegraph.com/subgraphs/name/pods-finance/pods-kovan-dev",
     },
     rpc: [],
     explorer: "https://kovan.etherscan.io",
@@ -177,8 +177,8 @@ const _networks: { [key: number]: INetwork } = {
       decimals: 18,
     },
     subgraph: {
-      prod: "",
-      dev: "",
+      prod: "https://api.thegraph.com/subgraphs/name/pods-finance/pods-goerli",
+      dev: "https://api.thegraph.com/subgraphs/name/pods-finance/pods-goerli",
     },
     rpc: [],
     explorer: "https://goerli.etherscan.io",

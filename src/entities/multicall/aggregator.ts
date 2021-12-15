@@ -942,8 +942,6 @@ export default class MulticallAggregator {
           const amountA = ethers.BigNumber.from(A).toString();
           const amountB = ethers.BigNumber.from(B).toString();
 
-          console.log({ option, amountA, amountB });
-
           const userFeeWithdrawAmountA: IValue = {
             label: "Fee amounts redeemable for user shares for side A",
             raw: new BigNumber(amountA),
