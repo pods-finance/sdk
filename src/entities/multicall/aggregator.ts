@@ -16,6 +16,7 @@ import {
   IProvider,
   IPoolGeneralMetrics,
   Optional,
+  IValue,
 } from "@types";
 
 import { ALLOW_LOGS } from "../../constants/globals";
@@ -23,6 +24,7 @@ import { expect, zero } from "../../utils";
 
 import MulticallParser from "./parser";
 import MulticallEngine from "./engine";
+import { ethers } from "ethers";
 
 export default class MulticallAggregator {
   static async getOptionsStatics(params: {
@@ -521,6 +523,7 @@ export default class MulticallAggregator {
           };
           calls.push(poolInstructions);
         }
+
         if (includeOption !== false) {
           const optionInstructions: CallContext = {
             reference: `o-${option.address!}`,
@@ -779,6 +782,210 @@ export default class MulticallAggregator {
           dynamics,
         });
     }
+
+    return undefined;
+  }
+
+  static async getUserFeeDynamics(params: {
+    provider: IProvider;
+    user: string;
+    options: IOption[];
+  }): Promise<Optional<{ [key: string]: IPoolGeneralMetrics }>> {
+    const { provider, options, user } = params;
+
+    const getShares = async () => {
+      const calls: CallContext[] = [];
+      options.forEach((option) => {
+        try {
+          expect(option?.pool?.feePoolAAddress, "option pool feePoolAAddress");
+          expect(option?.pool?.feePoolBAddress, "option pool feePoolBAddress");
+
+          expect(option?.pool?.tokenB?.decimals, "option pool tokenB decimals");
+
+          const feeInstructions = (
+            feePoolAddress: string,
+            type: string
+          ): CallContext =>
+            MulticallParser.instructions(
+              `fp-${option.address!}-${type}`,
+              feePoolAddress,
+              contracts.abis.FeePoolABI,
+              {
+                id: option.address,
+              },
+              [
+                {
+                  reference: `sharesOf${type}`,
+                  methodName: "sharesOf",
+                  methodParameters: [_.toString(user).toLowerCase()],
+                },
+              ]
+            );
+
+          calls.push(feeInstructions(option!.pool!.feePoolAAddress!, "A"));
+          calls.push(feeInstructions(option!.pool!.feePoolBAddress!, "B"));
+        } catch (error) {
+          if (ALLOW_LOGS())
+            console.error("Pods SDK - Multicall User", error, {
+              user,
+              options,
+            });
+        }
+      });
+
+      try {
+        const items = await MulticallEngine.use({
+          provider,
+          calls,
+        });
+        if (_.isNil(items)) return undefined;
+
+        const results = await MulticallEngine.parse({
+          items,
+        });
+
+        return results;
+      } catch (error) {
+        console.error("Pods SDK - Multicall User", error, {
+          user,
+          options,
+        });
+      }
+      return undefined;
+    };
+
+    const getAmounts = async (shares: any) => {
+      const calls: CallContext[] = [];
+      options.forEach((option) => {
+        try {
+          expect(option?.pool?.feePoolAAddress, "option pool feePoolAAddress");
+          expect(option?.pool?.feePoolBAddress, "option pool feePoolBAddress");
+
+          const feeInstructions = (
+            feePoolAddress: string,
+            type: string,
+            feeShares: string
+          ): CallContext =>
+            MulticallParser.instructions(
+              `fp-${option.address!}-${type}`,
+              feePoolAddress,
+              contracts.abis.FeePoolABI,
+              {
+                id: option.address,
+              },
+              [
+                {
+                  reference: `feeWithdrawAmount${type}`,
+                  methodName: "getWithdrawAmount",
+                  methodParameters: [
+                    _.toString(user).toLowerCase(),
+                    ethers.BigNumber.from(feeShares).toString(),
+                  ],
+                },
+              ]
+            );
+
+          calls.push(
+            feeInstructions(
+              option.pool!.feePoolAAddress!,
+              "A",
+              _.get(shares, `[${option.address}].sharesOfA.0`)
+            )
+          );
+          calls.push(
+            feeInstructions(
+              option.pool!.feePoolBAddress!,
+              "B",
+              _.get(shares, `[${option.address}].sharesOfB.0`)
+            )
+          );
+        } catch (error) {
+          if (ALLOW_LOGS())
+            console.error("Pods SDK - Multicall User", error, {
+              user,
+              options,
+            });
+        }
+      });
+
+      try {
+        const items = await MulticallEngine.use({
+          provider,
+          calls,
+        });
+        if (_.isNil(items)) return undefined;
+
+        const results = await MulticallEngine.parse({
+          items,
+        });
+
+        return results;
+      } catch (error) {
+        console.error("Pods SDK - Multicall User", error, {
+          user,
+          options,
+        });
+      }
+      return undefined;
+    };
+
+    const getInterpreted = (
+      amounts: any
+    ): { [key: string]: IPoolGeneralMetrics } => {
+      return Object.keys(amounts)
+        .map((id) => {
+          const option = options.find((o) => o.address === id);
+          const base = amounts[id];
+          const A = _.get(base, "feeWithdrawAmountA.1") || "0";
+          const B = _.get(base, "feeWithdrawAmountB.1") || "0";
+
+          const amountA = ethers.BigNumber.from(A).toString();
+          const amountB = ethers.BigNumber.from(B).toString();
+
+          console.log({ option, amountA, amountB });
+
+          const userFeeWithdrawAmountA: IValue = {
+            label: "Fee amounts redeemable for user shares for side A",
+            raw: new BigNumber(amountA),
+            humanized: new BigNumber(amountA).dividedBy(
+              new BigNumber(10).pow(option!.pool!.tokenB!.decimals!)
+            ),
+          };
+
+          const userFeeWithdrawAmountB: IValue = {
+            label: "Fee amounts redeemable for user shares for side B",
+            raw: new BigNumber(amountB),
+            humanized: new BigNumber(amountB).dividedBy(
+              new BigNumber(10).pow(option!.pool!.tokenB!.decimals!)
+            ),
+          };
+
+          return {
+            id,
+            value: {
+              userFeeWithdrawAmounts: [
+                userFeeWithdrawAmountA,
+                userFeeWithdrawAmountB,
+              ],
+            },
+          };
+        })
+        .reduce((prev: { [key: string]: IPoolGeneralMetrics }, curr: any) => {
+          prev[curr!.id] = curr.value;
+          return prev;
+        }, {});
+    };
+
+    try {
+      const shares = await getShares();
+      const amounts = await getAmounts(shares);
+
+      if (_.isNil(amounts)) return undefined;
+
+      const interpreted = getInterpreted(amounts);
+
+      return interpreted;
+    } catch (e) {}
 
     return undefined;
   }

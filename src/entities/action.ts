@@ -37,10 +37,13 @@ export default class Action implements IAction {
   public readonly poolAddress: string;
   public readonly userAddress: string;
 
+  private _metadataOptionsMintedAndSold?: BigNumber;
+  private _metadataFeeAValue?: BigNumber;
+  private _metadataFeeBValue?: BigNumber;
+
   private _option?: IOption;
 
   private _spotPrice?: BigNumber;
-  private _metadataOptionsMintedAndSold?: BigNumber;
   private _nextIV?: BigNumber;
   private _nextSellingPrice?: BigNumber;
   private _nextBuyingPrice?: BigNumber;
@@ -84,6 +87,20 @@ export default class Action implements IAction {
   }
   public set metadataOptionsMintedAndSold(value: Optional<BigNumber>) {
     this._metadataOptionsMintedAndSold = value;
+  }
+
+  public get metadataFeeAValue(): Optional<BigNumber> {
+    return this._metadataFeeAValue;
+  }
+  public set metadataFeeAValue(value: Optional<BigNumber>) {
+    this._metadataFeeAValue = value;
+  }
+
+  public get metadataFeeBValue(): Optional<BigNumber> {
+    return this._metadataFeeBValue;
+  }
+  public set metadataFeeBValue(value: Optional<BigNumber>) {
+    this._metadataFeeBValue = value;
   }
 
   public get nextIV(): Optional<BigNumber> {
@@ -238,8 +255,17 @@ export default class Action implements IAction {
     this.userAddress = _.toString(params.userAddress).toLowerCase();
     this.poolAddress = _.toString(params.poolAddress).toLowerCase();
 
-    this.spotPrice = params.spotPrice;
     this.metadataOptionsMintedAndSold = params.metadataOptionsMintedAndSold;
+    this.metadataFeeAValue = params.metadataFeeAValue;
+    this.metadataFeeBValue = params.metadataFeeBValue;
+
+    /**
+     *
+     * --- HEAVY ---
+     *
+     */
+
+    this.spotPrice = params.spotPrice;
     this.nextIV = params.nextIV;
     this.nextSellingPrice = params.nextSellingPrice;
     this.nextBuyingPrice = params.nextBuyingPrice;
@@ -576,7 +602,7 @@ export default class Action implements IAction {
   public getMetadataOptionsMintedAndSoldValue(): IValue {
     expect(
       this.metadataOptionsMintedAndSold,
-      "metadataOptionsMintedAndSold (pack:heavy)"
+      "metadataOptionsMintedAndSold (pack:light)"
     );
     expect(this.option, "option");
     expect(this.option?.decimals, "decimals (option)");
@@ -585,6 +611,42 @@ export default class Action implements IAction {
       raw: new BigNumber(this.metadataOptionsMintedAndSold!),
       humanized: new BigNumber(this.metadataOptionsMintedAndSold!).dividedBy(
         new BigNumber(10).pow(this.option!.decimals!)
+      ),
+    };
+
+    return value;
+  }
+
+  public getMetadataFeeAValue(): IValue {
+    expect(this.metadataFeeAValue, "metadataFeeAValue (pack:light)");
+    expect(this.option, "option");
+    expect(
+      this.option?.pool?.tokenB?.decimals,
+      "decimals (option pool tokenB)"
+    );
+
+    const value: IValue = {
+      raw: new BigNumber(this.metadataFeeAValue!),
+      humanized: new BigNumber(this.metadataFeeAValue!).dividedBy(
+        new BigNumber(10).pow(this.option!.pool!.tokenB!.decimals)
+      ),
+    };
+
+    return value;
+  }
+
+  public getMetadataFeeBValue(): IValue {
+    expect(this.metadataFeeBValue, "metadataFeeBValue (pack:light)");
+    expect(this.option, "option");
+    expect(
+      this.option?.pool?.tokenB?.decimals,
+      "decimals (option pool tokenB)"
+    );
+
+    const value: IValue = {
+      raw: new BigNumber(this.metadataFeeBValue!),
+      humanized: new BigNumber(this.metadataFeeBValue!).dividedBy(
+        new BigNumber(10).pow(this.option!.pool!.tokenB!.decimals)
       ),
     };
 

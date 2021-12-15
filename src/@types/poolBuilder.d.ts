@@ -10,6 +10,9 @@ export interface IPoolBuilderParams {
   factoryAddress: string;
   optionAddress: string;
 
+  feePoolAAddress: string;
+  feePoolBAddress: string;
+
   tokenA: string;
   tokenADecimals: BigNumber;
   tokenASymbol: string;

@@ -8,8 +8,6 @@ const chains = {
   optimism: "Optimism",
 };
 
-
-
 const _networks: { [key: number]: INetwork } = {
   1: {
     chainId: 1,
@@ -53,7 +51,7 @@ const _networks: { [key: number]: INetwork } = {
     subgraph: {
       prod: "https://api.thegraph.com/subgraphs/name/pods-finance/pods-kovan",
       dev:
-        "https://api.thegraph.com/subgraphs/name/pods-finance/pods-kovan-dev",
+        "https://api.thegraph.com/subgraphs/name/pods-finance/pods-experimental", // kovan-dev
     },
     rpc: [],
     explorer: "https://kovan.etherscan.io",
@@ -64,7 +62,7 @@ const _networks: { [key: number]: INetwork } = {
   137: {
     chainId: 137,
     networkId: 137,
-    name: "Matic",
+    name: "Polygon",
     supported: true,
     chain: chains.polygon,
     network: "mainnet",

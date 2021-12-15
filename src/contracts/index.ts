@@ -9,6 +9,7 @@ import PoolABI from "./abis/OptionAMMPool.json";
 import OptionFactoryABI from "./abis/OptionFactory.json";
 import OptionHelperABI from "./abis/OptionHelper.json";
 import OptionABI from "./abis/WPodPut.json";
+import FeePoolABI from "./abis/FeePool.json";
 
 function instance(
   provider: ISignerOrProvider,
@@ -37,6 +38,8 @@ const instances = {
     instance(provider, address, OptionHelperABI),
   option: (provider: ISignerOrProvider, address: string): Contract =>
     instance(provider, address, OptionABI),
+  feePool: (provider: ISignerOrProvider, address: string): Contract =>
+    instance(provider, address, FeePoolABI),
 };
 
 const abis = {
@@ -48,6 +51,7 @@ const abis = {
   OptionFactoryABI,
   OptionHelperABI,
   OptionABI,
+  FeePoolABI,
 };
 
 const contracts = {

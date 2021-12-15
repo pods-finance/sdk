@@ -32,6 +32,9 @@ export default class Pool implements IPool {
   private _factoryAddress?: string;
   private _optionAddress?: string;
 
+  private _feePoolAAddress?: string;
+  private _feePoolBAddress?: string;
+
   /**
    * ---------- SETTERS & GETTERS ----------
    */
@@ -70,6 +73,20 @@ export default class Pool implements IPool {
     this._optionAddress = value;
   }
 
+  public get feePoolAAddress(): Optional<string> {
+    return this._feePoolAAddress;
+  }
+  public set feePoolAAddress(value: Optional<string>) {
+    this._feePoolAAddress = value;
+  }
+
+  public get feePoolBAddress(): Optional<string> {
+    return this._feePoolBAddress;
+  }
+  public set feePoolBAddress(value: Optional<string>) {
+    this._feePoolBAddress = value;
+  }
+
   /**
    * ---------- CONSTRUCTOR & METHODS ----------
    */
@@ -82,6 +99,9 @@ export default class Pool implements IPool {
   init(params: IPoolBuilderParams): IPool {
     this.factoryAddress = _.toString(params.factoryAddress).toLowerCase();
     this.optionAddress = _.toString(params.optionAddress).toLowerCase();
+
+    this.feePoolAAddress = _.toString(params.feePoolAAddress).toLowerCase();
+    this.feePoolBAddress = _.toString(params.feePoolBAddress).toLowerCase();
 
     this.provider = params.provider;
 

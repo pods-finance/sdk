@@ -18,6 +18,9 @@ export default class PoolBuilder implements IPoolBuilder {
     body.factoryAddress = _.get(body, "factory.id");
     body.optionAddress = _.get(body, "option.id");
 
+    body.feePoolAAddress = _.get(body, "feePoolA.address");
+    body.feePoolBAddress = _.get(body, "feePoolB.address");
+
     const pool = new Pool({
       address: body.address,
       networkId: body.networkId,

@@ -12,6 +12,7 @@ const Multicall = {
   getGeneralDynamics: MulticallAggregator.getGeneralDynamics,
   getUserDynamics: MulticallAggregator.getUserDynamics,
   getUserRebalanceDynamics: MulticallAggregator.getUserRebalanceDynamics,
+  getUserFeeDynamics: MulticallAggregator.getUserFeeDynamics,
 };
 
 export default Multicall;

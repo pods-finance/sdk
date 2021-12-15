@@ -32,6 +32,24 @@ export const OptionFragment = gql`
   }
 `;
 
+export const FeeFragment = gql`
+  fragment FeeFragment on Fee {
+    id
+    value
+  }
+`;
+
+export const FeePool = gql`
+  fragment FeePoolFragment on FeePool {
+    id
+    address
+    type
+    pool {
+      id
+    }
+  }
+`;
+
 export const PoolFragment = gql`
   fragment PoolFragment on Pool {
     id
@@ -48,6 +66,14 @@ export const PoolFragment = gql`
     option {
       id
     }
+    feePoolA {
+      id
+      address
+    }
+    feePoolB {
+      id
+      address
+    }
   }
 `;
 
@@ -58,6 +84,7 @@ export const ActionFragmentLight = gql`
     type
     from
     timestamp
+    optionType
     inputTokenA
     inputTokenB
     outputTokenA
@@ -71,8 +98,18 @@ export const ActionFragmentLight = gql`
         id
       }
     }
-    optionType
+    metadata {
+      id
+      optionsMintedAndSold
+      feeA {
+        ...FeeFragment
+      }
+      feeB {
+        ...FeeFragment
+      }
+    }
   }
+  ${FeeFragment}
 `;
 
 export const ActionFragmentHeavy = gql`
@@ -80,9 +117,6 @@ export const ActionFragmentHeavy = gql`
     ...ActionFragmentLight
     spotPrice {
       value
-    }
-    metadata {
-      optionsMintedAndSold
     }
     nextIV
     nextSellingPrice

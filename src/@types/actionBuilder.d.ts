@@ -22,9 +22,12 @@ export interface IActionBuilderParams {
 
   option?: IOptionBuilderParams;
 
+  metadataOptionsMintedAndSold?: BigNumber;
+  metadataFeeAValue?: BigNumber;
+  metadataFeeBValue?: BigNumber;
+
   /** HEAVY */
   spotPrice?: BigNumber;
-  metadataOptionsMintedAndSold?: BigNumber;
   nextIV?: BigNumber;
   nextSellingPrice?: BigNumber;
   nextBuyingPrice?: BigNumber;

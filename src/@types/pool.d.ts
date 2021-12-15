@@ -34,6 +34,8 @@ export interface IPoolGeneralMetrics {
 
   optionUnderlyingBalance?: IValue;
   optionStrikeBalance?: IValue;
+
+  userFeeWithdrawAmounts?: IValue[];
 }
 
 export interface IPool {
@@ -47,6 +49,9 @@ export interface IPool {
 
   factoryAddress?: string;
   optionAddress?: string;
+
+  feePoolAAddress?: string;
+  feePoolBAddress?: string;
 
   option?: IOption;
 

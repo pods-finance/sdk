@@ -28,6 +28,10 @@ export default class ActionBuilder implements IActionBuilder {
       body,
       "metadata.optionsMintedAndSold"
     );
+
+    body.metadataFeeAValue = _.get(body, "metadata.feeA.value");
+    body.metadataFeeBValue = _.get(body, "metadata.feeB.value");
+
     body.spotPrice = _.get(body, "spotPrice.value");
 
     const action = new Action(body as IActionBuilderParams);
