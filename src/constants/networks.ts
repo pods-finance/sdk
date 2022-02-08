@@ -175,7 +175,7 @@ const _networks: { [key: number]: INetwork } = {
     },
     subgraph: {
       prod: "https://api.thegraph.com/subgraphs/name/pods-finance/pods-bsc",
-      dev: "https://api.thegraph.com/subgraphs/name/pods-finance/pods-bsc-dev",
+      dev: "https://api.thegraph.com/subgraphs/name/pods-finance/pods-bsc",
     },
     rpc: [],
     explorer: "https://bscscan.com",
@@ -304,7 +304,7 @@ const _networks: { [key: number]: INetwork } = {
       prod:
         "https://api.thegraph.com/subgraphs/name/pods-finance/pods-avalanche",
       dev:
-        "https://api.thegraph.com/subgraphs/name/pods-finance/pods-avalanche-dev",
+        "https://api.thegraph.com/subgraphs/name/pods-finance/pods-avalanche",
     },
     rpc: [],
     explorer: "https://snowtrace.io",
