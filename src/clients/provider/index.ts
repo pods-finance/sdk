@@ -11,11 +11,15 @@ function getBaseProvider(
   const network = networks[networkId];
 
   const fallbackRPC = {
-    [networks.matic.chainId]: "https://rpc-mainnet.maticvigil.com",
-    [networks.mumbai.chainId]: "https://rpc-mumbai.matic.today",
+    [networks.matic.chainId]: networks.matic.rpc[0],
+    [networks.mumbai.chainId]: networks.mumbai.rpc[0],
+    [networks.bsc.chainId]: networks.bsc.rpc[0],
   };
 
   if ([networks.matic.chainId, networks.mumbai.chainId].includes(networkId))
+    return new ethers.providers.JsonRpcProvider(fallbackRPC[networkId]);
+
+  if ([networks.bsc.chainId].includes(networkId))
     return new ethers.providers.JsonRpcProvider(fallbackRPC[networkId]);
 
   return ethers.providers.getDefaultProvider(

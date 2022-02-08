@@ -118,14 +118,15 @@ const _networks: { [key: number]: INetwork } = {
     tag: "optimism",
     token: {
       utility: ["0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"],
-      wrapped: [""],
+      wrapped: ["0x4200000000000000000000000000000000000006"],
       name: "Ether",
       symbol: "ETH",
       decimals: 18,
     },
     subgraph: {
-      prod: "",
-      dev: "",
+      prod:
+        "https://api.thegraph.com/subgraphs/name/pods-finance/pods-optimism",
+      dev: "https://api.thegraph.com/subgraphs/name/pods-finance/pods-optimism",
     },
     rpc: ["https://mainnet.optimism.io/"],
     explorer: "https://optimistic.etherscan.io",
@@ -177,12 +178,11 @@ const _networks: { [key: number]: INetwork } = {
       prod: "https://api.thegraph.com/subgraphs/name/pods-finance/pods-bsc",
       dev: "https://api.thegraph.com/subgraphs/name/pods-finance/pods-bsc",
     },
-    rpc: [],
+    rpc: ["https://bsc-dataseed1.binance.org"],
     explorer: "https://bscscan.com",
     infura: () => ``,
     multicall2: "0xed386Fe855C1EFf2f843B910923Dd8846E45C5A4",
   },
-
   100: {
     chainId: 100,
     networkId: 100,
@@ -207,6 +207,35 @@ const _networks: { [key: number]: INetwork } = {
     infura: () => "",
     multicall2: "",
   },
+  137: {
+    chainId: 137,
+    networkId: 137,
+    name: "Polygon",
+    supported: true,
+    chain: chains.polygon,
+    network: "mainnet",
+    tag: "matic",
+    token: {
+      utility: ["0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"],
+      wrapped: ["0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270"],
+      name: "Matic",
+      symbol: "MATIC",
+      decimals: 18,
+    },
+    subgraph: {
+      prod: "https://api.thegraph.com/subgraphs/name/pods-finance/pods-matic",
+      dev:
+        "https://api.thegraph.com/subgraphs/name/pods-finance/pods-matic-dev",
+    },
+    rpc: [
+      "https://rpc-mainnet.maticvigil.com",
+      "https://rpc-mainnet.matic.network",
+      "wss://ws-mainnet.matic.network",
+    ],
+    explorer: "https://polygonscan.com",
+    infura: (key) => `https://polygon-mainnet.infura.io/v3/${key}`,
+    multicall2: "0x275617327c958bd06b5d6b871e7f491d76113dd8",
+  },
   250: {
     chainId: 250,
     networkId: 250,
@@ -230,34 +259,6 @@ const _networks: { [key: number]: INetwork } = {
     explorer: "https://ftmscan.com",
     infura: () => "",
     multicall2: "0xD98e3dBE5950Ca8Ce5a4b59630a5652110403E5c",
-  },
-  137: {
-    chainId: 137,
-    networkId: 137,
-    name: "Polygon",
-    supported: true,
-    chain: chains.polygon,
-    network: "mainnet",
-    tag: "matic",
-    token: {
-      utility: ["0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"],
-      wrapped: ["0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270"],
-      name: "Matic",
-      symbol: "MATIC",
-      decimals: 18,
-    },
-    subgraph: {
-      prod: "https://api.thegraph.com/subgraphs/name/pods-finance/pods-matic",
-      dev:
-        "https://api.thegraph.com/subgraphs/name/pods-finance/pods-matic-dev",
-    },
-    rpc: [
-      "https://rpc-mainnet.matic.network",
-      "wss://ws-mainnet.matic.network",
-    ],
-    explorer: "https://polygonscan.com",
-    infura: (key) => `https://polygon-mainnet.infura.io/v3/${key}`,
-    multicall2: "0x275617327c958bd06b5d6b871e7f491d76113dd8",
   },
   42161: {
     chainId: 42161,
