@@ -11,6 +11,7 @@ export const OptionFragment = gql`
     from
     type
     symbol
+    decimals
     exerciseType
     underlyingAsset
     underlyingAssetDecimals
