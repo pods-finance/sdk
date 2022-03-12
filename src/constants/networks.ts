@@ -1,25 +1,35 @@
 import { INetwork } from "@types";
+import _ from "lodash";
+import chains from "../utils/chains.json";
 
-const chains = {
-  polygon: "Polygon",
-  ethereum: "Ethereum",
-  xdai: "xDAI",
-  fantom: "Fantom",
-  arbitrum: "Arbitrum",
-  optimism: "Optimism",
-  avalanche: "Avalanche",
-  bsc: "BSC",
-};
+const NETWORK_ETHEREUM_ID = 1;
+const NETWORK_GOERLI_ID = 5;
+const NETWORK_OPTIMISM_ID = 10;
+const NETWORK_KOVAN_ID = 42;
+const NETWORK_BSC_ID = 56;
+const NETWORK_MATIC_ID = 137;
+const NETWORK_FANTOM_ID = 250;
+const NETWORK_ARBITRUM_ID = 42161;
+const NETWORK_AVALANCHE_ID = 43114;
+
+function inline(id: number): INetwork {
+  const chain = chains.find((item) => _.get(item, "chainId") === id);
+  return (chain || {}) as INetwork;
+}
+
+// isCustomEndpoint
 
 const _networks: { [key: number]: INetwork } = {
-  1: {
-    chainId: 1,
-    networkId: 1,
-    supported: true,
+  ...chains.reduce(
+    (previous, current) => ({
+      ...previous,
+      [_.get(current, "chainId")]: current,
+    }),
+    {}
+  ),
+  [NETWORK_ETHEREUM_ID]: {
+    ...inline(NETWORK_ETHEREUM_ID),
     name: "Mainnet",
-    chain: chains.ethereum,
-    tag: "mainnet",
-    network: "mainnet",
     token: {
       utility: ["0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"],
       wrapped: ["0xc02aaa39b223fe8d0a0e5c4f27ead9083c756cc2"],
@@ -27,71 +37,14 @@ const _networks: { [key: number]: INetwork } = {
       symbol: "ETH",
       decimals: 18,
     },
-    subgraph: {
-      prod: "https://api.thegraph.com/subgraphs/name/pods-finance/pods",
-      dev: "https://api.thegraph.com/subgraphs/name/pods-finance/pods-dev",
-    },
-    rpc: ["https://api.mycryptoapi.com/eth", "https://cloudflare-eth.com"],
+    subgraph: "https://api.thegraph.com/subgraphs/name/pods-finance/pods",
     explorer: "https://etherscan.io",
-    infura: (key) => `https://mainnet.infura.io/v3/${key}`,
+    endpoint: (key) => `https://mainnet.infura.io/v3/${key}`,
     multicall2: "0x5ba1e12693dc8f9c48aad8770482f4739beed696",
   },
-  3: {
-    chainId: 3,
-    networkId: 3,
-    name: "Ropsten",
-    supported: false,
-    chain: chains.ethereum,
-    tag: "ropsten",
-    network: "testnet",
-    token: {
-      utility: ["0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"],
-      wrapped: [],
-      name: "Ether",
-      symbol: "ETH",
-      decimals: 18,
-    },
-    subgraph: {
-      prod: "",
-      dev: "",
-    },
-    rpc: [],
-    explorer: "https://ropsten.etherscan.io",
-    infura: () => "",
-    multicall2: "0x5ba1e12693dc8f9c48aad8770482f4739beed696",
-  },
-  4: {
-    chainId: 4,
-    networkId: 4,
-    name: "Rinkeby",
-    supported: false,
-    chain: chains.ethereum,
-    tag: "rinkeby",
-    network: "testnet",
-    token: {
-      utility: ["0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"],
-      wrapped: [],
-      name: "Ether",
-      symbol: "ETH",
-      decimals: 18,
-    },
-    subgraph: {
-      prod: "",
-      dev: "",
-    },
-    rpc: [],
-    explorer: "https://rinkeby.etherscan.io",
-    infura: () => "",
-    multicall2: "0x5ba1e12693dc8f9c48aad8770482f4739beed696",
-  },
-  5: {
-    chainId: 5,
-    networkId: 5,
+  [NETWORK_GOERLI_ID]: {
+    ...inline(NETWORK_GOERLI_ID),
     name: "Goerli",
-    supported: false,
-    chain: chains.ethereum,
-    tag: "goerli",
-    network: "testnet",
     token: {
       utility: ["0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"],
       wrapped: [],
@@ -99,23 +52,15 @@ const _networks: { [key: number]: INetwork } = {
       symbol: "ETH",
       decimals: 18,
     },
-    subgraph: {
-      prod: "https://api.thegraph.com/subgraphs/name/pods-finance/pods-goerli",
-      dev: "https://api.thegraph.com/subgraphs/name/pods-finance/pods-goerli",
-    },
-    rpc: [],
+    subgraph:
+      "https://api.thegraph.com/subgraphs/name/pods-finance/pods-goerli",
     explorer: "https://goerli.etherscan.io",
-    infura: () => "",
+    endpoint: (key) => `https://goerli.infura.io/v3/${key}`,
     multicall2: "0x5ba1e12693dc8f9c48aad8770482f4739beed696",
   },
-  10: {
-    chainId: 10,
-    networkId: 10,
+  [NETWORK_OPTIMISM_ID]: {
+    ...inline(NETWORK_OPTIMISM_ID),
     name: "Optimism",
-    supported: false,
-    chain: chains.optimism,
-    network: "mainnet",
-    tag: "optimism",
     token: {
       utility: ["0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"],
       wrapped: ["0x4200000000000000000000000000000000000006"],
@@ -123,24 +68,15 @@ const _networks: { [key: number]: INetwork } = {
       symbol: "ETH",
       decimals: 18,
     },
-    subgraph: {
-      prod:
-        "https://api.thegraph.com/subgraphs/name/pods-finance/pods-optimism",
-      dev: "https://api.thegraph.com/subgraphs/name/pods-finance/pods-optimism",
-    },
-    rpc: ["https://mainnet.optimism.io/"],
+    subgraph:
+      "https://api.thegraph.com/subgraphs/name/pods-finance/pods-optimism",
     explorer: "https://optimistic.etherscan.io",
-    infura: (key) => `https://mainnet.infura.io/v3/${key}`,
-    multicall2: "",
+    endpoint: (key) => `https://optimism-mainnet.infura.io/v3/${key}`,
+    multicall2: "0x2DC0E2aa608532Da689e89e237dF582B783E552C",
   },
-  42: {
-    chainId: 42,
-    networkId: 42,
+  [NETWORK_KOVAN_ID]: {
+    ...inline(NETWORK_KOVAN_ID),
     name: "Kovan",
-    supported: true,
-    chain: chains.ethereum,
-    tag: "kovan",
-    network: "testnet",
     token: {
       utility: ["0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"],
       wrapped: ["0x824b1e309c4eb33501fb49f5de9cb7481686a799"],
@@ -148,25 +84,15 @@ const _networks: { [key: number]: INetwork } = {
       symbol: "ETH",
       decimals: 18,
     },
-    subgraph: {
-      prod: "https://api.thegraph.com/subgraphs/name/pods-finance/pods-kovan",
-      dev:
-        "https://api.thegraph.com/subgraphs/name/pods-finance/pods-kovan-dev",
-    },
-    rpc: [],
+    subgraph: "https://api.thegraph.com/subgraphs/name/pods-finance/pods-kovan",
     explorer: "https://kovan.etherscan.io",
     faucet: "https://faucet.kovan.network",
-    infura: (key) => `https://kovan.infura.io/v3/${key}`,
+    endpoint: (key) => `https://kovan.infura.io/v3/${key}`,
     multicall2: "0x5ba1e12693dc8f9c48aad8770482f4739beed696",
   },
-  56: {
-    chainId: 56,
-    networkId: 56,
+  [NETWORK_BSC_ID]: {
+    ...inline(NETWORK_BSC_ID),
     name: "BSC",
-    supported: true,
-    chain: chains.bsc,
-    tag: "binance",
-    network: "testnet",
     token: {
       utility: ["0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"],
       wrapped: ["0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c"],
@@ -174,47 +100,15 @@ const _networks: { [key: number]: INetwork } = {
       symbol: "BNB",
       decimals: 18,
     },
-    subgraph: {
-      prod: "https://api.thegraph.com/subgraphs/name/pods-finance/pods-bsc",
-      dev: "https://api.thegraph.com/subgraphs/name/pods-finance/pods-bsc",
-    },
-    rpc: ["https://bsc-dataseed1.binance.org"],
-    explorer: "https://bscscan.com",
-    infura: () => ``,
+    subgraph: "https://api.thegraph.com/subgraphs/name/pods-finance/pods-bsc",
+    explorer: "https://bscscan.io",
+    endpoint: () => `https://bsc-dataseed1.ninicoin.io/`,
+    isEndpointRaw: true,
     multicall2: "0xed386Fe855C1EFf2f843B910923Dd8846E45C5A4",
   },
-  100: {
-    chainId: 100,
-    networkId: 100,
-    name: "xDAI",
-    supported: false,
-    chain: chains.xdai,
-    tag: "xdai",
-    network: "mainnet",
-    token: {
-      utility: ["0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"],
-      wrapped: [],
-      name: "xDAI",
-      symbol: "xDAI",
-      decimals: 18,
-    },
-    subgraph: {
-      prod: "",
-      dev: "",
-    },
-    rpc: [],
-    explorer: "https://blockscout.com/poa/xdai/mainnet",
-    infura: () => "",
-    multicall2: "",
-  },
-  137: {
-    chainId: 137,
-    networkId: 137,
+  [NETWORK_MATIC_ID]: {
+    ...inline(NETWORK_MATIC_ID),
     name: "Polygon",
-    supported: true,
-    chain: chains.polygon,
-    network: "mainnet",
-    tag: "matic",
     token: {
       utility: ["0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"],
       wrapped: ["0x0d500b1d8e8ef31e21c99d1db9a6444d3adf1270"],
@@ -222,28 +116,14 @@ const _networks: { [key: number]: INetwork } = {
       symbol: "MATIC",
       decimals: 18,
     },
-    subgraph: {
-      prod: "https://api.thegraph.com/subgraphs/name/pods-finance/pods-matic",
-      dev:
-        "https://api.thegraph.com/subgraphs/name/pods-finance/pods-matic-dev",
-    },
-    rpc: [
-      "https://rpc-mainnet.maticvigil.com",
-      "https://rpc-mainnet.matic.network",
-      "wss://ws-mainnet.matic.network",
-    ],
+    subgraph: "https://api.thegraph.com/subgraphs/name/pods-finance/pods-matic",
     explorer: "https://polygonscan.com",
-    infura: (key) => `https://polygon-mainnet.infura.io/v3/${key}`,
+    endpoint: (key) => `https://polygon-mainnet.infura.io/v3/${key}`,
     multicall2: "0x275617327c958bd06b5d6b871e7f491d76113dd8",
   },
-  250: {
-    chainId: 250,
-    networkId: 250,
+  [NETWORK_FANTOM_ID]: {
+    ...inline(NETWORK_FANTOM_ID),
     name: "Fantom",
-    supported: false,
-    chain: chains.fantom,
-    tag: "fantom",
-    network: "mainnet",
     token: {
       utility: ["0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"],
       wrapped: ["0x21be370d5312f44cb42ce377bc9b8a0cef1a4c83"],
@@ -251,23 +131,16 @@ const _networks: { [key: number]: INetwork } = {
       symbol: "FTM",
       decimals: 18,
     },
-    subgraph: {
-      prod: "https://api.thegraph.com/subgraphs/name/pods-finance/pods-fantom",
-      dev: "https://api.thegraph.com/subgraphs/name/pods-finance/pods-fantom",
-    },
-    rpc: [],
+    subgraph:
+      "https://api.thegraph.com/subgraphs/name/pods-finance/pods-fantom",
     explorer: "https://ftmscan.com",
-    infura: () => "",
+    endpoint: () => `https://rpc.ftm.tools/`,
+    isEndpointRaw: true,
     multicall2: "0xD98e3dBE5950Ca8Ce5a4b59630a5652110403E5c",
   },
-  42161: {
-    chainId: 42161,
-    networkId: 42161,
+  [NETWORK_ARBITRUM_ID]: {
+    ...inline(NETWORK_ARBITRUM_ID),
     name: "Arbitrum",
-    supported: false,
-    chain: chains.arbitrum,
-    network: "mainnet",
-    tag: "arbitrum",
     token: {
       utility: ["0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"],
       wrapped: ["0x82af49447d8a07e3bd95bd0d56f35241523fbab1"],
@@ -275,88 +148,42 @@ const _networks: { [key: number]: INetwork } = {
       symbol: "AETH",
       decimals: 18,
     },
-    subgraph: {
-      prod:
-        "https://api.thegraph.com/subgraphs/name/pods-finance/pods-arbitrum",
-      dev:
-        "https://api.thegraph.com/subgraphs/name/pods-finance/pods-arbitrum-dev",
-    },
-    rpc: ["https://arb1.arbitrum.io/rpc", "wss://arb1.arbitrum.io/ws"],
+    subgraph:
+      "https://api.thegraph.com/subgraphs/name/pods-finance/pods-arbitrum",
     explorer: "https://arbiscan.io",
-    infura: (key) => `https://mainnet.infura.io/v3/${key}`,
+    endpoint: (key) => `https://arbitrum-mainnet.infura.io/v3/${key}`,
     multicall2: "0x842eC2c7D803033Edf55E478F461FC547Bc54EB2",
   },
-  43114: {
-    chainId: 43114,
-    networkId: 43114,
-    supported: true,
+  [NETWORK_AVALANCHE_ID]: {
+    ...inline(NETWORK_AVALANCHE_ID),
     name: "Avalanche",
-    chain: chains.avalanche,
-    tag: "mainnet",
-    network: "avalanche",
     token: {
       utility: ["0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"],
       wrapped: ["0xb31f66aa3c1e785363f0875a1b74e27b85fd66c7"],
       name: "Avax",
-      symbol: "AXAX",
+      symbol: "AVAX",
       decimals: 18,
     },
-    subgraph: {
-      prod:
-        "https://api.thegraph.com/subgraphs/name/pods-finance/pods-avalanche",
-      dev:
-        "https://api.thegraph.com/subgraphs/name/pods-finance/pods-avalanche",
-    },
-    rpc: [],
+    subgraph:
+      "https://api.thegraph.com/subgraphs/name/pods-finance/pods-avalanche",
     explorer: "https://snowtrace.io",
-    infura: () => "",
-    multicall2: "0xed386Fe855C1EFf2f843B910923Dd8846E45C5A4",
-  },
-  80001: {
-    chainId: 80001,
-    networkId: 80001,
-    name: "Mumbai",
-    supported: true,
-    chain: chains.polygon,
-    network: "testnet",
-    tag: "mumbai",
-    token: {
-      utility: ["0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"],
-      wrapped: ["0xfe7f1ef1386e6df3d462e30aa5709fb5ef647ec9"],
-      name: "Matic",
-      symbol: "MATIC",
-      decimals: 18,
-    },
-    subgraph: {
-      prod: "https://api.thegraph.com/subgraphs/name/pods-finance/pods-mumbai",
-      dev:
-        "https://api.thegraph.com/subgraphs/name/pods-finance/pods-mumbai-dev",
-    },
-    rpc: ["https://rpc-mumbai.matic.today", "wss://ws-mumbai.matic.today"],
-    explorer: "https://mumbai.polygonscan.com",
-    faucet: "https://faucet.matic.network",
-    infura: (key) => `https://polygon-mumbai.infura.io/v3/${key}`,
-    multicall2: "0xe9939e7Ea7D7fb619Ac57f648Da7B1D425832631",
+    endpoint: () => `https://api.avax.network/ext/bc/C/rpc/`,
+    isEndpointRaw: true,
+    multicall2: "0xed386Fe855C1EFf2f843B910923Dd8846E45C5A4", // backup: 0x8755b94F88D120AB2Cc13b1f6582329b067C760d
   },
 };
 
 const networks: { [key: string]: INetwork } = {
   ..._networks,
-  mainnet: _networks[1],
-  optimism: _networks[10], // NEW
-  kovan: _networks[42],
-  bsc: _networks[56], // NEW
-  matic: _networks[137],
-  fantom: _networks[250], // NEW
-  mumbai: _networks[80001],
-  arbitrum: _networks[42161],
-  avalanche: _networks[43114], // NEW
-
-  /** Mentioned but not supported */
-  ropsten: _networks[3],
-  rinkeby: _networks[4],
-  goerli: _networks[5],
-  xdai: _networks[100],
+  mainnet: _networks[NETWORK_ETHEREUM_ID],
+  goerli: _networks[NETWORK_GOERLI_ID],
+  optimism: _networks[NETWORK_OPTIMISM_ID],
+  kovan: _networks[NETWORK_KOVAN_ID],
+  bsc: _networks[NETWORK_BSC_ID],
+  matic: _networks[NETWORK_MATIC_ID],
+  fantom: _networks[NETWORK_FANTOM_ID],
+  arbitrum: _networks[NETWORK_ARBITRUM_ID],
+  avalanche: _networks[NETWORK_AVALANCHE_ID],
 };
 
 export { chains };

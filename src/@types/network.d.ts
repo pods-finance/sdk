@@ -1,5 +1,4 @@
 export interface INetwork {
-  supported: boolean;
   chainId: number;
   networkId: number;
   name: string;
@@ -13,13 +12,11 @@ export interface INetwork {
     symbol: string;
     decimals: number;
   };
-  subgraph: {
-    prod: string;
-    dev: string;
-  };
+  subgraph: string;
   rpc: string[];
   faucet?: string;
   explorer: string;
-  infura: (key: string) => string;
+  endpoint: (key?: string) => string;
+  isEndpointRaw: boolean;
   multicall2: string;
 }
