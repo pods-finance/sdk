@@ -17,9 +17,8 @@ function inline(id: number): INetwork {
   return (chain || {}) as INetwork;
 }
 
-// isCustomEndpoint
-
 const _networks: { [key: number]: INetwork } = {
+  /** The networks datapoint will include all available chains as per the ChainList standards */
   ...chains.reduce(
     (previous, current) => ({
       ...previous,
@@ -27,6 +26,7 @@ const _networks: { [key: number]: INetwork } = {
     }),
     {}
   ),
+  /** Custom functionality for the chain body e.g. subgraph or endpoint will be added below as needed */
   [NETWORK_ETHEREUM_ID]: {
     ...inline(NETWORK_ETHEREUM_ID),
     name: "Mainnet",
@@ -167,7 +167,7 @@ const _networks: { [key: number]: INetwork } = {
     subgraph:
       "https://api.thegraph.com/subgraphs/name/pods-finance/pods-avalanche",
     explorer: "https://snowtrace.io",
-    endpoint: () => `https://api.avax.network/ext/bc/C/rpc/`,
+    endpoint: () => `https://api.avax.network/ext/bc/C/rpc`,
     isEndpointRaw: true,
     multicall2: "0xed386Fe855C1EFf2f843B910923Dd8846E45C5A4", // backup: 0x8755b94F88D120AB2Cc13b1f6582329b067C760d
   },
