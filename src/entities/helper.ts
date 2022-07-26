@@ -9,7 +9,7 @@ import {
   ITransactionError,
   Optional,
 } from "@types";
-import { expect, getDefaultDeadline, getOverrides } from "../utils";
+import { expect, getDefaultDeadline, getOverrides, scaleUp } from "../utils";
 import contracts from "../contracts";
 import { ALLOW_LOGS } from "../constants/globals";
 
@@ -63,12 +63,8 @@ export default class Helper implements IHelper {
     expect(optionAmount, "optionAmount", "object");
     expect(premiumAmount, "premiumAmount", "object");
 
-    const input = new BigNumber(premiumAmount).multipliedBy(
-      new BigNumber(10).pow(option.pool!.tokenB!.decimals)
-    );
-    const output = new BigNumber(optionAmount).multipliedBy(
-      new BigNumber(10).pow(option.decimals!)
-    );
+    const input = scaleUp(premiumAmount, option.pool!.tokenB!.decimals);
+    const output = scaleUp(optionAmount, option.decimals!);
 
     const IV = await option.pool!.getIV({ provider: this.provider });
 
@@ -122,12 +118,8 @@ export default class Helper implements IHelper {
     expect(optionAmount, "optionAmount", "object");
     expect(premiumAmount, "premiumAmount", "object");
 
-    const input = new BigNumber(premiumAmount).multipliedBy(
-      new BigNumber(10).pow(option.pool!.tokenB!.decimals)
-    );
-    const output = new BigNumber(optionAmount).multipliedBy(
-      new BigNumber(10).pow(option.decimals!)
-    );
+    const input = scaleUp(premiumAmount, option.pool!.tokenB!.decimals);
+    const output = scaleUp(optionAmount, option.decimals!);
 
     const IV = await option.pool!.getIV({ provider: this.provider });
 
@@ -189,13 +181,8 @@ export default class Helper implements IHelper {
     expect(optionAmount, "optionAmount", "object");
     expect(premiumAmount, "premiumAmount", "object");
 
-    const input = new BigNumber(optionAmount).multipliedBy(
-      new BigNumber(10).pow(option.decimals!)
-    );
-
-    const output = new BigNumber(premiumAmount).multipliedBy(
-      new BigNumber(10).pow(option.pool!.tokenB!.decimals)
-    );
+    const input = scaleUp(optionAmount, option.decimals!);
+    const output = scaleUp(premiumAmount, option.pool!.tokenB!.decimals);
 
     const IV = await option.pool!.getIV({ provider: this.provider });
 
@@ -250,13 +237,8 @@ export default class Helper implements IHelper {
     expect(optionAmount, "optionAmount", "object");
     expect(premiumAmount, "premiumAmount", "object");
 
-    const input = new BigNumber(optionAmount).multipliedBy(
-      new BigNumber(10).pow(option.decimals!)
-    );
-
-    const output = new BigNumber(premiumAmount).multipliedBy(
-      new BigNumber(10).pow(option.pool!.tokenB!.decimals)
-    );
+    const input = scaleUp(optionAmount, option.decimals!);
+    const output = scaleUp(premiumAmount, option.pool!.tokenB!.decimals);
 
     const IV = await option.pool!.getIV({ provider: this.provider });
 
@@ -361,13 +343,8 @@ export default class Helper implements IHelper {
     expect(tokenAAmount, "tokenAAmount", "object");
     expect(tokenBAmount, "tokenBAmount", "object");
 
-    const amountA = new BigNumber(tokenAAmount).multipliedBy(
-      new BigNumber(10).pow(option.decimals!)
-    );
-
-    const amountB = new BigNumber(tokenBAmount).multipliedBy(
-      new BigNumber(10).pow(option.pool!.tokenB!.decimals)
-    );
+    const amountA = scaleUp(tokenAAmount, option.decimals!);
+    const amountB = scaleUp(tokenBAmount, option.pool!.tokenB!.decimals);
 
     const contract = contracts.instances.optionHelper(
       this.signer!,
@@ -417,9 +394,7 @@ export default class Helper implements IHelper {
         "Adding liquidity with a single asset is not allowed for calls."
       );
 
-    const amountB = new BigNumber(tokenBAmount).multipliedBy(
-      new BigNumber(10).pow(option.pool!.tokenB!.decimals)
-    );
+    const amountB = scaleUp(tokenBAmount, option.pool!.tokenB!.decimals);
 
     const contract = contracts.instances.optionHelper(
       this.signer!,
@@ -468,13 +443,8 @@ export default class Helper implements IHelper {
     expect(tokenAAmount, "tokenAAmount", "object");
     expect(tokenBAmount, "tokenBAmount", "object");
 
-    const amountA = new BigNumber(tokenAAmount).multipliedBy(
-      new BigNumber(10).pow(option.collateral!.decimals!)
-    );
-
-    const amountB = new BigNumber(tokenBAmount).multipliedBy(
-      new BigNumber(10).pow(option.pool!.tokenB!.decimals)
-    );
+    const amountA = scaleUp(tokenAAmount, option.collateral!.decimals!);
+    const amountB = scaleUp(tokenBAmount, option.pool!.tokenB!.decimals);
 
     const contract = contracts.instances.optionHelper(
       this.signer!,
@@ -523,9 +493,8 @@ export default class Helper implements IHelper {
         "Minting from the Option Helper with utility tokens (e.g. ETH, MATIC) is not allowed for calls. Please interact with the option contract itself."
       );
 
-    const output = new BigNumber(optionAmount).multipliedBy(
-      new BigNumber(10).pow(option.decimals!)
-    );
+    const output = scaleUp(optionAmount, option.decimals!);
+    
 
     const contract = contracts.instances.optionHelper(
       this.signer!,
@@ -565,9 +534,7 @@ export default class Helper implements IHelper {
 
     const contract = contracts.instances.option(this.signer!, option.address);
 
-    const input = new BigNumber(optionAmount).multipliedBy(
-      new BigNumber(10).pow(option.decimals!)
-    );
+    const input = scaleUp(optionAmount, option.decimals!);
 
     const args = [input.toFixed(0).toString()];
 
@@ -600,9 +567,7 @@ export default class Helper implements IHelper {
     expect(option.decimals, "decimals");
     expect(optionAmount, "optionAmount", "object");
 
-    const input = new BigNumber(optionAmount).multipliedBy(
-      new BigNumber(10).pow(option.decimals!)
-    );
+    const input = scaleUp(optionAmount, option.decimals!);
 
     const contract = contracts.instances.option(this.signer!, option.address);
 
@@ -638,9 +603,7 @@ export default class Helper implements IHelper {
     expect(option.decimals, "decimals");
     expect(optionAmount, "optionAmount", "object");
 
-    const input = new BigNumber(optionAmount).multipliedBy(
-      new BigNumber(10).pow(option.decimals!)
-    );
+    const input = scaleUp(optionAmount, option.decimals!);
 
     const contract = contracts.instances.option(this.signer!, option.address);
 

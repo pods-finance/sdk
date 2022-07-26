@@ -20,7 +20,7 @@ import {
 } from "@types";
 
 import { ALLOW_LOGS } from "../../constants/globals";
-import { expect, zero } from "../../utils";
+import { expect, humanize, zero } from "../../utils";
 
 import MulticallParser from "./parser";
 import MulticallEngine from "./engine";
@@ -251,9 +251,7 @@ export default class MulticallAggregator {
         if (includePool !== false) {
           expect(option?.pool?.tokenA, "option pool tokenA");
           const pool = option.pool!;
-          const one = new BigNumber(1).times(
-            new BigNumber(10).pow(pool!.tokenA!.decimals)
-          );
+          const one = new BigNumber(10).pow(pool!.tokenA!.decimals)
 
           const poolInstructions: CallContext = MulticallParser.instructions(
             `p-${option.address!}`,
@@ -945,17 +943,13 @@ export default class MulticallAggregator {
           const userFeeWithdrawAmountA: IValue = {
             label: "Fee amounts redeemable for user shares for side A",
             raw: new BigNumber(amountA),
-            humanized: new BigNumber(amountA).dividedBy(
-              new BigNumber(10).pow(option!.pool!.tokenB!.decimals!)
-            ),
+            humanized: humanize(new BigNumber(amountA), option!.pool!.tokenA!.decimals),
           };
 
           const userFeeWithdrawAmountB: IValue = {
             label: "Fee amounts redeemable for user shares for side B",
             raw: new BigNumber(amountB),
-            humanized: new BigNumber(amountB).dividedBy(
-              new BigNumber(10).pow(option!.pool!.tokenB!.decimals!)
-            ),
+            humanized: humanize(new BigNumber(amountB), option!.pool!.tokenB!.decimals),
           };
 
           return {

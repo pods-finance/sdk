@@ -10,7 +10,7 @@ import {
 import { IOption, IPool, IValue } from "@types";
 
 import { ALLOW_LOGS, ALLOW_LOGS_LVL2 } from "../../constants/globals";
-import { expect, zero } from "../../utils";
+import { expect, humanize, zero } from "../../utils";
 
 export default class Parser {
   /**
@@ -46,23 +46,17 @@ export default class Parser {
 
       const value: IValue = {
         raw: new BigNumber(amountBIn),
-        humanized: new BigNumber(amountBIn).dividedBy(
-          new BigNumber(10).pow(pool!.tokenB!.decimals)
-        ),
+        humanized: humanize(new BigNumber(amountBIn), pool!.tokenB!.decimals)
       };
 
       const feesA: IValue = {
         raw: new BigNumber(feesTokenA),
-        humanized: new BigNumber(feesTokenA).dividedBy(
-          new BigNumber(10).pow(pool!.tokenB!.decimals)
-        ),
+        humanized: humanize(new BigNumber(feesTokenA), pool!.tokenA!.decimals)
       };
 
       const feesB: IValue = {
         raw: new BigNumber(feesTokenB),
-        humanized: new BigNumber(feesTokenB).dividedBy(
-          new BigNumber(10).pow(pool!.tokenB!.decimals)
-        ),
+        humanized: humanize(new BigNumber(feesTokenB), pool!.tokenB!.decimals)
       };
 
       return { value, feesA, feesB };
@@ -100,23 +94,17 @@ export default class Parser {
 
       const value: IValue = {
         raw: new BigNumber(amountBOut),
-        humanized: new BigNumber(amountBOut).dividedBy(
-          new BigNumber(10).pow(pool!.tokenB!.decimals)
-        ),
+        humanized: humanize(new BigNumber(amountBOut), pool!.tokenB!.decimals)
       };
 
       const feesA: IValue = {
         raw: new BigNumber(feesTokenA),
-        humanized: new BigNumber(feesTokenA).dividedBy(
-          new BigNumber(10).pow(pool!.tokenB!.decimals)
-        ),
+        humanized: humanize(new BigNumber(feesTokenA), pool!.tokenA!.decimals)
       };
 
       const feesB: IValue = {
         raw: new BigNumber(feesTokenB),
-        humanized: new BigNumber(feesTokenB).dividedBy(
-          new BigNumber(10).pow(pool!.tokenB!.decimals)
-        ),
+        humanized: humanize(new BigNumber(feesTokenB), pool!.tokenB!.decimals)
       };
 
       return { value, feesA, feesB };
@@ -150,17 +138,13 @@ export default class Parser {
       const TBA: IValue = {
         label: "TBA",
         raw: new BigNumber(rTBA),
-        humanized: new BigNumber(rTBA).dividedBy(
-          new BigNumber(10).pow(pool!.tokenA!.decimals)
-        ),
+        humanized: humanize(new BigNumber(rTBA), pool!.tokenA!.decimals)
       };
 
       const TBB: IValue = {
         label: "TBB",
         raw: new BigNumber(rTBB),
-        humanized: new BigNumber(rTBB).dividedBy(
-          new BigNumber(10).pow(pool!.tokenB!.decimals)
-        ),
+        humanized: humanize(new BigNumber(rTBB), pool!.tokenB!.decimals)
       };
 
       return [TBA, TBB];
@@ -202,16 +186,12 @@ export default class Parser {
       const UBA: IValue = {
         label: "Balance tokenA",
         raw: new BigNumber(rUBA),
-        humanized: new BigNumber(rUBA).dividedBy(
-          new BigNumber(10).pow(pool.tokenA!.decimals)
-        ),
+        humanized: humanize(new BigNumber(rUBA), pool!.tokenA!.decimals)
       };
       const UBB: IValue = {
         label: "Balance tokenB",
         raw: new BigNumber(rUBB),
-        humanized: new BigNumber(rUBB).dividedBy(
-          new BigNumber(10).pow(pool.tokenB!.decimals)
-        ),
+        humanized: humanize(new BigNumber(rUBB), pool!.tokenB!.decimals)
       };
 
       return [UBA, UBB];
@@ -252,17 +232,13 @@ export default class Parser {
       const SB: IValue = {
         label: "Balance token",
         raw: new BigNumber(rSB),
-        humanized: new BigNumber(rSB).dividedBy(
-          new BigNumber(10).pow(option.strike!.decimals)
-        ),
+        humanized: humanize(new BigNumber(rSB), option!.strike!.decimals)
       };
 
       const UB: IValue = {
         label: "Balance underlying",
         raw: new BigNumber(rUB),
-        humanized: new BigNumber(rUB).dividedBy(
-          new BigNumber(10).pow(option.underlying!.decimals)
-        ),
+        humanized: humanize(new BigNumber(rUB), option!.underlying!.decimals)
       };
 
       return [UB, SB];
@@ -294,9 +270,7 @@ export default class Parser {
       const value: IValue = {
         label: "Balance option tokens",
         raw: new BigNumber(amount),
-        humanized: new BigNumber(amount).dividedBy(
-          new BigNumber(10).pow(option.decimals!)
-        ),
+        humanized: humanize(new BigNumber(amount), option!.decimals)
       };
 
       return value;
@@ -328,9 +302,7 @@ export default class Parser {
       const value: IValue = {
         label: "Balance option tokens in wallet",
         raw: new BigNumber(amount),
-        humanized: new BigNumber(amount).dividedBy(
-          new BigNumber(10).pow(option.decimals!)
-        ),
+        humanized: humanize(new BigNumber(amount), option!.decimals)
       };
 
       return value;
@@ -367,37 +339,27 @@ export default class Parser {
 
       const value: IValue = {
         raw: new BigNumber(amount),
-        humanized: new BigNumber(amount).dividedBy(
-          new BigNumber(10).pow(pool!.tokenB!.decimals)
-        ),
+        humanized: humanize(new BigNumber(amount), pool!.tokenB!.decimals)
       };
 
       const feesA: IValue = {
         raw: new BigNumber(feesTokenA),
-        humanized: new BigNumber(feesTokenA).dividedBy(
-          new BigNumber(10).pow(pool!.tokenB!.decimals)
-        ),
+        humanized: humanize(new BigNumber(feesTokenA), pool!.tokenA!.decimals)
       };
 
       const feesB: IValue = {
         raw: new BigNumber(feesTokenB),
-        humanized: new BigNumber(feesTokenB).dividedBy(
-          new BigNumber(10).pow(pool!.tokenB!.decimals)
-        ),
+        humanized: humanize(new BigNumber(feesTokenB), pool!.tokenB!.decimals)
       };
 
       const surplus: IValue = {
         raw: new BigNumber((_context.surplus as string) || 0),
-        humanized: new BigNumber((_context.surplus as string) || 0).dividedBy(
-          new BigNumber(10).pow(pool!.tokenA!.decimals)
-        ),
+        humanized: humanize(new BigNumber((_context.surplus as string) || 0), pool!.tokenA!.decimals)
       };
 
       const shortage: IValue = {
         raw: new BigNumber((_context.shortage as string) || 0),
-        humanized: new BigNumber((_context.shortage as string) || 0).dividedBy(
-          new BigNumber(10).pow(pool!.tokenA!.decimals)
-        ),
+        humanized: humanize(new BigNumber((_context.shortage as string) || 0), pool!.tokenA!.decimals)
       };
 
       const context = {
@@ -441,9 +403,7 @@ export default class Parser {
       const value: IValue = {
         label,
         raw: new BigNumber(amount),
-        humanized: new BigNumber(amount).dividedBy(
-          new BigNumber(10).pow(decimals!)
-        ),
+        humanized: humanize(new BigNumber(amount), decimals)
       };
 
       return value;
