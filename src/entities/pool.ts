@@ -186,7 +186,7 @@ export default class Pool implements IPool {
 
       const feesA: IValue = {
         raw: new BigNumber(feesTokenA.toString()),
-        humanized: humanize(new BigNumber(feesTokenA.toString()), this.tokenA!.decimals)
+        humanized: humanize(new BigNumber(feesTokenA.toString()), this.tokenB!.decimals)
       };
 
       const feesB: IValue = {
@@ -231,7 +231,7 @@ export default class Pool implements IPool {
 
       const feesA: IValue = {
         raw: new BigNumber(feesTokenA.toString()),
-        humanized: humanize(new BigNumber(feesTokenA.toString()), this.tokenA!.decimals)
+        humanized: humanize(new BigNumber(feesTokenA.toString()), this.tokenB!.decimals)
       };
 
       const feesB: IValue = {
@@ -302,7 +302,7 @@ export default class Pool implements IPool {
 
       const feesA: IValue = {
         raw: new BigNumber(feesTokenA.toString()),
-        humanized: humanize(new BigNumber(feesTokenA.toString()), this.tokenA!.decimals)
+        humanized: humanize(new BigNumber(feesTokenA.toString()), this.tokenB!.decimals)
       };
 
       const feesB: IValue = {
@@ -375,7 +375,7 @@ export default class Pool implements IPool {
 
       const FBA: IValue = {
         raw: new BigNumber(feeBalanceA.toString()),
-        humanized: humanize(new BigNumber(feeBalanceA.toString()), this.tokenA!.decimals)
+        humanized: humanize(new BigNumber(feeBalanceA.toString()), this.tokenB!.decimals)
       };
 
       const FBB: IValue = {

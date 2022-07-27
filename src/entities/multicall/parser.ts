@@ -51,7 +51,7 @@ export default class Parser {
 
       const feesA: IValue = {
         raw: new BigNumber(feesTokenA),
-        humanized: humanize(new BigNumber(feesTokenA), pool!.tokenA!.decimals)
+        humanized: humanize(new BigNumber(feesTokenA), pool!.tokenB!.decimals)
       };
 
       const feesB: IValue = {
@@ -99,7 +99,7 @@ export default class Parser {
 
       const feesA: IValue = {
         raw: new BigNumber(feesTokenA),
-        humanized: humanize(new BigNumber(feesTokenA), pool!.tokenA!.decimals)
+        humanized: humanize(new BigNumber(feesTokenA), pool!.tokenB!.decimals)
       };
 
       const feesB: IValue = {
@@ -344,7 +344,7 @@ export default class Parser {
 
       const feesA: IValue = {
         raw: new BigNumber(feesTokenA),
-        humanized: humanize(new BigNumber(feesTokenA), pool!.tokenA!.decimals)
+        humanized: humanize(new BigNumber(feesTokenA), pool!.tokenB!.decimals)
       };
 
       const feesB: IValue = {

@@ -943,7 +943,7 @@ export default class MulticallAggregator {
           const userFeeWithdrawAmountA: IValue = {
             label: "Fee amounts redeemable for user shares for side A",
             raw: new BigNumber(amountA),
-            humanized: humanize(new BigNumber(amountA), option!.pool!.tokenA!.decimals),
+            humanized: humanize(new BigNumber(amountA), option!.pool!.tokenB!.decimals),
           };
 
           const userFeeWithdrawAmountB: IValue = {
