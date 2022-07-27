@@ -21,7 +21,7 @@ import {
   MILESTONE_EXPIRATION_SOON,
   ALLOW_LOGS,
 } from "../constants/globals";
-import { expect, zero } from "../utils";
+import { expect, humanize, zero } from "../utils";
 import contracts from "../contracts";
 import Token from "./token";
 
@@ -208,9 +208,7 @@ export default class Option implements IOption {
 
     this.strikePrice = {
       raw: params.strikePrice,
-      humanized: new BigNumber(params.strikePrice).dividedBy(
-        new BigNumber(10).pow(this.strike!.decimals)
-      ),
+      humanized: humanize(new BigNumber(params.strikePrice), this.strike!.decimals)
     };
 
     this.expiration = new BigNumber(params.expiration).toNumber();
@@ -224,9 +222,7 @@ export default class Option implements IOption {
 
     this.seriesFeeVolume = {
       raw: params.seriesFeeVolume,
-      humanized: new BigNumber(params.seriesFeeVolume).dividedBy(
-        new BigNumber(10).pow(this.strike!.decimals)
-      ),
+      humanized: humanize(new BigNumber(params.seriesFeeVolume), this.strike!.decimals)
     };
 
     return this as IOption;
@@ -337,9 +333,7 @@ export default class Option implements IOption {
 
       const supply: IValue = {
         raw: new BigNumber(result.toString()),
-        humanized: new BigNumber(result.toString()).dividedBy(
-          new BigNumber(10).pow(this.decimals!)
-        ),
+        humanized: humanize(new BigNumber(result.toString()), this.decimals!)
       };
 
       return supply;
@@ -374,9 +368,7 @@ export default class Option implements IOption {
 
       const size: IValue = {
         raw: new BigNumber(result.toString()),
-        humanized: new BigNumber(result.toString()).dividedBy(
-          new BigNumber(10).pow(this.decimals!)
-        ),
+        humanized: humanize(new BigNumber(result.toString()), this.decimals!)
       };
 
       return size;
@@ -406,9 +398,7 @@ export default class Option implements IOption {
 
       const size: IValue = {
         raw: new BigNumber(result.toString()),
-        humanized: new BigNumber(result.toString()).dividedBy(
-          new BigNumber(10).pow(this.decimals!)
-        ),
+        humanized: humanize(new BigNumber(result.toString()), this.decimals!)
       };
 
       return size;
@@ -444,16 +434,12 @@ export default class Option implements IOption {
 
       const SB: IValue = {
         raw: new BigNumber(result[0].toString()),
-        humanized: new BigNumber(result[0].toString()).dividedBy(
-          new BigNumber(10).pow(this.strike!.decimals)
-        ),
+        humanized: humanize(new BigNumber(result[0].toString()), this.strike!.decimals)
       };
 
       const UB: IValue = {
         raw: new BigNumber(result[1].toString()),
-        humanized: new BigNumber(result[1].toString()).dividedBy(
-          new BigNumber(10).pow(this.underlying!.decimals)
-        ),
+        humanized: humanize(new BigNumber(result[1].toString()), this.underlying!.decimals)
       };
 
       return [UB, SB];

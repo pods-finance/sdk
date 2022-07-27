@@ -12,7 +12,7 @@ import {
   IPositionBuilderParams,
 } from "@types";
 
-import { expect } from "../utils";
+import { expect, humanize } from "../utils";
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
@@ -115,9 +115,7 @@ export default class Position implements IPosition {
 
     const value: IValue = {
       raw: new BigNumber(this.premiumPaid!),
-      humanized: new BigNumber(this.premiumPaid!).dividedBy(
-        new BigNumber(10).pow(this.option!.pool!.tokenB!.decimals)
-      ),
+      humanized: humanize(new BigNumber(this.premiumPaid!), this.option!.pool!.tokenB!.decimals)
     };
 
     return value;
@@ -131,9 +129,7 @@ export default class Position implements IPosition {
 
     const value: IValue = {
       raw: new BigNumber(this.premiumReceived!),
-      humanized: new BigNumber(this.premiumReceived!).dividedBy(
-        new BigNumber(10).pow(this.option!.pool!.tokenB!.decimals)
-      ),
+      humanized: humanize(new BigNumber(this.premiumReceived!), this.option!.pool!.tokenB!.decimals)
     };
 
     return value;
@@ -147,9 +143,7 @@ export default class Position implements IPosition {
 
     const value: IValue = {
       raw: new BigNumber(this.optionsBought!),
-      humanized: new BigNumber(this.optionsBought!).dividedBy(
-        new BigNumber(10).pow(this.option!.pool!.tokenA!.decimals)
-      ),
+      humanized: humanize(new BigNumber(this.optionsBought!), this.option!.pool!.tokenA!.decimals)
     };
 
     return value;
@@ -163,9 +157,7 @@ export default class Position implements IPosition {
 
     const value: IValue = {
       raw: new BigNumber(this.optionsSold!),
-      humanized: new BigNumber(this.optionsSold!).dividedBy(
-        new BigNumber(10).pow(this.option!.pool!.tokenA!.decimals)
-      ),
+      humanized: humanize(new BigNumber(this.optionsSold!), this.option!.pool!.tokenA!.decimals)
     };
 
     return value;
@@ -179,9 +171,7 @@ export default class Position implements IPosition {
 
     const value: IValue = {
       raw: new BigNumber(this.optionsResold!),
-      humanized: new BigNumber(this.optionsResold!).dividedBy(
-        new BigNumber(10).pow(this.option!.pool!.tokenA!.decimals)
-      ),
+      humanized: humanize(new BigNumber(this.optionsResold!), this.option!.pool!.tokenA!.decimals)
     };
 
     return value;
@@ -195,9 +185,7 @@ export default class Position implements IPosition {
 
     const value: IValue = {
       raw: new BigNumber(this.optionsMinted!),
-      humanized: new BigNumber(this.optionsMinted!).dividedBy(
-        new BigNumber(10).pow(this.option!.pool!.tokenA!.decimals)
-      ),
+      humanized: humanize(new BigNumber(this.optionsMinted!), this.option!.pool!.tokenA!.decimals)
     };
 
     return value;
@@ -211,9 +199,7 @@ export default class Position implements IPosition {
 
     const value: IValue = {
       raw: new BigNumber(this.optionsUnminted!),
-      humanized: new BigNumber(this.optionsUnminted!).dividedBy(
-        new BigNumber(10).pow(this.option!.pool!.tokenA!.decimals)
-      ),
+      humanized: humanize(new BigNumber(this.optionsUnminted!), this.option!.pool!.tokenA!.decimals)
     };
 
     return value;
@@ -227,9 +213,7 @@ export default class Position implements IPosition {
 
     const value: IValue = {
       raw: new BigNumber(this.optionsExercised!),
-      humanized: new BigNumber(this.optionsExercised!).dividedBy(
-        new BigNumber(10).pow(this.option!.pool!.tokenA!.decimals)
-      ),
+      humanized: humanize(new BigNumber(this.optionsExercised!), this.option!.pool!.tokenA!.decimals)
     };
 
     return value;
@@ -243,9 +227,7 @@ export default class Position implements IPosition {
 
     const value: IValue = {
       raw: new BigNumber(this.optionsSent!),
-      humanized: new BigNumber(this.optionsSent!).dividedBy(
-        new BigNumber(10).pow(this.option!.pool!.tokenA!.decimals)
-      ),
+      humanized: humanize(new BigNumber(this.optionsSent!), this.option!.pool!.tokenA!.decimals)
     };
 
     return value;
@@ -259,9 +241,7 @@ export default class Position implements IPosition {
 
     const value: IValue = {
       raw: new BigNumber(this.optionsReceived!),
-      humanized: new BigNumber(this.optionsReceived!).dividedBy(
-        new BigNumber(10).pow(this.option!.pool!.tokenA!.decimals)
-      ),
+      humanized: humanize(new BigNumber(this.optionsReceived!), this.option!.pool!.tokenA!.decimals)
     };
 
     return value;
@@ -274,9 +254,7 @@ export default class Position implements IPosition {
 
     const value: IValue = {
       raw: new BigNumber(this.underlyingWithdrawn!),
-      humanized: new BigNumber(this.underlyingWithdrawn!).dividedBy(
-        new BigNumber(10).pow(this.option!.underlying!.decimals)
-      ),
+      humanized: humanize(new BigNumber(this.underlyingWithdrawn!), this.option!.underlying!.decimals)
     };
 
     return value;
@@ -289,9 +267,7 @@ export default class Position implements IPosition {
 
     const value: IValue = {
       raw: new BigNumber(this.strikeWithdrawn!),
-      humanized: new BigNumber(this.strikeWithdrawn!).dividedBy(
-        new BigNumber(10).pow(this.option!.strike!.decimals)
-      ),
+      humanized: humanize(new BigNumber(this.strikeWithdrawn!), this.option!.strike!.decimals)
     };
 
     return value;
@@ -305,9 +281,7 @@ export default class Position implements IPosition {
 
     const value: IValue = {
       raw: new BigNumber(this.initialOptionsProvided!),
-      humanized: new BigNumber(this.initialOptionsProvided!).dividedBy(
-        new BigNumber(10).pow(this.option!.pool!.tokenA!.decimals)
-      ),
+      humanized: humanize(new BigNumber(this.initialOptionsProvided!), this.option!.pool!.tokenA!.decimals)
     };
 
     return value;
@@ -321,9 +295,7 @@ export default class Position implements IPosition {
 
     const value: IValue = {
       raw: new BigNumber(this.initialTokensProvided!),
-      humanized: new BigNumber(this.initialTokensProvided!).dividedBy(
-        new BigNumber(10).pow(this.option!.pool!.tokenB!.decimals)
-      ),
+      humanized: humanize(new BigNumber(this.initialTokensProvided!), this.option!.pool!.tokenB!.decimals)
     };
 
     return value;
@@ -337,9 +309,7 @@ export default class Position implements IPosition {
 
     const value: IValue = {
       raw: new BigNumber(this.finalOptionsRemoved!),
-      humanized: new BigNumber(this.finalOptionsRemoved!).dividedBy(
-        new BigNumber(10).pow(this.option!.pool!.tokenA!.decimals)
-      ),
+      humanized: humanize(new BigNumber(this.finalOptionsRemoved!), this.option!.pool!.tokenA!.decimals)
     };
 
     return value;
@@ -353,9 +323,7 @@ export default class Position implements IPosition {
 
     const value: IValue = {
       raw: new BigNumber(this.finalTokensRemoved!),
-      humanized: new BigNumber(this.finalTokensRemoved!).dividedBy(
-        new BigNumber(10).pow(this.option!.pool!.tokenB!.decimals)
-      ),
+      humanized: humanize(new BigNumber(this.finalTokensRemoved!), this.option!.pool!.tokenB!.decimals)
     };
 
     return value;
@@ -369,9 +337,7 @@ export default class Position implements IPosition {
 
     const value: IValue = {
       raw: new BigNumber(this.remainingOptionsProvided!),
-      humanized: new BigNumber(this.remainingOptionsProvided!).dividedBy(
-        new BigNumber(10).pow(this.option!.pool!.tokenA!.decimals)
-      ),
+      humanized: humanize(new BigNumber(this.remainingOptionsProvided!), this.option!.pool!.tokenA!.decimals)
     };
 
     return value;
@@ -385,9 +351,7 @@ export default class Position implements IPosition {
 
     const value: IValue = {
       raw: new BigNumber(this.remainingTokensProvided!),
-      humanized: new BigNumber(this.remainingTokensProvided!).dividedBy(
-        new BigNumber(10).pow(this.option!.pool!.tokenB!.decimals)
-      ),
+      humanized: humanize(new BigNumber(this.remainingTokensProvided!), this.option!.pool!.tokenB!.decimals)
     };
 
     return value;

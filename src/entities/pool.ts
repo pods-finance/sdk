@@ -2,7 +2,7 @@ import _ from "lodash";
 import BigNumber from "bignumber.js";
 import Token from "./token";
 import contracts from "../contracts";
-import { zero } from "../utils";
+import { zero, scaleUp } from "../utils";
 
 import {
   IProvider,
@@ -14,7 +14,7 @@ import {
   Optional,
 } from "@types";
 import { ALLOW_LOGS } from "../constants/globals";
-import { expect } from "../utils";
+import { expect, humanize } from "../utils";
 
 export default class Pool implements IPool {
   /**
@@ -133,9 +133,7 @@ export default class Pool implements IPool {
 
     const IV: IValue = {
       raw: new BigNumber(_.get(properties, "currentIV").toString()),
-      humanized: new BigNumber(
-        _.get(properties, "currentIV").toString()
-      ).dividedBy(new BigNumber(10).pow(18)),
+      humanized: humanize(new BigNumber(_.get(properties, "currentIV").toString()), 18)
     };
 
     return IV;
@@ -152,9 +150,7 @@ export default class Pool implements IPool {
 
     const adjustedIV: IValue = {
       raw: new BigNumber(result.toString()),
-      humanized: new BigNumber(result.toString()).dividedBy(
-        new BigNumber(10).pow(18)
-      ),
+      humanized: humanize(new BigNumber(result.toString()), 18)
     };
 
     return adjustedIV;
@@ -169,9 +165,7 @@ export default class Pool implements IPool {
     expect(this.provider || params.provider, "provider");
 
     try {
-      const sanitized = params.amount.multipliedBy(
-        new BigNumber(10).pow(this.tokenA!.decimals)
-      );
+      const sanitized = scaleUp(params.amount, this.tokenA!.decimals)
       const contract = contracts.instances.pool(
         (this.provider || params.provider)!,
         this.address
@@ -187,23 +181,17 @@ export default class Pool implements IPool {
 
       const value: IValue = {
         raw: new BigNumber(amountBIn.toString()),
-        humanized: new BigNumber(amountBIn.toString()).dividedBy(
-          new BigNumber(10).pow(this.tokenB!.decimals)
-        ),
+        humanized: humanize(new BigNumber(amountBIn.toString()), this.tokenB!.decimals)
       };
 
       const feesA: IValue = {
         raw: new BigNumber(feesTokenA.toString()),
-        humanized: new BigNumber(feesTokenA.toString()).dividedBy(
-          new BigNumber(10).pow(this.tokenB!.decimals)
-        ),
+        humanized: humanize(new BigNumber(feesTokenA.toString()), this.tokenB!.decimals)
       };
 
       const feesB: IValue = {
         raw: new BigNumber(feesTokenB.toString()),
-        humanized: new BigNumber(feesTokenB.toString()).dividedBy(
-          new BigNumber(10).pow(this.tokenB!.decimals)
-        ),
+        humanized: humanize(new BigNumber(feesTokenB.toString()), this.tokenB!.decimals)
       };
 
       return { value, feesA, feesB };
@@ -222,9 +210,7 @@ export default class Pool implements IPool {
     expect(this.provider || params.provider, "provider");
 
     try {
-      const sanitized = params.amount.multipliedBy(
-        new BigNumber(10).pow(this.tokenA!.decimals)
-      );
+      const sanitized = scaleUp(params.amount, this.tokenA!.decimals);
       const contract = contracts.instances.pool(
         (this.provider || params.provider)!,
         this.address
@@ -240,23 +226,17 @@ export default class Pool implements IPool {
 
       const value: IValue = {
         raw: new BigNumber(amountBOut.toString()),
-        humanized: new BigNumber(amountBOut.toString()).dividedBy(
-          new BigNumber(10).pow(this.tokenB!.decimals)
-        ),
+        humanized: humanize(new BigNumber(amountBOut.toString()), this.tokenB!.decimals)
       };
 
       const feesA: IValue = {
         raw: new BigNumber(feesTokenA.toString()),
-        humanized: new BigNumber(feesTokenA.toString()).dividedBy(
-          new BigNumber(10).pow(this.tokenB!.decimals)
-        ),
+        humanized: humanize(new BigNumber(feesTokenA.toString()), this.tokenB!.decimals)
       };
 
       const feesB: IValue = {
         raw: new BigNumber(feesTokenB.toString()),
-        humanized: new BigNumber(feesTokenB.toString()).dividedBy(
-          new BigNumber(10).pow(this.tokenB!.decimals)
-        ),
+        humanized: humanize(new BigNumber(feesTokenB.toString()), this.tokenB!.decimals)
       };
 
       return { value, feesA, feesB };
@@ -282,9 +262,7 @@ export default class Pool implements IPool {
 
       const value: IValue = {
         raw: new BigNumber(result.toString()),
-        humanized: new BigNumber(result.toString()).dividedBy(
-          new BigNumber(10).pow(this.tokenB!.decimals)
-        ),
+        humanized: humanize(new BigNumber(result.toString()), this.tokenB!.decimals)
       };
 
       return { value };
@@ -303,9 +281,7 @@ export default class Pool implements IPool {
     expect(this.provider || params.provider, "provider");
 
     try {
-      const sanitized = params.amount.multipliedBy(
-        new BigNumber(10).pow(this.tokenB!.decimals)
-      );
+      const sanitized = scaleUp(params.amount, this.tokenB!.decimals);
       const contract = contracts.instances.pool(
         (this.provider || params.provider)!,
         this.address
@@ -321,23 +297,17 @@ export default class Pool implements IPool {
 
       const value: IValue = {
         raw: new BigNumber(amountAOut.toString()),
-        humanized: new BigNumber(amountAOut.toString()).dividedBy(
-          new BigNumber(10).pow(this.tokenA!.decimals)
-        ),
+        humanized: humanize(new BigNumber(amountAOut.toString()), this.tokenA!.decimals)
       };
 
       const feesA: IValue = {
         raw: new BigNumber(feesTokenA.toString()),
-        humanized: new BigNumber(feesTokenA.toString()).dividedBy(
-          new BigNumber(10).pow(this.tokenB!.decimals)
-        ),
+        humanized: humanize(new BigNumber(feesTokenA.toString()), this.tokenB!.decimals)
       };
 
       const feesB: IValue = {
         raw: new BigNumber(feesTokenB.toString()),
-        humanized: new BigNumber(feesTokenB.toString()).dividedBy(
-          new BigNumber(10).pow(this.tokenB!.decimals)
-        ),
+        humanized: humanize(new BigNumber(feesTokenB.toString()), this.tokenB!.decimals)
       };
 
       return { value, feesA, feesB };
@@ -364,16 +334,12 @@ export default class Pool implements IPool {
 
       const DBA: IValue = {
         raw: new BigNumber(resultDBA.toString()),
-        humanized: new BigNumber(resultDBA.toString()).dividedBy(
-          new BigNumber(10).pow(this.tokenA!.decimals)
-        ),
+        humanized: humanize(new BigNumber(resultDBA.toString()), this.tokenA!.decimals)
       };
 
       const DBB: IValue = {
         raw: new BigNumber(resultDBB.toString()),
-        humanized: new BigNumber(resultDBB.toString()).dividedBy(
-          new BigNumber(10).pow(this.tokenB!.decimals)
-        ),
+        humanized: humanize(new BigNumber(resultDBB.toString()), this.tokenB!.decimals)
       };
 
       return [DBA, DBB];
@@ -409,16 +375,12 @@ export default class Pool implements IPool {
 
       const FBA: IValue = {
         raw: new BigNumber(feeBalanceA.toString()),
-        humanized: new BigNumber(feeBalanceA.toString()).dividedBy(
-          new BigNumber(10).pow(this.tokenB!.decimals)
-        ),
+        humanized: humanize(new BigNumber(feeBalanceA.toString()), this.tokenB!.decimals)
       };
 
       const FBB: IValue = {
         raw: new BigNumber(feeBalanceB.toString()),
-        humanized: new BigNumber(feeBalanceB.toString()).dividedBy(
-          new BigNumber(10).pow(this.tokenB!.decimals)
-        ),
+        humanized: humanize(new BigNumber(feeBalanceB.toString()), this.tokenB!.decimals)
       };
 
       return [FBA, FBB];
@@ -444,15 +406,11 @@ export default class Pool implements IPool {
       const result = await contract.getPoolBalances();
       const TBA: IValue = {
         raw: new BigNumber(result[0].toString()),
-        humanized: new BigNumber(result[0].toString()).dividedBy(
-          new BigNumber(10).pow(this.tokenA!.decimals)
-        ),
+        humanized: humanize(new BigNumber(result[0].toString()), this.tokenA!.decimals)
       };
       const TBB: IValue = {
         raw: new BigNumber(result[1].toString()),
-        humanized: new BigNumber(result[1].toString()).dividedBy(
-          new BigNumber(10).pow(this.tokenB!.decimals)
-        ),
+        humanized: humanize(new BigNumber(result[1].toString()), this.tokenB!.decimals)
       };
       return [TBA, TBB];
     } catch (error) {
@@ -520,9 +478,7 @@ export default class Pool implements IPool {
 
       const size: IValue = {
         raw: new BigNumber(result.toString()),
-        humanized: new BigNumber(result.toString()).dividedBy(
-          new BigNumber(10).pow(this.tokenB!.decimals)
-        ),
+        humanized: humanize(new BigNumber(result.toString()), this.tokenB!.decimals)
       };
 
       return size;
@@ -557,15 +513,11 @@ export default class Pool implements IPool {
 
       const UBA: IValue = {
         raw: new BigNumber(result[0].toString()),
-        humanized: new BigNumber(result[0].toString()).dividedBy(
-          new BigNumber(10).pow(this.tokenA!.decimals)
-        ),
+        humanized: humanize(new BigNumber(result[0].toString()), this.tokenA!.decimals)
       };
       const UBB: IValue = {
         raw: new BigNumber(result[1].toString()),
-        humanized: new BigNumber(result[1].toString()).dividedBy(
-          new BigNumber(10).pow(this.tokenB!.decimals)
-        ),
+        humanized: humanize(new BigNumber(result[1].toString()), this.tokenB!.decimals)
       };
 
       return [UBA, UBB];

@@ -80,7 +80,7 @@ export async function getOwner(provider: IProvider): Promise<string> {
  * @param decimals
  * @returns {BigNumber} humanized value
  */
-export function humanize(raw: BigNumber, decimals: number = 18): BigNumber {
+export function humanize(raw: BigNumber, decimals: BigNumber| number = 18): BigNumber {
   return raw.dividedBy(new BigNumber(10).pow(decimals));
 }
 
@@ -124,15 +124,22 @@ export async function getOverrides(
   return overrides;
 }
 
+/**
+ * Multiply numbers by 10^decimals.
+ */
+ export function scaleUp(raw: BigNumber, decimals: BigNumber| number = 18): BigNumber {
+  return raw.multipliedBy(new BigNumber(10).pow(decimals));
+}
+
 const utils = {
   config,
   isNilOrEmptyString,
   attemptAsync,
   zero,
   expect,
-
   getDefaultDeadline,
   getOwner,
   humanize,
+  scaleUp
 };
 export default utils;

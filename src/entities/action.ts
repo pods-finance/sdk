@@ -13,7 +13,7 @@ import {
 } from "@types";
 
 import { ActionType } from "../constants/globals";
-import { expect, zero } from "../utils";
+import { expect, humanize, zero } from "../utils";
 
 dayjs.extend(relativeTime);
 dayjs.extend(duration);
@@ -308,9 +308,7 @@ export default class Action implements IAction {
 
         const value: IValue = {
           raw: new BigNumber(this.inputTokenA!),
-          humanized: new BigNumber(this.inputTokenA!).dividedBy(
-            new BigNumber(10).pow(this.option!.pool!.tokenA!.decimals)
-          ),
+          humanized: humanize(this.inputTokenA!, this.option!.pool!.tokenA!.decimals),
         };
 
         return value;
@@ -322,9 +320,7 @@ export default class Action implements IAction {
 
         const value: IValue = {
           raw: new BigNumber(this.inputTokenA!),
-          humanized: new BigNumber(this.inputTokenA!).dividedBy(
-            new BigNumber(10).pow(this.option!.underlying!.decimals)
-          ),
+          humanized: humanize(this.inputTokenA!, this.option!.underlying!.decimals),
         };
 
         return value;
@@ -346,9 +342,7 @@ export default class Action implements IAction {
 
         const value: IValue = {
           raw: new BigNumber(this.inputTokenA!),
-          humanized: new BigNumber(this.inputTokenA!).dividedBy(
-            new BigNumber(10).pow(this.option!.pool!.tokenA!.decimals)
-          ),
+          humanized: humanize(this.inputTokenA!, this.option!.pool!.tokenA!.decimals),
         };
 
         return value;
@@ -360,9 +354,7 @@ export default class Action implements IAction {
 
         const value: IValue = {
           raw: new BigNumber(this.inputTokenA!),
-          humanized: new BigNumber(this.inputTokenA!).dividedBy(
-            new BigNumber(10).pow(this.option!.collateral!.decimals)
-          ),
+          humanized: humanize(this.inputTokenA!, this.option!.collateral!.decimals),
         };
 
         return value;
@@ -386,9 +378,7 @@ export default class Action implements IAction {
 
         const value: IValue = {
           raw: new BigNumber(this.inputTokenB!),
-          humanized: new BigNumber(this.inputTokenB!).dividedBy(
-            new BigNumber(10).pow(this.option!.pool!.tokenB!.decimals)
-          ),
+          humanized: humanize(this.inputTokenB!, this.option!.pool!.tokenB!.decimals),
         };
 
         return value;
@@ -399,9 +389,7 @@ export default class Action implements IAction {
 
         const value: IValue = {
           raw: new BigNumber(this.inputTokenB!),
-          humanized: new BigNumber(this.inputTokenB!).dividedBy(
-            new BigNumber(10).pow(this.option!.strike!.decimals)
-          ),
+          humanized: humanize(this.inputTokenB!, this.option!.strike!.decimals),
         };
 
         return value;
@@ -415,9 +403,7 @@ export default class Action implements IAction {
 
         const value: IValue = {
           raw: new BigNumber(this.inputTokenB!),
-          humanized: new BigNumber(this.inputTokenB!).dividedBy(
-            new BigNumber(10).pow(this.option!.pool!.tokenB!.decimals)
-          ),
+          humanized: humanize(this.inputTokenB!, this.option!.pool!.tokenB!.decimals),
         };
 
         return value;
@@ -426,9 +412,7 @@ export default class Action implements IAction {
 
         const value: IValue = {
           raw: new BigNumber(this.inputTokenB!),
-          humanized: new BigNumber(this.inputTokenB!).dividedBy(
-            new BigNumber(10).pow(this.option!.strike!.decimals)
-          ),
+          humanized: humanize(this.inputTokenB!, this.option!.strike!.decimals),
         };
 
         return value;
@@ -458,9 +442,7 @@ export default class Action implements IAction {
 
         const value: IValue = {
           raw: new BigNumber(this.outputTokenA!),
-          humanized: new BigNumber(this.outputTokenA!).dividedBy(
-            new BigNumber(10).pow(this.option!.pool!.tokenA!.decimals)
-          ),
+          humanized: humanize(this.outputTokenA!, this.option!.pool!.tokenA!.decimals),
         };
 
         return value;
@@ -472,9 +454,7 @@ export default class Action implements IAction {
 
         const value: IValue = {
           raw: new BigNumber(this.outputTokenA!),
-          humanized: new BigNumber(this.outputTokenA!).dividedBy(
-            new BigNumber(10).pow(this.option!.underlying!.decimals)
-          ),
+          humanized: humanize(this.outputTokenA!, this.option!.underlying!.decimals),
         };
 
         return value;
@@ -495,9 +475,7 @@ export default class Action implements IAction {
 
         const value: IValue = {
           raw: new BigNumber(this.outputTokenA!),
-          humanized: new BigNumber(this.outputTokenA!).dividedBy(
-            new BigNumber(10).pow(this.option!.pool!.tokenA!.decimals)
-          ),
+          humanized: humanize(this.outputTokenA!, this.option!.pool!.tokenA!.decimals),
         };
 
         return value;
@@ -513,9 +491,7 @@ export default class Action implements IAction {
 
         const value: IValue = {
           raw: new BigNumber(this.outputTokenA!),
-          humanized: new BigNumber(this.outputTokenA!).dividedBy(
-            new BigNumber(10).pow(this.option!.collateral!.decimals)
-          ),
+          humanized: humanize(this.outputTokenA!, this.option!.collateral!.decimals),
         };
 
         return value;
@@ -537,9 +513,7 @@ export default class Action implements IAction {
 
         const value: IValue = {
           raw: new BigNumber(this.outputTokenB!),
-          humanized: new BigNumber(this.outputTokenB!).dividedBy(
-            new BigNumber(10).pow(this.option!.pool!.tokenB!.decimals)
-          ),
+          humanized: humanize(this.outputTokenB!, this.option!.pool!.tokenB!.decimals),
         };
 
         return value;
@@ -556,9 +530,7 @@ export default class Action implements IAction {
 
         const value: IValue = {
           raw: new BigNumber(this.outputTokenB!),
-          humanized: new BigNumber(this.outputTokenB!).dividedBy(
-            new BigNumber(10).pow(this.option!.strike!.decimals)
-          ),
+          humanized: humanize(this.outputTokenB!, this.option!.strike!.decimals),
         };
 
         return value;
@@ -572,9 +544,7 @@ export default class Action implements IAction {
 
         const value: IValue = {
           raw: new BigNumber(this.outputTokenB!),
-          humanized: new BigNumber(this.outputTokenB!).dividedBy(
-            new BigNumber(10).pow(this.option!.pool!.tokenB!.decimals)
-          ),
+          humanized: humanize(this.outputTokenB!, this.option!.pool!.tokenB!.decimals),
         };
 
         return value;
@@ -587,9 +557,7 @@ export default class Action implements IAction {
 
         const value: IValue = {
           raw: new BigNumber(this.outputTokenB!),
-          humanized: new BigNumber(this.outputTokenB!).dividedBy(
-            new BigNumber(10).pow(this.option!.strike!.decimals)
-          ),
+          humanized: humanize(this.outputTokenB!, this.option!.strike!.decimals),
         };
 
         return value;
@@ -609,9 +577,7 @@ export default class Action implements IAction {
 
     const value: IValue = {
       raw: new BigNumber(this.metadataOptionsMintedAndSold!),
-      humanized: new BigNumber(this.metadataOptionsMintedAndSold!).dividedBy(
-        new BigNumber(10).pow(this.option!.decimals!)
-      ),
+      humanized: humanize(this.metadataOptionsMintedAndSold!, this.option!.decimals),
     };
 
     return value;
@@ -627,9 +593,7 @@ export default class Action implements IAction {
 
     const value: IValue = {
       raw: new BigNumber(this.metadataFeeAValue!),
-      humanized: new BigNumber(this.metadataFeeAValue!).dividedBy(
-        new BigNumber(10).pow(this.option!.pool!.tokenB!.decimals)
-      ),
+      humanized: humanize(this.metadataFeeAValue!, this.option!.pool!.tokenB!.decimals),
     };
 
     return value;
@@ -645,9 +609,7 @@ export default class Action implements IAction {
 
     const value: IValue = {
       raw: new BigNumber(this.metadataFeeBValue!),
-      humanized: new BigNumber(this.metadataFeeBValue!).dividedBy(
-        new BigNumber(10).pow(this.option!.pool!.tokenB!.decimals)
-      ),
+      humanized: humanize(this.metadataFeeBValue!, this.option!.pool!.tokenB!.decimals),
     };
 
     return value;
@@ -663,9 +625,7 @@ export default class Action implements IAction {
 
     const value: IValue = {
       raw: new BigNumber(this.spotPrice!),
-      humanized: new BigNumber(this.spotPrice!).dividedBy(
-        new BigNumber(10).pow(this.option!.pool!.tokenB!.decimals)
-      ),
+      humanized: humanize(this.spotPrice!, this.option!.pool!.tokenB!.decimals),
     };
 
     return value;
@@ -681,9 +641,7 @@ export default class Action implements IAction {
 
     const value: IValue = {
       raw: new BigNumber(this.nextSellingPrice!),
-      humanized: new BigNumber(this.nextSellingPrice!).dividedBy(
-        new BigNumber(10).pow(this.option!.pool!.tokenB!.decimals)
-      ),
+      humanized: humanize(this.nextSellingPrice!, this.option!.pool!.tokenB!.decimals),
     };
 
     return value;
@@ -699,9 +657,7 @@ export default class Action implements IAction {
 
     const value: IValue = {
       raw: new BigNumber(this.nextBuyingPrice!),
-      humanized: new BigNumber(this.nextBuyingPrice!).dividedBy(
-        new BigNumber(10).pow(this.option!.pool!.tokenB!.decimals)
-      ),
+      humanized: humanize(this.nextBuyingPrice!, this.option!.pool!.tokenB!.decimals),
     };
 
     return value;
@@ -720,9 +676,7 @@ export default class Action implements IAction {
 
     const value: IValue = {
       raw: new BigNumber(this.nextDynamicSellingPrice!),
-      humanized: new BigNumber(this.nextDynamicSellingPrice!).dividedBy(
-        new BigNumber(10).pow(this.option!.pool!.tokenB!.decimals)
-      ),
+      humanized: humanize(this.nextDynamicSellingPrice!, this.option!.pool!.tokenB!.decimals)
     };
 
     return value;
@@ -738,9 +692,7 @@ export default class Action implements IAction {
 
     const value: IValue = {
       raw: new BigNumber(this.nextDynamicBuyingPrice!),
-      humanized: new BigNumber(this.nextDynamicBuyingPrice!).dividedBy(
-        new BigNumber(10).pow(this.option!.pool!.tokenB!.decimals)
-      ),
+      humanized: humanize(this.nextDynamicBuyingPrice!, this.option!.pool!.tokenB!.decimals),
     };
 
     return value;
@@ -759,9 +711,7 @@ export default class Action implements IAction {
 
     const value: IValue = {
       raw: new BigNumber(this.nextUserTokenALiquidity!),
-      humanized: new BigNumber(this.nextUserTokenALiquidity!).dividedBy(
-        new BigNumber(10).pow(this.option!.pool!.tokenA!.decimals)
-      ),
+      humanized: humanize(this.nextUserTokenALiquidity!, this.option!.pool!.tokenA!.decimals),
     };
 
     return value;
@@ -780,9 +730,7 @@ export default class Action implements IAction {
 
     const value: IValue = {
       raw: new BigNumber(this.nextUserTokenBLiquidity!),
-      humanized: new BigNumber(this.nextUserTokenBLiquidity!).dividedBy(
-        new BigNumber(10).pow(this.option!.pool!.tokenB!.decimals)
-      ),
+      humanized: humanize(this.nextUserTokenBLiquidity!, this.option!.pool!.tokenB!.decimals),
     };
 
     return value;
@@ -798,9 +746,7 @@ export default class Action implements IAction {
 
     const value: IValue = {
       raw: new BigNumber(this.nextTBA!),
-      humanized: new BigNumber(this.nextTBA!).dividedBy(
-        new BigNumber(10).pow(this.option!.pool!.tokenA!.decimals)
-      ),
+      humanized: humanize(this.nextTBA!, this.option!.pool!.tokenA!.decimals),
     };
 
     return value;
@@ -816,9 +762,7 @@ export default class Action implements IAction {
 
     const value: IValue = {
       raw: new BigNumber(this.nextTBB!),
-      humanized: new BigNumber(this.nextTBB!).dividedBy(
-        new BigNumber(10).pow(this.option!.pool!.tokenB!.decimals)
-      ),
+      humanized: humanize(this.nextTBB!, this.option!.pool!.tokenB!.decimals),
     };
 
     return value;
@@ -834,9 +778,7 @@ export default class Action implements IAction {
 
     const value: IValue = {
       raw: new BigNumber(this.nextDBA!),
-      humanized: new BigNumber(this.nextDBA!).dividedBy(
-        new BigNumber(10).pow(this.option!.pool!.tokenA!.decimals)
-      ),
+      humanized: humanize(this.nextDBA!, this.option!.pool!.tokenA!.decimals),
     };
 
     return value;
@@ -852,9 +794,7 @@ export default class Action implements IAction {
 
     const value: IValue = {
       raw: new BigNumber(this.nextDBB!),
-      humanized: new BigNumber(this.nextDBB!).dividedBy(
-        new BigNumber(10).pow(this.option!.pool!.tokenB!.decimals)
-      ),
+      humanized: humanize(this.nextDBB!, this.option!.pool!.tokenB!.decimals),
     };
 
     return value;
@@ -874,9 +814,7 @@ export default class Action implements IAction {
 
     const value: IValue = {
       raw: new BigNumber(this.nextFeesA!),
-      humanized: new BigNumber(this.nextFeesA!).dividedBy(
-        new BigNumber(10).pow(this.option!.pool!.tokenB!.decimals)
-      ),
+      humanized: humanize(this.nextFeesA!, this.option!.pool!.tokenB!.decimals),
     };
 
     return value;
@@ -896,9 +834,7 @@ export default class Action implements IAction {
 
     const value: IValue = {
       raw: new BigNumber(this.nextFeesB!),
-      humanized: new BigNumber(this.nextFeesB!).dividedBy(
-        new BigNumber(10).pow(this.option!.pool!.tokenB!.decimals)
-      ),
+      humanized: humanize(this.nextFeesB!, this.option!.pool!.tokenB!.decimals),
     };
 
     return value;
