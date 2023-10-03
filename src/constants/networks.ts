@@ -11,6 +11,7 @@ const NETWORK_MATIC_ID = 137;
 const NETWORK_FANTOM_ID = 250;
 const NETWORK_ARBITRUM_ID = 42161;
 const NETWORK_AVALANCHE_ID = 43114;
+const NETWORK_NUCLEA_ID = 22842;
 
 function inline(id: number): INetwork {
   const chain = chains.find((item) => _.get(item, "chainId") === id);
@@ -57,6 +58,22 @@ const _networks: { [key: number]: INetwork } = {
     explorer: "https://goerli.etherscan.io",
     endpoint: (key) => `https://goerli.infura.io/v3/${key}`,
     multicall2: "0x5ba1e12693dc8f9c48aad8770482f4739beed696",
+  },
+  [NETWORK_NUCLEA_ID]: {
+    ...inline(NETWORK_NUCLEA_ID),
+    name: "Nuclea",
+    token: {
+      utility: ["0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee"],
+      wrapped: ["0x4200000000000000000000000000000000000006"],
+      name: "Ether",
+      symbol: "ETH",
+      decimals: 18,
+    },
+    subgraph:
+      "https://api.thegraph.com/subgraphs/name/pods-finance/pods-optimism",
+    explorer: "https://optimistic.etherscan.io",
+    endpoint: (key) => `https://optimism-mainnet.infura.io/v3/${key}`,
+    multicall2: "0x2DC0E2aa608532Da689e89e237dF582B783E552C",
   },
   [NETWORK_OPTIMISM_ID]: {
     ...inline(NETWORK_OPTIMISM_ID),
